@@ -32,11 +32,12 @@ import { Button } from "@/components/ui/button";
 
 const NAV = [
   { to: "/app", label: "Início", icon: Home, exact: true },
-  { to: "/app/dinheiro", label: "Dinheiro", icon: Wallet },
-  { to: "/app/moto", label: "Minha Moto", icon: Bike },
-  { to: "/app/manutencao", label: "Manutenção", icon: Wrench },
-  { to: "/app/perfil", label: "Perfil", icon: User },
+  { to: "/app/dinheiro", label: "Dinheiro", icon: Wallet, exact: false },
+  { to: "/app/moto", label: "Minha Moto", icon: Bike, exact: false },
+  { to: "/app/manutencao", label: "Manutenção", icon: Wrench, exact: false },
+  { to: "/app/perfil", label: "Perfil", icon: User, exact: false },
 ] as const;
+
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -67,10 +68,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 to={item.to}
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
-                  isActive(item.to, "exact" in item ? item.exact : false)
+                  isActive(item.to, item.exact)
                     ? "glass-soft font-semibold text-foreground"
                     : "text-muted-foreground hover:bg-glass hover:text-foreground",
                 )}
+
               >
                 <item.icon className="size-4 shrink-0" />
                 {item.label}
