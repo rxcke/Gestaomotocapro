@@ -1,0 +1,13 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { SignOutButton } from "@/components/AppShell";
+import { GlassCard, PageTitle } from "@/components/glass";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { useProfile, useUpdateProfile } from "@/lib/data";
+import { useTheme } from "@/lib/theme";
+
+export const Route = createFileRoute("/_authenticated/app/perfil")({head:()=>({meta:[{title:"Perfil — MotoFinance"},{name:"description",content:"Conta e preferências do MotoFinance."},{property:"og:title",content:"Perfil — MotoFinance"},{property:"og:description",content:"Conta e preferências do MotoFinance."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:ProfilePage});
+function ProfilePage(){const p=useProfile();const save=useUpdateProfile();const{theme,toggle}=useTheme();const[name,setName]=useState<string|undefined>(undefined);const[pro,setPro]=useState<boolean|undefined>(undefined);const currentName=name??p.data?.name??"";const currentPro=pro??p.data?.is_professional??false;return <div className="space-y-6"><PageTitle title="Perfil" subtitle="Conta, preferências e modo de uso."/><GlassCard><h2 className="font-display text-lg font-bold">Conta</h2><div className="mt-4 space-y-4"><div className="space-y-1.5"><Label htmlFor="profile-name">Nome</Label><Input id="profile-name" className="h-12 text-base" value={currentName} onChange={e=>setName(e.target.value)}/></div><div className="glass-soft flex items-center justify-between gap-3 p-4"><div><p className="text-sm font-semibold">Modo profissional</p><p className="text-xs text-muted-foreground">Ativa jornada e indicadores de lucro por hora.</p></div><Switch checked={currentPro} onCheckedChange={setPro}/></div><Button onClick={()=>save.mutate({name:currentName,is_professional:currentPro})} disabled={save.isPending}>Salvar perfil</Button></div></GlassCard><GlassCard><h2 className="font-display text-lg font-bold">Preferências</h2><div className="mt-4 grid gap-3 sm:grid-cols-2"><Button variant="outline" className="h-12" onClick={toggle}>Tema {theme==="dark"?"claro":"escuro"}</Button><Button asChild variant="outline" className="h-12"><Link to="/app/metas">Gerenciar metas</Link></Button><Button asChild variant="outline" className="h-12"><Link to="/app/documentos">Documentos</Link></Button><Button asChild variant="outline" className="h-12"><Link to="/app/moto">Minhas motos</Link></Button></div></GlassCard><GlassCard><SignOutButton full/></GlassCard></div>}
