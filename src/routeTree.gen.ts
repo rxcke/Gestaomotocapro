@@ -17,9 +17,12 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppDinheiroRouteImport } from './routes/_authenticated/app.dinheiro'
+import { Route as AuthenticatedAppDocumentosRouteImport } from './routes/_authenticated/app.documentos'
 import { Route as AuthenticatedAppManutencaoRouteImport } from './routes/_authenticated/app.manutencao'
 import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticated/app.metas'
 import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
+import { Route as AuthenticatedAppPerfilRouteImport } from './routes/_authenticated/app.perfil'
+import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authenticated/app.relatorios'
 import { Route as AuthenticatedAppMotoAbastecimentosRouteImport } from './routes/_authenticated/app.moto.abastecimentos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -62,6 +65,12 @@ const AuthenticatedAppDinheiroRoute =
     path: '/dinheiro',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppDocumentosRoute =
+  AuthenticatedAppDocumentosRouteImport.update({
+    id: '/documentos',
+    path: '/documentos',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppManutencaoRoute =
   AuthenticatedAppManutencaoRouteImport.update({
     id: '/manutencao',
@@ -78,6 +87,17 @@ const AuthenticatedAppMotoRoute = AuthenticatedAppMotoRouteImport.update({
   path: '/moto',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppPerfilRoute = AuthenticatedAppPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppRelatoriosRoute =
+  AuthenticatedAppRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppMotoAbastecimentosRoute =
   AuthenticatedAppMotoAbastecimentosRouteImport.update({
     id: '/abastecimentos',
@@ -92,9 +112,12 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
+  '/app/documentos': typeof AuthenticatedAppDocumentosRoute
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
+  '/app/perfil': typeof AuthenticatedAppPerfilRoute
+  '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
 }
@@ -104,9 +127,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
+  '/app/documentos': typeof AuthenticatedAppDocumentosRoute
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
+  '/app/perfil': typeof AuthenticatedAppPerfilRoute
+  '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
 }
@@ -119,9 +145,12 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
+  '/_authenticated/app/documentos': typeof AuthenticatedAppDocumentosRoute
   '/_authenticated/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/_authenticated/app/metas': typeof AuthenticatedAppMetasRoute
   '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
+  '/_authenticated/app/perfil': typeof AuthenticatedAppPerfilRoute
+  '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
 }
@@ -134,9 +163,12 @@ export interface FileRouteTypes {
     | '/app'
     | '/onboarding'
     | '/app/dinheiro'
+    | '/app/documentos'
     | '/app/manutencao'
     | '/app/metas'
     | '/app/moto'
+    | '/app/perfil'
+    | '/app/relatorios'
     | '/app/'
     | '/app/moto/abastecimentos'
   fileRoutesByTo: FileRoutesByTo
@@ -146,9 +178,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/onboarding'
     | '/app/dinheiro'
+    | '/app/documentos'
     | '/app/manutencao'
     | '/app/metas'
     | '/app/moto'
+    | '/app/perfil'
+    | '/app/relatorios'
     | '/app'
     | '/app/moto/abastecimentos'
   id:
@@ -160,9 +195,12 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/onboarding'
     | '/_authenticated/app/dinheiro'
+    | '/_authenticated/app/documentos'
     | '/_authenticated/app/manutencao'
     | '/_authenticated/app/metas'
     | '/_authenticated/app/moto'
+    | '/_authenticated/app/perfil'
+    | '/_authenticated/app/relatorios'
     | '/_authenticated/app/'
     | '/_authenticated/app/moto/abastecimentos'
   fileRoutesById: FileRoutesById
@@ -232,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppDinheiroRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/documentos': {
+      id: '/_authenticated/app/documentos'
+      path: '/documentos'
+      fullPath: '/app/documentos'
+      preLoaderRoute: typeof AuthenticatedAppDocumentosRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/manutencao': {
       id: '/_authenticated/app/manutencao'
       path: '/manutencao'
@@ -251,6 +296,20 @@ declare module '@tanstack/react-router' {
       path: '/moto'
       fullPath: '/app/moto'
       preLoaderRoute: typeof AuthenticatedAppMotoRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/perfil': {
+      id: '/_authenticated/app/perfil'
+      path: '/perfil'
+      fullPath: '/app/perfil'
+      preLoaderRoute: typeof AuthenticatedAppPerfilRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/relatorios': {
+      id: '/_authenticated/app/relatorios'
+      path: '/relatorios'
+      fullPath: '/app/relatorios'
+      preLoaderRoute: typeof AuthenticatedAppRelatoriosRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/moto/abastecimentos': {
@@ -277,17 +336,23 @@ const AuthenticatedAppMotoRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppDinheiroRoute: typeof AuthenticatedAppDinheiroRoute
+  AuthenticatedAppDocumentosRoute: typeof AuthenticatedAppDocumentosRoute
   AuthenticatedAppManutencaoRoute: typeof AuthenticatedAppManutencaoRoute
   AuthenticatedAppMetasRoute: typeof AuthenticatedAppMetasRoute
   AuthenticatedAppMotoRoute: typeof AuthenticatedAppMotoRouteWithChildren
+  AuthenticatedAppPerfilRoute: typeof AuthenticatedAppPerfilRoute
+  AuthenticatedAppRelatoriosRoute: typeof AuthenticatedAppRelatoriosRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppDinheiroRoute: AuthenticatedAppDinheiroRoute,
+  AuthenticatedAppDocumentosRoute: AuthenticatedAppDocumentosRoute,
   AuthenticatedAppManutencaoRoute: AuthenticatedAppManutencaoRoute,
   AuthenticatedAppMetasRoute: AuthenticatedAppMetasRoute,
   AuthenticatedAppMotoRoute: AuthenticatedAppMotoRouteWithChildren,
+  AuthenticatedAppPerfilRoute: AuthenticatedAppPerfilRoute,
+  AuthenticatedAppRelatoriosRoute: AuthenticatedAppRelatoriosRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 
