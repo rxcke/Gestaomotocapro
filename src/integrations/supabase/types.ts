@@ -14,7 +14,455 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      documents: {
+        Row: {
+          amount: number | null
+          created_at: string
+          description: string | null
+          expiration_date: string | null
+          id: string
+          motorcycle_id: string | null
+          name: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          description?: string | null
+          expiration_date?: string | null
+          id?: string
+          motorcycle_id?: string | null
+          name: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          description?: string | null
+          expiration_date?: string | null
+          id?: string
+          motorcycle_id?: string | null
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_motorcycle_id_fkey"
+            columns: ["motorcycle_id"]
+            isOneToOne: false
+            referencedRelation: "motorcycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          group_name: string
+          id: string
+          motorcycle_id: string | null
+          user_id: string
+          work_session_id: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          group_name?: string
+          id?: string
+          motorcycle_id?: string | null
+          user_id: string
+          work_session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          group_name?: string
+          id?: string
+          motorcycle_id?: string | null
+          user_id?: string
+          work_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_motorcycle_id_fkey"
+            columns: ["motorcycle_id"]
+            isOneToOne: false
+            referencedRelation: "motorcycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_session_fk"
+            columns: ["work_session_id"]
+            isOneToOne: false
+            referencedRelation: "work_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fuel_records: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          km: number
+          liters: number
+          motorcycle_id: string | null
+          price_per_liter: number
+          station: string | null
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          km: number
+          liters: number
+          motorcycle_id?: string | null
+          price_per_liter: number
+          station?: string | null
+          total: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          km?: number
+          liters?: number
+          motorcycle_id?: string | null
+          price_per_liter?: number
+          station?: string | null
+          total?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fuel_records_motorcycle_id_fkey"
+            columns: ["motorcycle_id"]
+            isOneToOne: false
+            referencedRelation: "motorcycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          name: string
+          start_date: string
+          target_amount: number
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          name: string
+          start_date?: string
+          target_amount: number
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          name?: string
+          start_date?: string
+          target_amount?: number
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      incomes: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          motorcycle_id: string | null
+          time: string | null
+          user_id: string
+          work_session_id: string | null
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          motorcycle_id?: string | null
+          time?: string | null
+          user_id: string
+          work_session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          motorcycle_id?: string | null
+          time?: string | null
+          user_id?: string
+          work_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incomes_motorcycle_id_fkey"
+            columns: ["motorcycle_id"]
+            isOneToOne: false
+            referencedRelation: "motorcycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incomes_session_fk"
+            columns: ["work_session_id"]
+            isOneToOne: false
+            referencedRelation: "work_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_records: {
+        Row: {
+          category: string
+          cost: number
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          km: number | null
+          motorcycle_id: string | null
+          next_date: string | null
+          next_km: number | null
+          user_id: string
+          workshop: string | null
+        }
+        Insert: {
+          category?: string
+          cost?: number
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          km?: number | null
+          motorcycle_id?: string | null
+          next_date?: string | null
+          next_km?: number | null
+          user_id: string
+          workshop?: string | null
+        }
+        Update: {
+          category?: string
+          cost?: number
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          km?: number | null
+          motorcycle_id?: string | null
+          next_date?: string | null
+          next_km?: number | null
+          user_id?: string
+          workshop?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_motorcycle_id_fkey"
+            columns: ["motorcycle_id"]
+            isOneToOne: false
+            referencedRelation: "motorcycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      motorcycles: {
+        Row: {
+          brand: string
+          created_at: string
+          current_km: number
+          id: string
+          is_active: boolean
+          model: string
+          photo_url: string | null
+          plate: string | null
+          purchase_date: string | null
+          purchase_value: number | null
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          brand: string
+          created_at?: string
+          current_km?: number
+          id?: string
+          is_active?: boolean
+          model: string
+          photo_url?: string | null
+          plate?: string | null
+          purchase_date?: string | null
+          purchase_value?: number | null
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          current_km?: number
+          id?: string
+          is_active?: boolean
+          model?: string
+          photo_url?: string | null
+          plate?: string | null
+          purchase_date?: string | null
+          purchase_value?: number | null
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_professional: boolean
+          name: string | null
+          onboarding_completed: boolean
+          phone: string | null
+          updated_at: string
+          usage_types: string[]
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          is_professional?: boolean
+          name?: string | null
+          onboarding_completed?: boolean
+          phone?: string | null
+          updated_at?: string
+          usage_types?: string[]
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_professional?: boolean
+          name?: string | null
+          onboarding_completed?: boolean
+          phone?: string | null
+          updated_at?: string
+          usage_types?: string[]
+        }
+        Relationships: []
+      }
+      work_sessions: {
+        Row: {
+          created_at: string
+          end_km: number | null
+          end_time: string | null
+          id: string
+          motorcycle_id: string | null
+          net_profit: number
+          start_km: number | null
+          start_time: string
+          total_expense: number
+          total_income: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_km?: number | null
+          end_time?: string | null
+          id?: string
+          motorcycle_id?: string | null
+          net_profit?: number
+          start_km?: number | null
+          start_time?: string
+          total_expense?: number
+          total_income?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_km?: number | null
+          end_time?: string | null
+          id?: string
+          motorcycle_id?: string | null
+          net_profit?: number
+          start_km?: number | null
+          start_time?: string
+          total_expense?: number
+          total_income?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_sessions_motorcycle_id_fkey"
+            columns: ["motorcycle_id"]
+            isOneToOne: false
+            referencedRelation: "motorcycles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
