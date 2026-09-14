@@ -1,0 +1,17 @@
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { GoalDialog } from "@/components/forms/dialogs";
+import { EmptyState, GlassCard, PageTitle } from "@/components/glass";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useScopedData } from "@/lib/app-context";
+import { financeSummary, inPeriod, percent, sumAmount } from "@/lib/calc";
+import { useRemove } from "@/lib/data";
+import { brl, dateBR } from "@/lib/format";
+import type { Goal } from "@/lib/types";
+
+export const Route = createFileRoute("/_authenticated/app/metas")({
+  head:()=>({meta:[{title:"Metas — MotoFinance"},{name:"description",content:"Metas mensais, semanais e de economia."},{property:"og:title",content:"Metas — MotoFinance"},{property:"og:description",content:"Metas mensais, semanais e de economia."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}), component:GoalsPage,
+});
+function GoalsPage(){const data=useScopedData();const[record,setRecord]=useState<Goal|null|undefined>(undefined);const remove=useRemove("goals","Meta excluída.");return <div className="space-y-6"><div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3"><PageTitle title="Metas" subtitle="Transforme o valor do mês em uma meta diária."/><Button size="sm" onClick={()=>setRecord(null)}><Plus className="mr-1 size-4"/>Criar</Button></div>{data.goals.length?<div className="grid gap-4 md:grid-cols-2">{data.goals.map(g=>{const period={start:g.start_date,end:g.end_date};const progressValue=g.type==="economia"?Math.max(0,financeSummary(data.incomes,data.expenses,period).net):sumAmount(inPeriod(data.incomes,period));const pct=percent(progressValue,g.target_amount);const days=Math.max(1,Math.ceil((new Date(`${g.end_date}T12:00:00`).getTime()-Date.now())/86400000));const daily=Math.max(0,(g.target_amount-progressValue)/days);return <GlassCard key={g.id}><div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3"><div><p className="text-xs font-semibold text-accent">{g.type}</p><h2 className="font-display text-lg font-bold">{g.name}</h2></div><div className="flex"><Button variant="ghost" size="icon" className="size-8" onClick={()=>setRecord(g)}><Pencil className="size-3.5"/></Button><Button variant="ghost" size="icon" className="size-8 text-negative" onClick={()=>window.confirm("Excluir esta meta?")&&remove.mutate(g.id)}><Trash2 className="size-3.5"/></Button></div></div><div className="mt-5 flex justify-between text-sm"><span>{brl(progressValue)}</span><span className="text-muted-foreground">{brl(g.target_amount)}</span></div><Progress value={Math.min(100,pct)} className="mt-2 [&>div]:bg-accent"/><p className="mt-2 text-xs text-muted-foreground">{pct>=100?"Meta alcançada! 🔥":`${brl(daily)} por dia · até ${dateBR(g.end_date)}`}</p></GlassCard>})}</div>:<EmptyState title="Nenhuma meta criada" description="Defina um objetivo para acompanhar seu progresso."/>}<GoalDialog open={record!==undefined} onOpenChange={v=>!v&&setRecord(undefined)} record={record??null}/></div>}
