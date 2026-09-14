@@ -14,6 +14,10 @@ import type {
   WorkSession,
 } from "./types";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Acesso genérico às tabelas (nomes dinâmicos), a segurança é garantida por RLS.
+const db = supabase as unknown as { from: (table: string) => any };
+
 async function currentUserId() {
   const { data } = await supabase.auth.getUser();
   if (!data.user) throw new Error("Sessão expirada. Entre novamente.");
@@ -24,7 +28,7 @@ function useTable<T>(table: string, key: string, order: { column: string; asc?: 
   return useQuery({
     queryKey: [key],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from(table)
         .select("*")
         .order(order.column, { ascending: order.asc ?? false });
@@ -88,8 +92,8 @@ export function useUpsert<T extends Record<string, unknown>>(
       const uid = await currentUserId();
       const payload = { ...values, user_id: uid };
       const { data, error } = values.id
-        ? await supabase.from(table).update(payload).eq("id", values.id).select().single()
-        : await supabase.from(table).insert(payload).select().single();
+        ? await db.from(table).update(payload).eq("id", values.id).select().single()
+        : await db.from(table).insert(payload).select().single();
       if (error) throw error;
       return data;
     },
@@ -106,7 +110,7 @@ export function useRemove(table: string, message = "Registro excluído.") {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table).delete().eq("id", id);
+      const { error } = await db.from(table).delete().eq("id", id);
       if (error) throw error;
       return id;
     },
@@ -123,7 +127,7 @@ export function useUpdateProfile(successMessage = "Perfil atualizado.") {
   return useMutation({
     mutationFn: async (values: Partial<Profile>) => {
       const uid = await currentUserId();
-      const { error } = await supabase.from("profiles").update(values).eq("id", uid);
+      const { error } = await db.from("profiles").update(values).eq("id", uid);
       if (error) throw error;
     },
     onSuccess: () => {
