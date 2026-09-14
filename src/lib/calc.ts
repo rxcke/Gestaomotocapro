@@ -51,6 +51,7 @@ export function fuelStats(records: FuelRecord[]) {
   for (let i = 1; i < sorted.length; i++) {
     const prev = sorted[i - 1];
     const cur = sorted[i];
+    if (!prev || !cur) continue;
     const d = Number(cur.km) - Number(prev.km);
     const l = Number(cur.liters);
     if (d > 0 && l > 0) {
@@ -60,6 +61,7 @@ export function fuelStats(records: FuelRecord[]) {
       history.push({ from: Number(prev.km), to: Number(cur.km), distance: d, liters: l, kmL: d / l });
     }
   }
+
 
   return {
     distance,
