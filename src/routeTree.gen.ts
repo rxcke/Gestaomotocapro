@@ -24,6 +24,7 @@ import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
 import { Route as AuthenticatedAppPerfilRouteImport } from './routes/_authenticated/app.perfil'
 import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authenticated/app.relatorios'
+import { Route as AuthenticatedAppMotoIndexRouteImport } from './routes/_authenticated/app.moto.index'
 import { Route as AuthenticatedAppMotoAbastecimentosRouteImport } from './routes/_authenticated/app.moto.abastecimentos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -104,6 +105,12 @@ const AuthenticatedAppRelatoriosRoute =
     path: '/relatorios',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppMotoIndexRoute =
+  AuthenticatedAppMotoIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppMotoRoute,
+  } as any)
 const AuthenticatedAppMotoAbastecimentosRoute =
   AuthenticatedAppMotoAbastecimentosRouteImport.update({
     id: '/abastecimentos',
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
+  '/app/moto/': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -138,11 +146,11 @@ export interface FileRoutesByTo {
   '/app/jornada': typeof AuthenticatedAppJornadaRoute
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
-  '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
+  '/app/moto': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
+  '/_authenticated/app/moto/': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/app/relatorios'
     | '/app/'
     | '/app/moto/abastecimentos'
+    | '/app/moto/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -192,11 +202,11 @@ export interface FileRouteTypes {
     | '/app/jornada'
     | '/app/manutencao'
     | '/app/metas'
-    | '/app/moto'
     | '/app/perfil'
     | '/app/relatorios'
     | '/app'
     | '/app/moto/abastecimentos'
+    | '/app/moto'
   id:
     | '__root__'
     | '/'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/relatorios'
     | '/_authenticated/app/'
     | '/_authenticated/app/moto/abastecimentos'
+    | '/_authenticated/app/moto/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -331,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRelatoriosRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/moto/': {
+      id: '/_authenticated/app/moto/'
+      path: '/'
+      fullPath: '/app/moto/'
+      preLoaderRoute: typeof AuthenticatedAppMotoIndexRouteImport
+      parentRoute: typeof AuthenticatedAppMotoRoute
+    }
     '/_authenticated/app/moto/abastecimentos': {
       id: '/_authenticated/app/moto/abastecimentos'
       path: '/abastecimentos'
@@ -343,11 +361,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAppMotoRouteChildren {
   AuthenticatedAppMotoAbastecimentosRoute: typeof AuthenticatedAppMotoAbastecimentosRoute
+  AuthenticatedAppMotoIndexRoute: typeof AuthenticatedAppMotoIndexRoute
 }
 
 const AuthenticatedAppMotoRouteChildren: AuthenticatedAppMotoRouteChildren = {
   AuthenticatedAppMotoAbastecimentosRoute:
     AuthenticatedAppMotoAbastecimentosRoute,
+  AuthenticatedAppMotoIndexRoute: AuthenticatedAppMotoIndexRoute,
 }
 
 const AuthenticatedAppMotoRouteWithChildren =
