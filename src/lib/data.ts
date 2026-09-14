@@ -1,0 +1,141 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import type {
+  AppDocument,
+  Expense,
+  FuelRecord,
+  Goal,
+  Income,
+  MaintenanceRecord,
+  Motorcycle,
+  NotificationRow,
+  Profile,
+  WorkSession,
+} from "./types";
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Acesso genérico às tabelas (nomes dinâmicos), a segurança é garantida por RLS.
+const db = supabase as unknown as { from: (table: string) => any };
+
+async function currentUserId() {
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) throw new Error("Sessão expirada. Entre novamente.");
+  return data.user.id;
+}
+
+function useTable<T>(table: string, key: string, order: { column: string; asc?: boolean }) {
+  return useQuery({
+    queryKey: [key],
+    queryFn: async () => {
+      const { data, error } = await db
+        .from(table)
+        .select("*")
+        .order(order.column, { ascending: order.asc ?? false });
+      if (error) throw error;
+      return (data ?? []) as T[];
+    },
+  });
+}
+
+export const useProfile = () =>
+  useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const uid = await currentUserId();
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", uid).maybeSingle();
+      if (error) throw error;
+      return (data as Profile | null) ?? null;
+    },
+  });
+
+export const useMotorcycles = () => useTable<Motorcycle>("motorcycles", "motorcycles", { column: "created_at", asc: true });
+export const useIncomes = () => useTable<Income>("incomes", "incomes", { column: "date" });
+export const useExpenses = () => useTable<Expense>("expenses", "expenses", { column: "date" });
+export const useFuelRecords = () => useTable<FuelRecord>("fuel_records", "fuel_records", { column: "km" });
+export const useMaintenance = () =>
+  useTable<MaintenanceRecord>("maintenance_records", "maintenance_records", { column: "date" });
+export const useGoals = () => useTable<Goal>("goals", "goals", { column: "created_at" });
+export const useWorkSessions = () => useTable<WorkSession>("work_sessions", "work_sessions", { column: "start_time" });
+export const useDocuments = () => useTable<AppDocument>("documents", "documents", { column: "expiration_date", asc: true });
+export const useNotifications = () =>
+  useTable<NotificationRow>("notifications", "notifications", { column: "created_at" });
+
+const ALL_KEYS = [
+  "profile",
+  "motorcycles",
+  "incomes",
+  "expenses",
+  "fuel_records",
+  "maintenance_records",
+  "goals",
+  "work_sessions",
+  "documents",
+  "notifications",
+];
+
+export function useInvalidateAll() {
+  const qc = useQueryClient();
+  return () => ALL_KEYS.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+}
+
+type MutationOptions = { successMessage?: string; onDone?: () => void };
+
+export function useUpsert<T extends Record<string, unknown>>(
+  table: string,
+  key: string,
+  options: MutationOptions = {},
+) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (values: T & { id?: string }) => {
+      const uid = await currentUserId();
+      const payload = { ...values, user_id: uid };
+      const { data, error } = values.id
+        ? await db.from(table).update(payload).eq("id", values.id).select().single()
+        : await db.from(table).insert(payload).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      ALL_KEYS.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+      if (options.successMessage) toast.success(options.successMessage);
+      options.onDone?.();
+    },
+    onError: (error: Error) => toast.error(error.message || "Não foi possível salvar."),
+  });
+}
+
+export function useRemove(table: string, message = "Registro excluído.") {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await db.from(table).delete().eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      ALL_KEYS.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+      toast.success(message);
+    },
+    onError: (error: Error) => toast.error(error.message || "Não foi possível excluir."),
+  });
+}
+
+export function useUpdateProfile(successMessage = "Perfil atualizado.") {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (values: Partial<Profile>) => {
+      const uid = await currentUserId();
+      const { error } = await db.from("profiles").update(values).eq("id", uid);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      if (successMessage) toast.success(successMessage);
+    },
+    onError: (error: Error) => toast.error(error.message || "Não foi possível salvar o perfil."),
+  });
+}
+
+export { currentUserId };
