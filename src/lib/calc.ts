@@ -80,9 +80,11 @@ export function distanceInPeriod(records: FuelRecord[], p: Period) {
   if (inside.length === 0) return 0;
   const first = inside[0];
   const last = inside[inside.length - 1];
+  if (!first || !last) return 0;
   const before = sorted.filter((r) => Number(r.km) < Number(first.km)).pop();
   const startKm = before ? Number(before.km) : Number(first.km);
   return Math.max(0, Number(last.km) - startKm);
+
 }
 
 export function motoExpenses(expenses: Expense[]) {
