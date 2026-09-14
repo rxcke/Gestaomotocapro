@@ -112,7 +112,7 @@ export function SelectField({
   return (
     <div className="space-y-1.5">
       <Label htmlFor={name}>{label}</Label>
-      <Select name={name} defaultValue={defaultValue ?? options[0]?.value}>
+      <Select name={name} defaultValue={defaultValue ?? options[0]?.value ?? ""}>
         <SelectTrigger id={name} className="h-12 w-full text-base">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
