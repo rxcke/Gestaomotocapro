@@ -17,6 +17,10 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppDinheiroRouteImport } from './routes/_authenticated/app.dinheiro'
+import { Route as AuthenticatedAppManutencaoRouteImport } from './routes/_authenticated/app.manutencao'
+import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticated/app.metas'
+import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
+import { Route as AuthenticatedAppMotoAbastecimentosRouteImport } from './routes/_authenticated/app.moto.abastecimentos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +62,28 @@ const AuthenticatedAppDinheiroRoute =
     path: '/dinheiro',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppManutencaoRoute =
+  AuthenticatedAppManutencaoRouteImport.update({
+    id: '/manutencao',
+    path: '/manutencao',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppMetasRoute = AuthenticatedAppMetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppMotoRoute = AuthenticatedAppMotoRouteImport.update({
+  id: '/moto',
+  path: '/moto',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppMotoAbastecimentosRoute =
+  AuthenticatedAppMotoAbastecimentosRouteImport.update({
+    id: '/abastecimentos',
+    path: '/abastecimentos',
+    getParentRoute: () => AuthenticatedAppMotoRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,7 +92,11 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
+  '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
+  '/app/metas': typeof AuthenticatedAppMetasRoute
+  '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -74,7 +104,11 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
+  '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
+  '/app/metas': typeof AuthenticatedAppMetasRoute
+  '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,7 +119,11 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
+  '/_authenticated/app/manutencao': typeof AuthenticatedAppManutencaoRoute
+  '/_authenticated/app/metas': typeof AuthenticatedAppMetasRoute
+  '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,10 +134,23 @@ export interface FileRouteTypes {
     | '/app'
     | '/onboarding'
     | '/app/dinheiro'
+    | '/app/manutencao'
+    | '/app/metas'
+    | '/app/moto'
     | '/app/'
+    | '/app/moto/abastecimentos'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/reset-password' | '/onboarding' | '/app/dinheiro' | '/app'
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/onboarding'
+    | '/app/dinheiro'
+    | '/app/manutencao'
+    | '/app/metas'
+    | '/app/moto'
+    | '/app'
+    | '/app/moto/abastecimentos'
   id:
     | '__root__'
     | '/'
@@ -109,7 +160,11 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/onboarding'
     | '/_authenticated/app/dinheiro'
+    | '/_authenticated/app/manutencao'
+    | '/_authenticated/app/metas'
+    | '/_authenticated/app/moto'
     | '/_authenticated/app/'
+    | '/_authenticated/app/moto/abastecimentos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -177,16 +232,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppDinheiroRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/manutencao': {
+      id: '/_authenticated/app/manutencao'
+      path: '/manutencao'
+      fullPath: '/app/manutencao'
+      preLoaderRoute: typeof AuthenticatedAppManutencaoRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/metas': {
+      id: '/_authenticated/app/metas'
+      path: '/metas'
+      fullPath: '/app/metas'
+      preLoaderRoute: typeof AuthenticatedAppMetasRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/moto': {
+      id: '/_authenticated/app/moto'
+      path: '/moto'
+      fullPath: '/app/moto'
+      preLoaderRoute: typeof AuthenticatedAppMotoRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/moto/abastecimentos': {
+      id: '/_authenticated/app/moto/abastecimentos'
+      path: '/abastecimentos'
+      fullPath: '/app/moto/abastecimentos'
+      preLoaderRoute: typeof AuthenticatedAppMotoAbastecimentosRouteImport
+      parentRoute: typeof AuthenticatedAppMotoRoute
+    }
   }
 }
 
+interface AuthenticatedAppMotoRouteChildren {
+  AuthenticatedAppMotoAbastecimentosRoute: typeof AuthenticatedAppMotoAbastecimentosRoute
+}
+
+const AuthenticatedAppMotoRouteChildren: AuthenticatedAppMotoRouteChildren = {
+  AuthenticatedAppMotoAbastecimentosRoute:
+    AuthenticatedAppMotoAbastecimentosRoute,
+}
+
+const AuthenticatedAppMotoRouteWithChildren =
+  AuthenticatedAppMotoRoute._addFileChildren(AuthenticatedAppMotoRouteChildren)
+
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppDinheiroRoute: typeof AuthenticatedAppDinheiroRoute
+  AuthenticatedAppManutencaoRoute: typeof AuthenticatedAppManutencaoRoute
+  AuthenticatedAppMetasRoute: typeof AuthenticatedAppMetasRoute
+  AuthenticatedAppMotoRoute: typeof AuthenticatedAppMotoRouteWithChildren
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppDinheiroRoute: AuthenticatedAppDinheiroRoute,
+  AuthenticatedAppManutencaoRoute: AuthenticatedAppManutencaoRoute,
+  AuthenticatedAppMetasRoute: AuthenticatedAppMetasRoute,
+  AuthenticatedAppMotoRoute: AuthenticatedAppMotoRouteWithChildren,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 
