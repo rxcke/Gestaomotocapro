@@ -21,6 +21,7 @@ import { Route as AuthenticatedAppDocumentosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppJornadaRouteImport } from './routes/_authenticated/app.jornada'
 import { Route as AuthenticatedAppManutencaoRouteImport } from './routes/_authenticated/app.manutencao'
 import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticated/app.metas'
+import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
 import { Route as AuthenticatedAppPerfilRouteImport } from './routes/_authenticated/app.perfil'
 import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authenticated/app.relatorios'
 import { Route as AuthenticatedAppMotoIndexRouteImport } from './routes/_authenticated/app.moto.index'
@@ -88,6 +89,11 @@ const AuthenticatedAppMetasRoute = AuthenticatedAppMetasRouteImport.update({
   path: '/metas',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppMotoRoute = AuthenticatedAppMotoRouteImport.update({
+  id: '/moto',
+  path: '/moto',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppPerfilRoute = AuthenticatedAppPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -101,15 +107,15 @@ const AuthenticatedAppRelatoriosRoute =
   } as any)
 const AuthenticatedAppMotoIndexRoute =
   AuthenticatedAppMotoIndexRouteImport.update({
-    id: '/moto/',
-    path: '/moto/',
-    getParentRoute: () => AuthenticatedAppRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppMotoRoute,
   } as any)
 const AuthenticatedAppMotoAbastecimentosRoute =
   AuthenticatedAppMotoAbastecimentosRouteImport.update({
-    id: '/moto/abastecimentos',
-    path: '/moto/abastecimentos',
-    getParentRoute: () => AuthenticatedAppRoute,
+    id: '/abastecimentos',
+    path: '/abastecimentos',
+    getParentRoute: () => AuthenticatedAppMotoRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/app/jornada': typeof AuthenticatedAppJornadaRoute
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
+  '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesById {
   '/_authenticated/app/jornada': typeof AuthenticatedAppJornadaRoute
   '/_authenticated/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/_authenticated/app/metas': typeof AuthenticatedAppMetasRoute
+  '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/_authenticated/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -177,6 +185,7 @@ export interface FileRouteTypes {
     | '/app/jornada'
     | '/app/manutencao'
     | '/app/metas'
+    | '/app/moto'
     | '/app/perfil'
     | '/app/relatorios'
     | '/app/'
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/jornada'
     | '/_authenticated/app/manutencao'
     | '/_authenticated/app/metas'
+    | '/_authenticated/app/moto'
     | '/_authenticated/app/perfil'
     | '/_authenticated/app/relatorios'
     | '/_authenticated/app/'
@@ -311,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMetasRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/moto': {
+      id: '/_authenticated/app/moto'
+      path: '/moto'
+      fullPath: '/app/moto'
+      preLoaderRoute: typeof AuthenticatedAppMotoRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/perfil': {
       id: '/_authenticated/app/perfil'
       path: '/perfil'
@@ -327,20 +344,34 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/app/moto/': {
       id: '/_authenticated/app/moto/'
-      path: '/moto'
+      path: '/'
       fullPath: '/app/moto/'
       preLoaderRoute: typeof AuthenticatedAppMotoIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
+      parentRoute: typeof AuthenticatedAppMotoRoute
     }
     '/_authenticated/app/moto/abastecimentos': {
       id: '/_authenticated/app/moto/abastecimentos'
-      path: '/moto/abastecimentos'
+      path: '/abastecimentos'
       fullPath: '/app/moto/abastecimentos'
       preLoaderRoute: typeof AuthenticatedAppMotoAbastecimentosRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
+      parentRoute: typeof AuthenticatedAppMotoRoute
     }
   }
 }
+
+interface AuthenticatedAppMotoRouteChildren {
+  AuthenticatedAppMotoAbastecimentosRoute: typeof AuthenticatedAppMotoAbastecimentosRoute
+  AuthenticatedAppMotoIndexRoute: typeof AuthenticatedAppMotoIndexRoute
+}
+
+const AuthenticatedAppMotoRouteChildren: AuthenticatedAppMotoRouteChildren = {
+  AuthenticatedAppMotoAbastecimentosRoute:
+    AuthenticatedAppMotoAbastecimentosRoute,
+  AuthenticatedAppMotoIndexRoute: AuthenticatedAppMotoIndexRoute,
+}
+
+const AuthenticatedAppMotoRouteWithChildren =
+  AuthenticatedAppMotoRoute._addFileChildren(AuthenticatedAppMotoRouteChildren)
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppDinheiroRoute: typeof AuthenticatedAppDinheiroRoute
@@ -348,11 +379,10 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppJornadaRoute: typeof AuthenticatedAppJornadaRoute
   AuthenticatedAppManutencaoRoute: typeof AuthenticatedAppManutencaoRoute
   AuthenticatedAppMetasRoute: typeof AuthenticatedAppMetasRoute
+  AuthenticatedAppMotoRoute: typeof AuthenticatedAppMotoRouteWithChildren
   AuthenticatedAppPerfilRoute: typeof AuthenticatedAppPerfilRoute
   AuthenticatedAppRelatoriosRoute: typeof AuthenticatedAppRelatoriosRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
-  AuthenticatedAppMotoAbastecimentosRoute: typeof AuthenticatedAppMotoAbastecimentosRoute
-  AuthenticatedAppMotoIndexRoute: typeof AuthenticatedAppMotoIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
@@ -361,12 +391,10 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppJornadaRoute: AuthenticatedAppJornadaRoute,
   AuthenticatedAppManutencaoRoute: AuthenticatedAppManutencaoRoute,
   AuthenticatedAppMetasRoute: AuthenticatedAppMetasRoute,
+  AuthenticatedAppMotoRoute: AuthenticatedAppMotoRouteWithChildren,
   AuthenticatedAppPerfilRoute: AuthenticatedAppPerfilRoute,
   AuthenticatedAppRelatoriosRoute: AuthenticatedAppRelatoriosRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
-  AuthenticatedAppMotoAbastecimentosRoute:
-    AuthenticatedAppMotoAbastecimentosRoute,
-  AuthenticatedAppMotoIndexRoute: AuthenticatedAppMotoIndexRoute,
 }
 
 const AuthenticatedAppRouteWithChildren =
