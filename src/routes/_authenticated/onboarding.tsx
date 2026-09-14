@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createFileRoute as _unused } from "@tanstack/react-router";
 import { AmbientBackground, GlassCard } from "@/components/glass";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -14,8 +13,6 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
 });
-
-void _unused;
 
 function Onboarding() {
   const navigate = useNavigate();

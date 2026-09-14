@@ -18,6 +18,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppDinheiroRouteImport } from './routes/_authenticated/app.dinheiro'
 import { Route as AuthenticatedAppDocumentosRouteImport } from './routes/_authenticated/app.documentos'
+import { Route as AuthenticatedAppJornadaRouteImport } from './routes/_authenticated/app.jornada'
 import { Route as AuthenticatedAppManutencaoRouteImport } from './routes/_authenticated/app.manutencao'
 import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticated/app.metas'
 import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
@@ -71,6 +72,11 @@ const AuthenticatedAppDocumentosRoute =
     path: '/documentos',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppJornadaRoute = AuthenticatedAppJornadaRouteImport.update({
+  id: '/jornada',
+  path: '/jornada',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppManutencaoRoute =
   AuthenticatedAppManutencaoRouteImport.update({
     id: '/manutencao',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/app/documentos': typeof AuthenticatedAppDocumentosRoute
+  '/app/jornada': typeof AuthenticatedAppJornadaRoute
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/app/documentos': typeof AuthenticatedAppDocumentosRoute
+  '/app/jornada': typeof AuthenticatedAppJornadaRoute
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/_authenticated/app/documentos': typeof AuthenticatedAppDocumentosRoute
+  '/_authenticated/app/jornada': typeof AuthenticatedAppJornadaRoute
   '/_authenticated/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/_authenticated/app/metas': typeof AuthenticatedAppMetasRoute
   '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/dinheiro'
     | '/app/documentos'
+    | '/app/jornada'
     | '/app/manutencao'
     | '/app/metas'
     | '/app/moto'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/app/dinheiro'
     | '/app/documentos'
+    | '/app/jornada'
     | '/app/manutencao'
     | '/app/metas'
     | '/app/moto'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/app/dinheiro'
     | '/_authenticated/app/documentos'
+    | '/_authenticated/app/jornada'
     | '/_authenticated/app/manutencao'
     | '/_authenticated/app/metas'
     | '/_authenticated/app/moto'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppDocumentosRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/jornada': {
+      id: '/_authenticated/app/jornada'
+      path: '/jornada'
+      fullPath: '/app/jornada'
+      preLoaderRoute: typeof AuthenticatedAppJornadaRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/manutencao': {
       id: '/_authenticated/app/manutencao'
       path: '/manutencao'
@@ -337,6 +356,7 @@ const AuthenticatedAppMotoRouteWithChildren =
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppDinheiroRoute: typeof AuthenticatedAppDinheiroRoute
   AuthenticatedAppDocumentosRoute: typeof AuthenticatedAppDocumentosRoute
+  AuthenticatedAppJornadaRoute: typeof AuthenticatedAppJornadaRoute
   AuthenticatedAppManutencaoRoute: typeof AuthenticatedAppManutencaoRoute
   AuthenticatedAppMetasRoute: typeof AuthenticatedAppMetasRoute
   AuthenticatedAppMotoRoute: typeof AuthenticatedAppMotoRouteWithChildren
@@ -348,6 +368,7 @@ interface AuthenticatedAppRouteChildren {
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppDinheiroRoute: AuthenticatedAppDinheiroRoute,
   AuthenticatedAppDocumentosRoute: AuthenticatedAppDocumentosRoute,
+  AuthenticatedAppJornadaRoute: AuthenticatedAppJornadaRoute,
   AuthenticatedAppManutencaoRoute: AuthenticatedAppManutencaoRoute,
   AuthenticatedAppMetasRoute: AuthenticatedAppMetasRoute,
   AuthenticatedAppMotoRoute: AuthenticatedAppMotoRouteWithChildren,
