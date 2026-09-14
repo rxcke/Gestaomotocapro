@@ -9,7 +9,7 @@ import { useRemove } from "@/lib/data";
 import { brl, km } from "@/lib/format";
 import type { Motorcycle } from "@/lib/types";
 
-export const Route = createFileRoute("/_authenticated/app/moto")({
+export const Route = createFileRoute("/_authenticated/app/moto/")({
   head: () => ({ meta: [
     { title: "Minha Moto — MotoFinance" },
     { name: "description", content: "Gerencie suas motos, quilometragem e custos." },
