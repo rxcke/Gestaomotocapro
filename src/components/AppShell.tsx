@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bike,
@@ -117,13 +117,13 @@ function SidebarFooter() {
   const profile = useProfile();
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return;
       const { data: allowed } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
       setIsAdmin(Boolean(allowed));
     });
-  });
+  }, []);
   const initials = (profile.data?.name ?? "Piloto")
     .split(" ")
     .slice(0, 2)

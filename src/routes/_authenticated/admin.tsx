@@ -40,7 +40,7 @@ function AdminPage() {
         <PageTitle title="Administração" subtitle="Dados reais de todos os usuários, com acesso restrito." />
         <Button asChild variant="outline" size="sm"><Link to="/app"><ArrowLeft className="mr-2 size-4" />Painel</Link></Button>
       </div>
-      {query.isLoading ? <LoadingBlock label="Carregando visão administrativa..." /> : query.isError || !query.data ? <ErrorBlock message={query.error instanceof Error ? query.error.message : undefined} /> : <AdminContent data={query.data} section={section} setSection={setSection} />}
+      {query.isLoading ? <LoadingBlock label="Carregando visão administrativa..." /> : query.isError || !query.data ? <ErrorBlock message={query.error instanceof Error ? query.error.message : "Não foi possível carregar os dados administrativos."} /> : <AdminContent data={query.data} section={section} setSection={setSection} />}
     </main>
   </div>;
 }
