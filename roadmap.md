@@ -5,4 +5,4 @@
 - [x] Motos, abastecimentos, manutenção e documentos
 - [x] Metas, jornada, relatórios, insights e perfil
 - [x] Validação autenticada dos fluxos principais no celular
-- [ ] Área administrativa segura para consultar motos, ganhos, gastos e abastecimentos de todos os usuários
+- [x] Área administrativa segura para consultar motos, ganhos, gastos e abastecimentos de todos os usuários

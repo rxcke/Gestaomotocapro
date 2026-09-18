@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bike,
@@ -11,6 +11,7 @@ import {
   Timer,
   BarChart3,
   LogOut,
+  ShieldCheck,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -114,6 +115,15 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function SidebarFooter() {
   const profile = useProfile();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      const { data: allowed } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
+      setIsAdmin(Boolean(allowed));
+    });
+  }, []);
   const initials = (profile.data?.name ?? "Piloto")
     .split(" ")
     .slice(0, 2)
@@ -122,7 +132,9 @@ function SidebarFooter() {
     .toUpperCase();
 
   return (
-    <div className="glass-soft mt-auto flex items-center gap-3 p-3">
+    <div className="mt-auto space-y-2">
+      {isAdmin ? <Button asChild variant="outline" className="w-full justify-start"><Link to="/admin"><ShieldCheck className="mr-2 size-4" />Administração</Link></Button> : null}
+      <div className="glass-soft flex items-center gap-3 p-3">
       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold">
         {initials || "P"}
       </span>
@@ -131,6 +143,7 @@ function SidebarFooter() {
         <p className="truncate text-[11px] text-muted-foreground">
           {profile.data?.is_professional ? "Motociclista profissional" : "Uso pessoal"}
         </p>
+      </div>
       </div>
     </div>
   );
