@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Bike, Fuel, TrendingDown, TrendingUp } from "lucide-react";
 import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock, PageTitle, Stat } from "@/components/glass";
@@ -8,8 +8,18 @@ import { Button } from "@/components/ui/button";
 import { getAdminData, type AdminData } from "@/lib/admin.functions";
 import { brl, dateBR, km } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) throw redirect({ to: "/auth" });
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: userData.user.id,
+      _role: "admin",
+    });
+    if (!isAdmin) throw redirect({ to: "/app" });
+  },
   head: () => ({ meta: [
     { title: "Administração — MotoFinance" },
     { name: "description", content: "Visão administrativa dos registros do MotoFinance." },
