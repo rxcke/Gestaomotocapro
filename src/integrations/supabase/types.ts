@@ -413,6 +413,54 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          canceled_at: string | null
+          created_at: string
+          email: string
+          expires_at: string | null
+          id: string
+          kiwify_product_id: string | null
+          kiwify_subscription_id: string | null
+          kiwify_transaction_id: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          started_at: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          canceled_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string | null
+          id?: string
+          kiwify_product_id?: string | null
+          kiwify_subscription_id?: string | null
+          kiwify_transaction_id?: string | null
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          canceled_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string | null
+          id?: string
+          kiwify_product_id?: string | null
+          kiwify_subscription_id?: string | null
+          kiwify_transaction_id?: string | null
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -431,6 +479,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_id: string
+          event_type: string
+          id: string
+          payload: Json
+          processed: boolean
+          processed_at: string | null
+          transaction_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_id: string
+          event_type: string
+          id?: string
+          payload: Json
+          processed?: boolean
+          processed_at?: string | null
+          transaction_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          processed_at?: string | null
+          transaction_id?: string | null
         }
         Relationships: []
       }
@@ -489,6 +573,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -496,9 +581,32 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_kiwify_subscription_event: {
+        Args: {
+          _buyer_email: string
+          _event_id: string
+          _event_type: string
+          _expires_at: string
+          _payload: Json
+          _plan: Database["public"]["Enums"]["subscription_plan"]
+          _product_id: string
+          _started_at: string
+          _subscription_id: string
+          _transaction_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      subscription_plan: "monthly" | "annual"
+      subscription_status:
+        | "pending"
+        | "active"
+        | "canceled"
+        | "expired"
+        | "refunded"
+        | "chargeback"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -627,6 +735,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      subscription_plan: ["monthly", "annual"],
+      subscription_status: [
+        "pending",
+        "active",
+        "canceled",
+        "expired",
+        "refunded",
+        "chargeback",
+      ],
     },
   },
 } as const
