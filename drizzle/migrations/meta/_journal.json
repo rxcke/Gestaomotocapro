@@ -15,6 +15,13 @@
       "when": 1789902575222,
       "tag": "0001_add_kiwify_subscriptions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789902612046,
+      "tag": "0002_enforce_premium_access_policies",
+      "breakpoints": true
     }
   ]
 }
