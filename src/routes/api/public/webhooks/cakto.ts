@@ -37,7 +37,7 @@ const payloadSchema = z.object({
 });
 
 type Order = z.infer<typeof orderSchema>;
-type Plan = "monthly" | "annual";
+type Plan = "monthly" | "quarterly" | "annual";
 
 function hexToBytes(value: string): ArrayBuffer | null {
   if (!/^[0-9a-f]+$/i.test(value) || value.length % 2 !== 0) return null;
@@ -168,8 +168,9 @@ export const Route = createFileRoute("/api/public/webhooks/cakto")({
 
         const webhookSecret = process.env["CAKTO_WEBHOOK_SECRET"];
         const monthlyProductId = process.env["CAKTO_MONTHLY_PRODUCT_ID"];
+        const quarterlyProductId = process.env["CAKTO_QUARTERLY_PRODUCT_ID"];
         const annualProductId = process.env["CAKTO_ANNUAL_PRODUCT_ID"];
-        if (!webhookSecret || !monthlyProductId || !annualProductId) {
+        if (!webhookSecret || !monthlyProductId || !quarterlyProductId || !annualProductId) {
           return Response.json({ error: "webhook_not_configured" }, { status: 503 });
         }
 
@@ -202,6 +203,8 @@ export const Route = createFileRoute("/api/public/webhooks/cakto")({
           for (const order of orders) {
             const plan: Plan | null = order.product.id === monthlyProductId
               ? "monthly"
+              : order.product.id === quarterlyProductId
+                ? "quarterly"
               : order.product.id === annualProductId
                 ? "annual"
                 : null;

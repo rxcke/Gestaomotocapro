@@ -11,7 +11,7 @@ export type AdminData = {
     id: string;
     user_id: string;
     email: string;
-    plan: "monthly" | "annual";
+    plan: "monthly" | "quarterly" | "annual";
     status: "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
     cakto_transaction_id: string | null;
     started_at: string | null;
