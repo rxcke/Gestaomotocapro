@@ -1,4 +1,4 @@
-export const APP_NAME = "MotoFinance";
+export const APP_NAME = "Gestão Motoboy";
 export const APP_TAGLINE = "Seu dinheiro. Sua moto. Seu resultado.";
 
 export const INCOME_CATEGORIES = [

@@ -8,13 +8,13 @@ import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MotoFinance — Sua moto gera dinheiro ou só leva dinheiro?" },
+      { title: "Gestão Motoboy — Sua moto gera dinheiro ou só leva dinheiro?" },
       {
         name: "description",
         content:
           "Controle ganhos, gastos, combustível e manutenção da sua moto em um só lugar e descubra quanto sobra no seu bolso.",
       },
-      { property: "og:title", content: "MotoFinance — Seu dinheiro. Sua moto. Seu resultado." },
+      { property: "og:title", content: "Gestão Motoboy — Seu dinheiro. Sua moto. Seu resultado." },
       {
         property: "og:description",
         content: "Ganhos, gastos, combustível, manutenção e custo por km da sua moto em um só app.",

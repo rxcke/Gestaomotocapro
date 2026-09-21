@@ -13,9 +13,9 @@ import type { Expense, Income } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/app/dinheiro")({
   head: () => ({ meta: [
-    { title: "Dinheiro — MotoFinance" },
+    { title: "Dinheiro — Gestão Motoboy" },
     { name: "description", content: "Ganhos, despesas e resultado líquido da sua moto." },
-    { property: "og:title", content: "Dinheiro — MotoFinance" },
+    { property: "og:title", content: "Dinheiro — Gestão Motoboy" },
     { property: "og:description", content: "Ganhos, despesas e resultado líquido da sua moto." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },

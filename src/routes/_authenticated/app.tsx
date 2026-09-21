@@ -4,6 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { AppDataProvider } from "@/lib/app-context";
 import { useProfile } from "@/lib/data";
 import { LoadingBlock } from "@/components/glass";
+import { PremiumGate } from "@/components/PremiumGate";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppLayout,
@@ -29,7 +30,9 @@ function AppLayout() {
   return (
     <AppDataProvider>
       <AppShell>
-        <Outlet />
+        <PremiumGate>
+          <Outlet />
+        </PremiumGate>
       </AppShell>
     </AppDataProvider>
   );
