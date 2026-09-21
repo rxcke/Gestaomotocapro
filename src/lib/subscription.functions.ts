@@ -36,7 +36,7 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
         .maybeSingle(),
     ]);
 
-    if (accessResult.error || subscriptionResult.error) {
+    if (accessResult.error || roleResult.error || subscriptionResult.error) {
       throw new Error("Não foi possível consultar sua assinatura.");
     }
 

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AmbientBackground, GlassCard } from "@/components/glass";
+import { useServerFn } from "@tanstack/react-start";
+import { AmbientBackground, GlassCard, LoadingBlock } from "@/components/glass";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +11,18 @@ import { Switch } from "@/components/ui/switch";
 import { USAGE_TYPES } from "@/lib/constants";
 import { useProfile, useUpdateProfile, useUpsert } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { getSubscriptionAccess } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
+  head: () => ({ meta: [
+    { title: "Configurar conta — Gestão Motoboy" },
+    { name: "description", content: "Configure seu perfil e cadastre sua primeira moto." },
+    { property: "og:title", content: "Configurar conta — Gestão Motoboy" },
+    { property: "og:description", content: "Configure seu perfil e cadastre sua primeira moto." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: Onboarding,
 });
 
@@ -19,6 +31,8 @@ function Onboarding() {
   const profile = useProfile();
   const updateProfile = useUpdateProfile("");
   const createMoto = useUpsert("motorcycles", "motorcycles", {});
+  const fetchAccess = useServerFn(getSubscriptionAccess);
+  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
@@ -28,6 +42,17 @@ function Onboarding() {
   const [saving, setSaving] = useState(false);
 
   const displayName = name || profile.data?.name || "";
+
+  const blocked = access.isSuccess && !access.data.active && !access.data.admin;
+  useEffect(() => {
+    if (blocked) navigate({ to: "/planos", replace: true });
+  }, [blocked, navigate]);
+
+  if (access.isLoading) {
+    return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><LoadingBlock label="Verificando sua assinatura..." /></div>;
+  }
+
+  if (blocked) return null;
 
   const toggleUsage = (u: string) =>
     setUsage((prev) => (prev.includes(u) ? prev.filter((x) => x !== u) : [...prev, u]));

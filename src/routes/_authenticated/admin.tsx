@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Section = "motorcycles" | "incomes" | "expenses" | "fuel" | "subscriptions";
+type Section = "motorcycles" | "incomes" | "expenses" | "fuel" | "subscriptions" | "webhooks";
 
 function Owner({ data, userId }: { data: AdminData; userId: string }) {
   const owner = data.owners[userId];
@@ -59,23 +59,36 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
   const totalIncome = data.incomes.reduce((sum, item) => sum + Number(item.amount), 0);
   const totalExpense = data.expenses.reduce((sum, item) => sum + Number(item.amount), 0);
   const activeSubscriptions = data.subscriptions.filter((item) => item.status === "active").length;
+  const monthlySubscriptions = data.subscriptions.filter((item) => item.plan === "monthly").length;
+  const annualSubscriptions = data.subscriptions.filter((item) => item.plan === "annual").length;
+  const canceledSubscriptions = data.subscriptions.filter((item) => item.status === "canceled").length;
+  const expiredSubscriptions = data.subscriptions.filter((item) => item.status === "expired").length;
+  const refundedSubscriptions = data.subscriptions.filter((item) => item.status === "refunded").length;
+  const chargebackSubscriptions = data.subscriptions.filter((item) => item.status === "chargeback").length;
   const sections = [
     { id: "motorcycles" as const, label: "Motos", icon: Bike, count: data.motorcycles.length },
     { id: "incomes" as const, label: "Ganhos", icon: TrendingUp, count: data.incomes.length },
     { id: "expenses" as const, label: "Gastos", icon: TrendingDown, count: data.expenses.length },
     { id: "fuel" as const, label: "Abastecimentos", icon: Fuel, count: data.fuelRecords.length },
     { id: "subscriptions" as const, label: "Assinaturas", icon: CreditCard, count: data.subscriptions.length },
+    { id: "webhooks" as const, label: "Webhooks", icon: ShieldCheck, count: data.webhookEvents.length },
   ];
 
   return <>
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <Stat label="Usuários com registros" value={Object.keys(data.owners).length} />
       <Stat label="Motos" value={data.motorcycles.length} />
       <Stat label="Ganhos registrados" value={brl(totalIncome)} tone="positive" />
       <Stat label="Gastos registrados" value={brl(totalExpense)} tone="negative" />
       <Stat label="Assinaturas ativas" value={activeSubscriptions} tone="positive" />
+      <Stat label="Planos mensais" value={monthlySubscriptions} />
+      <Stat label="Planos anuais" value={annualSubscriptions} />
+      <Stat label="Canceladas" value={canceledSubscriptions} />
+      <Stat label="Expiradas" value={expiredSubscriptions} />
+      <Stat label="Reembolsadas" value={refundedSubscriptions} tone="negative" />
+      <Stat label="Chargebacks" value={chargebackSubscriptions} tone="negative" />
     </div>
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
       {sections.map((item) => <Button key={item.id} variant={section === item.id ? "default" : "outline"} className="h-auto min-h-12 justify-start px-3 py-2" onClick={() => setSection(item.id)}><item.icon className="mr-2 size-4 shrink-0" /><span className="min-w-0 truncate">{item.label}</span><span className={cn("ml-auto text-xs", section === item.id ? "text-primary-foreground/75" : "text-muted-foreground")}>{item.count}</span></Button>)}
     </div>
     <GlassCard padded={false} className="overflow-hidden">
@@ -85,7 +98,8 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
         {section === "expenses" && data.expenses.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.category}</p><p className="truncate text-xs text-muted-foreground">{item.group_name} · {item.description ?? "Sem descrição"} · {dateBR(item.date)}</p></div><strong className="num-display text-sm text-negative">{brl(item.amount)}</strong></div>)}
         {section === "fuel" && data.fuelRecords.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.station ?? "Posto não informado"}</p><p className="text-xs text-muted-foreground">{item.liters.toLocaleString("pt-BR")} L · {km(item.km)} · {dateBR(item.date)}</p></div><strong className="num-display text-sm">{brl(item.total)}</strong></div>)}
         {section === "subscriptions" && data.subscriptions.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.plan === "monthly" ? "Mensal" : "Anual"} · {subscriptionStatus(item.status)}</p><p className="truncate text-xs text-muted-foreground">{item.kiwify_transaction_id ?? "Sem transação"} · {dateBR(item.started_at ?? item.created_at)}</p></div><strong className="text-sm">{item.expires_at ? dateBR(item.expires_at) : "—"}</strong></div>)}
-        {((section === "motorcycles" && !data.motorcycles.length) || (section === "incomes" && !data.incomes.length) || (section === "expenses" && !data.expenses.length) || (section === "fuel" && !data.fuelRecords.length) || (section === "subscriptions" && !data.subscriptions.length)) ? <p className="p-8 text-center text-sm text-muted-foreground">Nenhum registro encontrado.</p> : null}
+        {section === "webhooks" && data.webhookEvents.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><div><p className="font-semibold">{item.event_type}</p><p className="truncate text-xs text-muted-foreground">{item.transaction_id ?? "Sem transação"}</p></div><div><p className="text-sm">{item.processed ? "Processado" : "Não processado"}</p><p className="truncate text-xs text-muted-foreground">{item.error_message ?? "Sem erro registrado"}</p></div><strong className="text-sm">{dateBR(item.created_at)}</strong></div>)}
+        {((section === "motorcycles" && !data.motorcycles.length) || (section === "incomes" && !data.incomes.length) || (section === "expenses" && !data.expenses.length) || (section === "fuel" && !data.fuelRecords.length) || (section === "subscriptions" && !data.subscriptions.length) || (section === "webhooks" && !data.webhookEvents.length)) ? <p className="p-8 text-center text-sm text-muted-foreground">Nenhum registro encontrado.</p> : null}
       </div>
     </GlassCard>
   </>;
