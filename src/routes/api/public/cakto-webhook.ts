@@ -110,7 +110,19 @@ function subscriptionFields(order: Order) {
 }
 
 function sanitizedPayload(event: string, order: Order): Json {
-  return { event, data: order as unknown as Json };
+  const subscription = subscriptionFields(order);
+  return {
+    event,
+    data: {
+      id: order.id,
+      product_id: order.product.id,
+      offer_id: order.offer?.id ?? null,
+      subscription_id: subscription.id,
+      started_at: subscription.startedAt,
+      expires_at: subscription.expiresAt,
+      canceled_at: subscription.canceledAt,
+    },
+  };
 }
 
 async function recordRejectedEvent(
@@ -155,7 +167,7 @@ async function processOrder(event: string, order: Order, plan: Plan) {
   return data;
 }
 
-export const Route = createFileRoute("/api/public/webhooks/cakto")({
+export const Route = createFileRoute("/api/public/cakto-webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
