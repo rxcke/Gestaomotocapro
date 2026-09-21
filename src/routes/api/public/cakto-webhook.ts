@@ -155,7 +155,7 @@ async function processOrder(event: string, order: Order, plan: Plan) {
   return data;
 }
 
-export const Route = createFileRoute("/api/public/webhooks/cakto")({
+export const Route = createFileRoute("/api/public/cakto-webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {

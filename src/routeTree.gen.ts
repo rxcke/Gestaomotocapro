@@ -27,9 +27,9 @@ import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
 import { Route as AuthenticatedAppPerfilRouteImport } from './routes/_authenticated/app.perfil'
 import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authenticated/app.relatorios'
+import { Route as ApiPublicCaktoWebhookRouteImport } from './routes/api/public/cakto-webhook'
 import { Route as AuthenticatedAppMotoIndexRouteImport } from './routes/_authenticated/app.moto.index'
 import { Route as AuthenticatedAppMotoAbastecimentosRouteImport } from './routes/_authenticated/app.moto.abastecimentos'
-import { Route as ApiPublicWebhooksCaktoRouteImport } from './routes/api/public/webhooks/cakto'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -124,6 +124,11 @@ const AuthenticatedAppRelatoriosRoute =
     path: '/relatorios',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const ApiPublicCaktoWebhookRoute = ApiPublicCaktoWebhookRouteImport.update({
+  id: '/api/public/cakto-webhook',
+  path: '/api/public/cakto-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppMotoIndexRoute =
   AuthenticatedAppMotoIndexRouteImport.update({
     id: '/',
@@ -136,11 +141,6 @@ const AuthenticatedAppMotoAbastecimentosRoute =
     path: '/abastecimentos',
     getParentRoute: () => AuthenticatedAppMotoRoute,
   } as any)
-const ApiPublicWebhooksCaktoRoute = ApiPublicWebhooksCaktoRouteImport.update({
-  id: '/api/public/webhooks/cakto',
-  path: '/api/public/webhooks/cakto',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,9 +159,9 @@ export interface FileRoutesByFullPath {
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
+  '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
-  '/api/public/webhooks/cakto': typeof ApiPublicWebhooksCaktoRoute
   '/app/moto/': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRoutesByTo {
@@ -179,9 +179,9 @@ export interface FileRoutesByTo {
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
+  '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
-  '/api/public/webhooks/cakto': typeof ApiPublicWebhooksCaktoRoute
   '/app/moto': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRoutesById {
@@ -203,9 +203,9 @@ export interface FileRoutesById {
   '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/_authenticated/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
+  '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
-  '/api/public/webhooks/cakto': typeof ApiPublicWebhooksCaktoRoute
   '/_authenticated/app/moto/': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRouteTypes {
@@ -227,9 +227,9 @@ export interface FileRouteTypes {
     | '/app/moto'
     | '/app/perfil'
     | '/app/relatorios'
+    | '/api/public/cakto-webhook'
     | '/app/'
     | '/app/moto/abastecimentos'
-    | '/api/public/webhooks/cakto'
     | '/app/moto/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -247,9 +247,9 @@ export interface FileRouteTypes {
     | '/app/metas'
     | '/app/perfil'
     | '/app/relatorios'
+    | '/api/public/cakto-webhook'
     | '/app'
     | '/app/moto/abastecimentos'
-    | '/api/public/webhooks/cakto'
     | '/app/moto'
   id:
     | '__root__'
@@ -270,9 +270,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/moto'
     | '/_authenticated/app/perfil'
     | '/_authenticated/app/relatorios'
+    | '/api/public/cakto-webhook'
     | '/_authenticated/app/'
     | '/_authenticated/app/moto/abastecimentos'
-    | '/api/public/webhooks/cakto'
     | '/_authenticated/app/moto/'
   fileRoutesById: FileRoutesById
 }
@@ -281,7 +281,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  ApiPublicWebhooksCaktoRoute: typeof ApiPublicWebhooksCaktoRoute
+  ApiPublicCaktoWebhookRoute: typeof ApiPublicCaktoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -412,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRelatoriosRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/api/public/cakto-webhook': {
+      id: '/api/public/cakto-webhook'
+      path: '/api/public/cakto-webhook'
+      fullPath: '/api/public/cakto-webhook'
+      preLoaderRoute: typeof ApiPublicCaktoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/app/moto/': {
       id: '/_authenticated/app/moto/'
       path: '/'
@@ -425,13 +432,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/moto/abastecimentos'
       preLoaderRoute: typeof AuthenticatedAppMotoAbastecimentosRouteImport
       parentRoute: typeof AuthenticatedAppMotoRoute
-    }
-    '/api/public/webhooks/cakto': {
-      id: '/api/public/webhooks/cakto'
-      path: '/api/public/webhooks/cakto'
-      fullPath: '/api/public/webhooks/cakto'
-      preLoaderRoute: typeof ApiPublicWebhooksCaktoRouteImport
-      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -501,7 +501,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  ApiPublicWebhooksCaktoRoute: ApiPublicWebhooksCaktoRoute,
+  ApiPublicCaktoWebhookRoute: ApiPublicCaktoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
