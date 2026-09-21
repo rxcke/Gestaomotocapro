@@ -631,7 +631,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
-      subscription_plan: "monthly" | "annual"
+      subscription_plan: "monthly" | "quarterly" | "annual"
       subscription_status:
         | "pending"
         | "active"
@@ -767,7 +767,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
-      subscription_plan: ["monthly", "annual"],
+      subscription_plan: ["monthly", "quarterly", "annual"],
       subscription_status: [
         "pending",
         "active",
