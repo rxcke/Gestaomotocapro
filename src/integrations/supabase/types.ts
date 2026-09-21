@@ -415,6 +415,10 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          cakto_offer_id: string | null
+          cakto_product_id: string | null
+          cakto_subscription_id: string | null
+          cakto_transaction_id: string | null
           canceled_at: string | null
           created_at: string
           email: string
@@ -424,12 +428,17 @@ export type Database = {
           kiwify_subscription_id: string | null
           kiwify_transaction_id: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
+          provider: string
           started_at: string | null
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          cakto_offer_id?: string | null
+          cakto_product_id?: string | null
+          cakto_subscription_id?: string | null
+          cakto_transaction_id?: string | null
           canceled_at?: string | null
           created_at?: string
           email: string
@@ -439,12 +448,17 @@ export type Database = {
           kiwify_subscription_id?: string | null
           kiwify_transaction_id?: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
+          provider?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          cakto_offer_id?: string | null
+          cakto_product_id?: string | null
+          cakto_subscription_id?: string | null
+          cakto_transaction_id?: string | null
           canceled_at?: string | null
           created_at?: string
           email?: string
@@ -454,6 +468,7 @@ export type Database = {
           kiwify_subscription_id?: string | null
           kiwify_transaction_id?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
+          provider?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
@@ -580,6 +595,23 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      process_cakto_subscription_event: {
+        Args: {
+          _buyer_email: string
+          _canceled_at: string
+          _event_id: string
+          _event_type: string
+          _expires_at: string
+          _offer_id: string
+          _payload: Json
+          _plan: Database["public"]["Enums"]["subscription_plan"]
+          _product_id: string
+          _started_at: string
+          _subscription_id: string
+          _transaction_id: string
+        }
+        Returns: Json
       }
       process_kiwify_subscription_event: {
         Args: {
