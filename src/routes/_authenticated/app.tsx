@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { AppDataProvider } from "@/lib/app-context";
@@ -16,7 +16,6 @@ export const Route = createFileRoute("/_authenticated/app")({
 function AppLayout() {
   const profile = useProfile();
   const navigate = useNavigate();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const fetchAccess = useServerFn(getSubscriptionAccess);
   const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
   const hasPremium = Boolean(access.data?.active || access.data?.admin);

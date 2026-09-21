@@ -1,4 +1,4 @@
-# MotoFinance MVP
+# Gestão Motoboy MVP
 
 - [x] Base visual, autenticação, onboarding e banco protegido
 - [x] Dashboard e lançamentos financeiros

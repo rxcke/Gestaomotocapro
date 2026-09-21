@@ -112,7 +112,7 @@ export const getAdminData = createServerFn({ method: "GET" })
       incomesResult.error ??
       expensesResult.error ??
       fuelResult.error ??
-      profilesResult.error;
+      profilesResult.error ??
       subscriptionsResult.error ??
       eventsResult.error;
     if (error) throw new Error("Não foi possível carregar os dados administrativos.");
