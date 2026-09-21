@@ -10,3 +10,4 @@
 - [ ] Configurar os planos Cakto da imagem: Start mensal R$ 29,90, Pro trimestral R$ 69,90 e Elite anual R$ 199,90
 - [ ] Validar o endpoint POST público da Cakto, respostas HTTP 200, bloqueios e logs; informar a URL completa
 - [ ] Confirmar o backend conectado e funções existentes; documentar o endpoint compatível com a infraestrutura atual
+- [ ] Pausado por solicitação: confirmar banco, projeto conectado e Edge Functions antes de continuar a integração Cakto
