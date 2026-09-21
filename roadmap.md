@@ -11,4 +11,4 @@
 - [ ] Validar o endpoint POST público da Cakto, respostas HTTP 200, bloqueios e logs; informar a URL completa
 - [x] Confirmar o backend conectado e funções existentes; documentar o endpoint compatível com a infraestrutura atual
 - [x] Confirmação concluída; integração Cakto retomada por solicitação
-- [ ] Reavaliar payload oficial: um produto Cakto com três ofertas; confirmar identificador de oferta antes de finalizar
+- [x] Reavaliar payload oficial: um produto Cakto com três ofertas; usar `data.offer.id` para identificar cada plano

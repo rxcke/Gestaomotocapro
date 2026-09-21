@@ -144,6 +144,16 @@ async function recordRejectedEvent(
   );
 }
 
+function logWebhook(
+  level: "info" | "warn" | "error",
+  details: Record<string, unknown>,
+): void {
+  const entry = { source: "cakto-webhook", ...details };
+  if (level === "error") console.error(entry);
+  else if (level === "warn") console.warn(entry);
+  else console.info(entry);
+}
+
 async function processOrder(event: string, order: Order, plan: Plan) {
   const subscription = subscriptionFields(order);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -194,15 +204,22 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
         }
 
         const webhookSecret = process.env["CAKTO_WEBHOOK_SECRET"];
-        const monthlyProductId = process.env["CAKTO_MONTHLY_PRODUCT_ID"];
-        const quarterlyProductId = process.env["CAKTO_QUARTERLY_PRODUCT_ID"];
-        const annualProductId = process.env["CAKTO_ANNUAL_PRODUCT_ID"];
-        if (!webhookSecret || !monthlyProductId || !quarterlyProductId || !annualProductId) {
+        const productId = process.env["CAKTO_PRODUCT_ID"];
+        const startOfferId = process.env["CAKTO_START_OFFER_ID"];
+        const proOfferId = process.env["CAKTO_PRO_OFFER_ID"];
+        const eliteOfferId = process.env["CAKTO_ELITE_OFFER_ID"];
+        if (!webhookSecret || !productId || !startOfferId || !proOfferId || !eliteOfferId) {
+          logWebhook("error", { outcome: "webhook_not_configured" });
+          return Response.json({ error: "webhook_not_configured" }, { status: 503 });
+        }
+        if (new Set([startOfferId, proOfferId, eliteOfferId]).size !== 3) {
+          logWebhook("error", { outcome: "offer_configuration_conflict" });
           return Response.json({ error: "webhook_not_configured" }, { status: 503 });
         }
 
         const parsedPayload = payloadSchema.safeParse(parsedJson);
         if (!parsedPayload.success) {
+          logWebhook("warn", { outcome: "invalid_payload" });
           return Response.json({ error: "invalid_payload" }, { status: 400 });
         }
 
@@ -214,11 +231,13 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
         );
         const bodySecretIsValid = hasValidBodySecret(parsedPayload.data.secret, webhookSecret);
         if (!signatureIsValid && !bodySecretIsValid) {
+          logWebhook("warn", { outcome: "invalid_signature" });
           return Response.json({ error: "invalid_signature" }, { status: 401 });
         }
 
         const { event } = parsedPayload.data;
         if (!supportedEvents.has(event)) {
+          logWebhook("info", { event, outcome: "unsupported_event" });
           return Response.json({ received: true, ignored: "unsupported_event" });
         }
 
@@ -229,23 +248,38 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
         try {
           const results = [];
           for (const order of orders) {
-            const plan: Plan | null = order.product.id === monthlyProductId
-              ? "monthly"
-              : order.product.id === quarterlyProductId
-                ? "quarterly"
-              : order.product.id === annualProductId
-                ? "annual"
-                : null;
-            if (!plan) {
+            if (order.product.id !== productId) {
               await recordRejectedEvent(event, order, "unknown_product");
+              logWebhook("warn", { event, eventId: order.id, outcome: "unknown_product" });
               results.push({ id: order.id, result: "unknown_product" });
               continue;
             }
-            results.push({ id: order.id, result: await processOrder(event, order, plan) });
+
+            const offerId = order.offer?.id ?? null;
+            const plan: Plan | null = offerId === startOfferId
+              ? "monthly"
+              : offerId === proOfferId
+                ? "quarterly"
+              : offerId === eliteOfferId
+                ? "annual"
+                : null;
+            if (!plan) {
+              await recordRejectedEvent(event, order, "unknown_offer");
+              logWebhook("warn", { event, eventId: order.id, outcome: "unknown_offer" });
+              results.push({ id: order.id, result: "unknown_offer" });
+              continue;
+            }
+            const result = await processOrder(event, order, plan);
+            logWebhook("info", { event, eventId: order.id, plan, outcome: result });
+            results.push({ id: order.id, result });
           }
           return Response.json({ received: true, results });
         } catch (error) {
-          console.error("[Cakto webhook] Processing failed", error);
+          logWebhook("error", {
+            event,
+            outcome: "processing_failed",
+            message: error instanceof Error ? error.message : "unknown_error",
+          });
           return Response.json({ error: "processing_failed" }, { status: 500 });
         }
       },
