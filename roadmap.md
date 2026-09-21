@@ -12,3 +12,4 @@
 - [x] Confirmar o backend conectado e funções existentes; documentar o endpoint compatível com a infraestrutura atual
 - [x] Confirmação concluída; integração Cakto retomada por solicitação
 - [x] Reavaliar payload oficial: um produto Cakto com três ofertas; usar `data.offer.id` para identificar cada plano
+- [ ] Publicar `cakto-webhook` sem exigir o segredo na etapa de publicação e confirmar a URL pública exata
