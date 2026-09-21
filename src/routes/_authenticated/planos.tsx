@@ -60,9 +60,10 @@ function PlansPage() {
         <p className="mt-4 text-muted-foreground">Escolha o período ideal. Seus dados ficam preservados mesmo se você cancelar.</p>
       </div>
 
-      {access.data?.active ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">Sua assinatura está ativa</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-2 md:items-stretch">
-        <PlanCard name="Gestão Motoboy Mensal" price="R$ 29,90" period="/mês" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} />
-        <PlanCard name="Gestão Motoboy Anual" price="R$ 99,90" period="/ano" plan="annual" featured loading={opening === "annual"} onSubscribe={subscribe} />
+      {access.data?.active ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">Sua assinatura está ativa</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-3 md:items-stretch">
+         <PlanCard name="Start" price="R$ 29,90" period="/mês" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} />
+         <PlanCard name="Pro" price="R$ 69,90" period="/trimestre" plan="quarterly" featured loading={opening === "quarterly"} onSubscribe={subscribe} />
+         <PlanCard name="Elite" price="R$ 199,90" period="/ano" plan="annual" loading={opening === "annual"} onSubscribe={subscribe} />
       </div>}
     </main>
   </div>;
@@ -74,6 +75,6 @@ function PlanCard({ name, price, period, plan, featured = false, loading, onSubs
     <h2 className="pr-28 font-display text-xl font-bold">{name}</h2>
     <p className="mt-5"><span className="num-display text-4xl">{price}</span><span className="text-sm text-muted-foreground">{period}</span></p>
     <ul className="my-7 flex-1 space-y-3">{FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}</ul>
-    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => onSubscribe(plan)}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : plan === "monthly" ? "Assinar plano mensal" : "Assinar plano anual"}</Button>
+    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => onSubscribe(plan)}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : plan === "monthly" ? "Assinar plano mensal" : plan === "quarterly" ? "Assinar plano trimestral" : "Assinar plano anual"}</Button>
   </GlassCard>;
 }

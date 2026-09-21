@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type SubscriptionPlan = "monthly" | "annual";
+export type SubscriptionPlan = "monthly" | "quarterly" | "annual";
 export type SubscriptionStatus = "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
 
 export type SubscriptionView = {
@@ -21,7 +21,7 @@ export type SubscriptionAccess = {
   subscription: SubscriptionView | null;
 };
 
-const CheckoutInput = z.object({ plan: z.enum(["monthly", "annual"]) });
+const CheckoutInput = z.object({ plan: z.enum(["monthly", "quarterly", "annual"]) });
 
 export const getSubscriptionAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -62,7 +62,11 @@ export const getCheckoutUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => CheckoutInput.parse(input))
   .handler(async ({ data }) => {
-    const key = data.plan === "monthly" ? "CAKTO_MONTHLY_CHECKOUT_URL" : "CAKTO_ANNUAL_CHECKOUT_URL";
+    const key = data.plan === "monthly"
+      ? "CAKTO_MONTHLY_CHECKOUT_URL"
+      : data.plan === "quarterly"
+        ? "CAKTO_QUARTERLY_CHECKOUT_URL"
+        : "CAKTO_ANNUAL_CHECKOUT_URL";
     const configuredUrl = process.env[key];
     if (!configuredUrl) return { configured: false as const, url: null };
 
