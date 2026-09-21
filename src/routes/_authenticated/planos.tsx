@@ -55,7 +55,7 @@ function PlansPage() {
     <main className="relative mx-auto max-w-5xl">
       <div className="flex items-center justify-between gap-3"><Logo /><Button asChild variant="ghost"><Link to="/app/perfil">Perfil</Link></Button></div>
       <div className="mx-auto mt-10 max-w-2xl text-center">
-        <p className="text-sm font-semibold text-accent">GESTÃO MOTOboy PREMIUM</p>
+        <p className="text-sm font-semibold text-accent">GESTÃO MOTOBOY PREMIUM</p>
         <h1 className="mt-3 font-display text-3xl font-bold sm:text-5xl">Controle total da sua moto e do seu dinheiro</h1>
         <p className="mt-4 text-muted-foreground">Escolha o período ideal. Seus dados ficam preservados mesmo se você cancelar.</p>
       </div>
@@ -74,6 +74,6 @@ function PlanCard({ name, price, period, plan, featured = false, loading, onSubs
     <h2 className="pr-28 font-display text-xl font-bold">{name}</h2>
     <p className="mt-5"><span className="num-display text-4xl">{price}</span><span className="text-sm text-muted-foreground">{period}</span></p>
     <ul className="my-7 flex-1 space-y-3">{FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}</ul>
-    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => onSubscribe(plan)}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : plan === "monthly" ? "ASSINAR MENSAL" : "ASSINAR ANUAL"}</Button>
+    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => onSubscribe(plan)}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : plan === "monthly" ? "Assinar plano mensal" : "Assinar plano anual"}</Button>
   </GlassCard>;
 }
