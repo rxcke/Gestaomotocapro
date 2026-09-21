@@ -87,7 +87,8 @@ function hasValidBodySecret(received: unknown, expected: string): boolean {
   if (receivedBytes.length !== expectedBytes.length) return false;
   let difference = 0;
   for (let index = 0; index < expectedBytes.length; index += 1) {
-    difference |= receivedBytes[index] ^ expectedBytes[index];
+    difference |= receivedBytes.at(index) ?? 0;
+    difference ^= expectedBytes.at(index) ?? 0;
   }
   return difference === 0;
 }
