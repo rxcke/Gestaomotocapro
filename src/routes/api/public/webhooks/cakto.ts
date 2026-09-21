@@ -79,6 +79,21 @@ async function hasValidSignature(
   );
 }
 
+function hasValidBodySecret(received: unknown, expected: string): boolean {
+  if (typeof received !== "string") return false;
+  const encoder = new TextEncoder();
+  const receivedBytes = encoder.encode(received);
+  const expectedBytes = encoder.encode(expected);
+  if (receivedBytes.length !== expectedBytes.length) return false;
+  let difference = 0;
+  for (let index = 0; index < expectedBytes.length; index += 1) {
+    const receivedByte = receivedBytes.at(index) ?? 0;
+    const expectedByte = expectedBytes.at(index) ?? 0;
+    difference |= receivedByte ^ expectedByte;
+  }
+  return difference === 0;
+}
+
 function readString(record: Record<string, unknown> | null | undefined, key: string): string | null {
   const value = record?.[key];
   return typeof value === "string" && value.length > 0 ? value : null;
@@ -174,19 +189,20 @@ export const Route = createFileRoute("/api/public/webhooks/cakto")({
           return Response.json({ error: "webhook_not_configured" }, { status: 503 });
         }
 
+        const parsedPayload = payloadSchema.safeParse(parsedJson);
+        if (!parsedPayload.success) {
+          return Response.json({ error: "invalid_payload" }, { status: 400 });
+        }
+
         const signatureIsValid = await hasValidSignature(
           rawBody,
           request.headers.get("x-cakto-timestamp"),
           request.headers.get("x-cakto-signature"),
           webhookSecret,
         );
-        if (!signatureIsValid) {
+        const bodySecretIsValid = hasValidBodySecret(parsedPayload.data.secret, webhookSecret);
+        if (!signatureIsValid && !bodySecretIsValid) {
           return Response.json({ error: "invalid_signature" }, { status: 401 });
-        }
-
-        const parsedPayload = payloadSchema.safeParse(parsedJson);
-        if (!parsedPayload.success) {
-          return Response.json({ error: "invalid_payload" }, { status: 400 });
         }
 
         const { event } = parsedPayload.data;
