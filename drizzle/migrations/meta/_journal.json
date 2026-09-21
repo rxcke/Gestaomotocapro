@@ -22,6 +22,13 @@
       "when": 1789902612046,
       "tag": "0002_enforce_premium_access_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790012967111,
+      "tag": "0003_replace_kiwify_with_cakto_subscriptions",
+      "breakpoints": true
     }
   ]
 }
