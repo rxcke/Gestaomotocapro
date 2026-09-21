@@ -39,14 +39,14 @@ const payloadSchema = z.object({
 type Order = z.infer<typeof orderSchema>;
 type Plan = "monthly" | "annual";
 
-function hexToBytes(value: string): Uint8Array | null {
+function hexToBytes(value: string): ArrayBuffer | null {
   if (!/^[0-9a-f]+$/i.test(value) || value.length % 2 !== 0) return null;
   const bytes = new Uint8Array(value.length / 2);
   for (let index = 0; index < bytes.length; index += 1) {
     const pair = value.slice(index * 2, index * 2 + 2);
     bytes[index] = Number.parseInt(pair, 16);
   }
-  return bytes;
+  return bytes.buffer;
 }
 
 async function hasValidSignature(
@@ -120,6 +120,8 @@ async function recordRejectedEvent(
 async function processOrder(event: string, order: Order, plan: Plan) {
   const subscription = subscriptionFields(order);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // PostgREST accepts null for these nullable SQL parameters, while generated RPC types omit null.
+  const nullableRpcString = (value: string | null) => value as unknown as string;
   const { data, error } = await supabaseAdmin.rpc("process_cakto_subscription_event", {
     _event_id: `${event}:${order.id}`,
     _event_type: event,
@@ -127,11 +129,11 @@ async function processOrder(event: string, order: Order, plan: Plan) {
     _buyer_email: order.customer.email,
     _plan: plan,
     _product_id: order.product.id,
-    _offer_id: order.offer?.id ?? null,
-    _subscription_id: subscription.id,
-    _started_at: subscription.startedAt,
-    _expires_at: subscription.expiresAt,
-    _canceled_at: subscription.canceledAt,
+    _offer_id: nullableRpcString(order.offer?.id ?? null),
+    _subscription_id: nullableRpcString(subscription.id),
+    _started_at: nullableRpcString(subscription.startedAt),
+    _expires_at: nullableRpcString(subscription.expiresAt),
+    _canceled_at: nullableRpcString(subscription.canceledAt),
     _payload: sanitizedPayload(event, order),
   });
   if (error) throw new Error(error.message);
