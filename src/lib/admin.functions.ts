@@ -7,6 +7,25 @@ type AdminOwner = {
 };
 
 export type AdminData = {
+  subscriptions: Array<{
+    id: string;
+    user_id: string;
+    email: string;
+    plan: "monthly" | "annual";
+    status: "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
+    kiwify_transaction_id: string | null;
+    started_at: string | null;
+    expires_at: string | null;
+    created_at: string;
+  }>;
+  webhookEvents: Array<{
+    id: string;
+    event_type: string;
+    transaction_id: string | null;
+    processed: boolean;
+    error_message: string | null;
+    created_at: string;
+  }>;
   motorcycles: Array<{
     id: string;
     user_id: string;
@@ -61,7 +80,7 @@ export const getAdminData = createServerFn({ method: "GET" })
     if (roleError || !isAdmin) throw new Error("Acesso administrativo não autorizado.");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [motorcyclesResult, incomesResult, expensesResult, fuelResult, profilesResult] =
+    const [motorcyclesResult, incomesResult, expensesResult, fuelResult, profilesResult, subscriptionsResult, eventsResult] =
       await Promise.all([
         supabaseAdmin
           .from("motorcycles")
@@ -84,6 +103,8 @@ export const getAdminData = createServerFn({ method: "GET" })
           .order("date", { ascending: false })
           .limit(500),
         supabaseAdmin.from("profiles").select("id,name,email").limit(500),
+        supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,kiwify_transaction_id,started_at,expires_at,created_at").order("created_at", { ascending: false }).limit(500),
+        supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
       ]);
 
     const error =
@@ -92,6 +113,8 @@ export const getAdminData = createServerFn({ method: "GET" })
       expensesResult.error ??
       fuelResult.error ??
       profilesResult.error;
+      subscriptionsResult.error ??
+      eventsResult.error;
     if (error) throw new Error("Não foi possível carregar os dados administrativos.");
 
     const owners = Object.fromEntries(
@@ -106,6 +129,8 @@ export const getAdminData = createServerFn({ method: "GET" })
       incomes: incomesResult.data ?? [],
       expenses: expensesResult.data ?? [],
       fuelRecords: fuelResult.data ?? [],
+      subscriptions: subscriptionsResult.data ?? [],
+      webhookEvents: eventsResult.data ?? [],
       owners,
     };
   });

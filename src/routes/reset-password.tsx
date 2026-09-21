@@ -12,10 +12,10 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Redefinir senha — MotoFinance" },
-      { name: "description", content: "Defina uma nova senha para sua conta MotoFinance." },
-      { property: "og:title", content: "Redefinir senha — MotoFinance" },
-      { property: "og:description", content: "Defina uma nova senha para sua conta MotoFinance." },
+      { title: "Redefinir senha — Gestão Motoboy" },
+      { name: "description", content: "Defina uma nova senha para sua conta Gestão Motoboy." },
+      { property: "og:title", content: "Redefinir senha — Gestão Motoboy" },
+      { property: "og:description", content: "Defina uma nova senha para sua conta Gestão Motoboy." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },

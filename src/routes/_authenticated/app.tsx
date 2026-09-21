@@ -1,9 +1,13 @@
 import { useEffect } from "react";
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { AppDataProvider } from "@/lib/app-context";
 import { useProfile } from "@/lib/data";
 import { LoadingBlock } from "@/components/glass";
+import { PremiumGate } from "@/components/PremiumGate";
+import { getSubscriptionAccess } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppLayout,
@@ -12,13 +16,17 @@ export const Route = createFileRoute("/_authenticated/app")({
 function AppLayout() {
   const profile = useProfile();
   const navigate = useNavigate();
-  const needsOnboarding = profile.isSuccess && !(profile.data?.onboarding_completed ?? false);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const fetchAccess = useServerFn(getSubscriptionAccess);
+  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
+  const hasPremium = Boolean(access.data?.active || access.data?.admin);
+  const needsOnboarding = hasPremium && profile.isSuccess && !(profile.data?.onboarding_completed ?? false);
 
   useEffect(() => {
     if (needsOnboarding) navigate({ to: "/onboarding", replace: true });
   }, [needsOnboarding, navigate]);
 
-  if (profile.isLoading || needsOnboarding) {
+  if (profile.isLoading || access.isLoading || needsOnboarding) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-canvas p-6">
         <LoadingBlock label="Preparando seu painel..." />
@@ -29,7 +37,9 @@ function AppLayout() {
   return (
     <AppDataProvider>
       <AppShell>
-        <Outlet />
+        <PremiumGate>
+          <Outlet />
+        </PremiumGate>
       </AppShell>
     </AppDataProvider>
   );

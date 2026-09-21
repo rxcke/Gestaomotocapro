@@ -12,9 +12,9 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar no MotoFinance" },
+      { title: "Entrar no Gestão Motoboy" },
       { name: "description", content: "Acesse sua conta e acompanhe o resultado da sua moto." },
-      { property: "og:title", content: "Entrar no MotoFinance" },
+      { property: "og:title", content: "Entrar no Gestão Motoboy" },
       { property: "og:description", content: "Acesse sua conta e acompanhe o resultado da sua moto." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -67,7 +67,7 @@ function AuthPage() {
           return;
         }
         toast.success("Conta criada com sucesso.");
-        navigate({ to: "/app", replace: true });
+        navigate({ to: "/planos", replace: true });
         return;
       }
       const { error } = await supabase.auth.signInWithPassword({ email, password });

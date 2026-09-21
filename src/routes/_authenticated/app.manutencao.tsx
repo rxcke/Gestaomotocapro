@@ -12,8 +12,8 @@ import type { MaintenanceRecord } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/app/manutencao")({
   head: () => ({ meta: [
-    { title: "Manutenção — MotoFinance" }, { name: "description", content: "Histórico e alertas de manutenção por data e quilometragem." },
-    { property: "og:title", content: "Manutenção — MotoFinance" }, { property: "og:description", content: "Histórico e alertas de manutenção por data e quilometragem." },
+    { title: "Manutenção — Gestão Motoboy" }, { name: "description", content: "Histórico e alertas de manutenção por data e quilometragem." },
+    { property: "og:title", content: "Manutenção — Gestão Motoboy" }, { property: "og:description", content: "Histórico e alertas de manutenção por data e quilometragem." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
   ] }), component: MaintenancePage,
 });

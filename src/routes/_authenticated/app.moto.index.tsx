@@ -11,9 +11,9 @@ import type { Motorcycle } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/app/moto/")({
   head: () => ({ meta: [
-    { title: "Minha Moto — MotoFinance" },
+    { title: "Minha Moto — Gestão Motoboy" },
     { name: "description", content: "Gerencie suas motos, quilometragem e custos." },
-    { property: "og:title", content: "Minha Moto — MotoFinance" },
+    { property: "og:title", content: "Minha Moto — Gestão Motoboy" },
     { property: "og:description", content: "Gerencie suas motos, quilometragem e custos." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },

@@ -3,6 +3,7 @@ import { Output, NoObjectGeneratedError, streamText } from "ai";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { KM_ALERT_THRESHOLD, DAYS_ALERT_THRESHOLD } from "./constants";
+import { requireActiveSubscription } from "./subscription-access.server";
 
 const InputSchema = z.object({ motorcycleId: z.string().nullable() });
 
@@ -44,6 +45,7 @@ export const generateAiInsights = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
+    await requireActiveSubscription(context.supabase, context.userId);
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("A análise com IA ainda não está configurada corretamente.");
 
@@ -145,7 +147,7 @@ export const generateAiInsights = createServerFn({ method: "POST" })
         model: createInsightsModel(apiKey),
         maxRetries: 2,
         output: Output.object({ schema: InsightSchema }),
-        system: "Você é o analista financeiro do MotoFinance. Escreva em português do Brasil, de forma direta, responsável e sem inventar dados. Trate as manutenções marcadas como late/soon como fatos calculados pelo sistema. Não dê diagnóstico mecânico. Valores monetários devem usar R$ e vírgula decimal.",
+        system: "Você é o analista financeiro do Gestão Motoboy. Escreva em português do Brasil, de forma direta, responsável e sem inventar dados. Trate as manutenções marcadas como late/soon como fatos calculados pelo sistema. Não dê diagnóstico mecânico. Valores monetários devem usar R$ e vírgula decimal.",
         prompt: `Analise este resumo real: ${JSON.stringify(payload)}. Gere no máximo 3 insights, priorizando combustível, manutenção e custo por km. Só mencione economia quantificada quando os dados sustentarem o cálculo; caso contrário, recomende o próximo registro necessário. A evidência deve citar números do resumo e a recomendação deve ser uma ação curta.`,
         providerOptions: {
           openai: {

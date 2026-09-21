@@ -12,8 +12,8 @@ import type { FuelRecord } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/app/moto/abastecimentos")({
   head: () => ({ meta: [
-    { title: "Abastecimentos — MotoFinance" }, { name: "description", content: "Consumo médio e custo de combustível por quilômetro." },
-    { property: "og:title", content: "Abastecimentos — MotoFinance" }, { property: "og:description", content: "Consumo médio e custo de combustível por quilômetro." },
+    { title: "Abastecimentos — Gestão Motoboy" }, { name: "description", content: "Consumo médio e custo de combustível por quilômetro." },
+    { property: "og:title", content: "Abastecimentos — Gestão Motoboy" }, { property: "og:description", content: "Consumo médio e custo de combustível por quilômetro." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
   ] }), component: FuelPage,
 });
