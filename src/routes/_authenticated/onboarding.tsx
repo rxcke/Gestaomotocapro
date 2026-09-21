@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -43,14 +43,16 @@ function Onboarding() {
 
   const displayName = name || profile.data?.name || "";
 
+  const blocked = access.isSuccess && !access.data.active && !access.data.admin;
+  useEffect(() => {
+    if (blocked) navigate({ to: "/planos", replace: true });
+  }, [blocked, navigate]);
+
   if (access.isLoading) {
     return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><LoadingBlock label="Verificando sua assinatura..." /></div>;
   }
 
-  if (!access.data?.active && !access.data?.admin) {
-    navigate({ to: "/planos", replace: true });
-    return null;
-  }
+  if (blocked) return null;
 
   const toggleUsage = (u: string) =>
     setUsage((prev) => (prev.includes(u) ? prev.filter((x) => x !== u) : [...prev, u]));
