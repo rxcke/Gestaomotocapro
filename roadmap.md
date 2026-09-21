@@ -7,4 +7,4 @@
 - [x] Validação autenticada dos fluxos principais no celular
 - [x] Área administrativa segura para consultar motos, ganhos, gastos e abastecimentos de todos os usuários
 - [ ] Substituir integralmente Kiwify por Cakto: confirmar contrato oficial, migrar banco/configurações, endpoint seguro, processamento idempotente, logs e administração
-- [ ] Analisar a imagem enviada e incorporar qualquer configuração Cakto relevante
+- [ ] Configurar os planos Cakto da imagem: Start mensal R$ 29,90, Pro trimestral R$ 69,90 e Elite anual R$ 199,90
