@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const MAX_BODY_BYTES = 256_000;
 
-export const Route = createFileRoute("/api/public/webhooks/kiwify")({
+export const Route = createFileRoute("/api/public/webhooks/cakto")({
   server: {
     handlers: {
       POST: async ({ request }) => {
