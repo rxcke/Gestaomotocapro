@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Bike, CreditCard, Fuel, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeft, Bike, CreditCard, Fuel, ShieldCheck, TrendingDown, TrendingUp } from "lucide-react";
 import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock, PageTitle, Stat } from "@/components/glass";
 import { Button } from "@/components/ui/button";
 import { getAdminData, type AdminData } from "@/lib/admin.functions";
