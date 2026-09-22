@@ -9,6 +9,7 @@ import { ErrorBlock, LoadingBlock } from "@/components/glass";
 import { PremiumGate } from "@/components/PremiumGate";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
+import { isValidBrazilianMobile } from "@/lib/phone";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppLayout,
@@ -20,7 +21,7 @@ function AppLayout() {
   const fetchAccess = useServerFn(getSubscriptionAccess);
   const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess) });
   const hasPremium = Boolean(access.data?.active || access.data?.admin);
-  const needsOnboarding = profile.isSuccess && (!profile.data?.phone || (hasPremium && !(profile.data?.onboarding_completed ?? false)));
+  const needsOnboarding = profile.isSuccess && (!isValidBrazilianMobile(profile.data?.phone) || (hasPremium && !(profile.data?.onboarding_completed ?? false)));
 
   useEffect(() => {
     if (needsOnboarding) navigate({ to: "/onboarding", replace: true });
