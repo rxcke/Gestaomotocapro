@@ -27,3 +27,9 @@
 - [x] Validar e normalizar celular brasileiro no cadastro, onboarding e perfil
 - [x] Garantir fluxo Google condicional ao telefone
 - [x] Testar cadastro, persistência, edição e celular
+
+## Identidade Gestão Motoca Pro
+- [ ] Aplicar nova logo e ícone fornecidos
+- [ ] Substituir referências visuais da marca e tagline
+- [ ] Atualizar identidade para preto, laranja, branco e cinza
+- [ ] Validar contraste e responsividade em desktop e celular
