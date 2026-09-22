@@ -376,6 +376,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          auth_provider: string
           avatar_url: string | null
           created_at: string
           email: string | null
@@ -388,6 +389,7 @@ export type Database = {
           usage_types: string[]
         }
         Insert: {
+          auth_provider?: string
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -400,6 +402,7 @@ export type Database = {
           usage_types?: string[]
         }
         Update: {
+          auth_provider?: string
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -429,6 +432,7 @@ export type Database = {
           kiwify_transaction_id: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           provider: string
+          provider_status: string
           started_at: string | null
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string
@@ -449,6 +453,7 @@ export type Database = {
           kiwify_transaction_id?: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           provider?: string
+          provider_status?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
@@ -469,6 +474,7 @@ export type Database = {
           kiwify_transaction_id?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           provider?: string
+          provider_status?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
