@@ -33,3 +33,10 @@
 - [x] Substituir referências visuais da marca e tagline
 - [x] Atualizar identidade para preto, laranja, branco e cinza
 - [x] Validar contraste e responsividade em desktop e celular
+
+## Landing page de conversão
+- [ ] Criar navegação responsiva e hero com demonstração visual do painel
+- [ ] Criar seções de dor, solução, benefícios, transformação e funcionamento
+- [ ] Exibir os três planos reais usando o fluxo atual de assinatura
+- [ ] Criar FAQ, CTA final e rodapé
+- [ ] Validar SEO, acessibilidade e responsividade de celular a ultrawide
