@@ -131,6 +131,17 @@ function sanitizedPayload(event: string, order: Order): Json {
   };
 }
 
+function fallbackExpiration(event: string, plan: Plan, startedAt: string | null, expiresAt: string | null) {
+  if (expiresAt) return expiresAt;
+  const initialEvent = event === "purchase_approved" || event === "subscription_created";
+  const base = initialEvent && startedAt ? new Date(startedAt) : new Date();
+  if (Number.isNaN(base.getTime())) return null;
+  if (plan === "monthly") base.setUTCMonth(base.getUTCMonth() + 1);
+  else if (plan === "quarterly") base.setUTCMonth(base.getUTCMonth() + 3);
+  else base.setUTCFullYear(base.getUTCFullYear() + 1);
+  return base.toISOString();
+}
+
 async function recordRejectedEvent(
   event: string,
   order: Order,
@@ -162,6 +173,7 @@ function logWebhook(
 
 async function processOrder(event: string, order: Order, plan: Plan) {
   const subscription = subscriptionFields(order);
+  const effectiveExpiration = fallbackExpiration(event, plan, subscription.startedAt, subscription.expiresAt);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   // PostgREST accepts null for these nullable SQL parameters, while generated RPC types omit null.
   const nullableRpcString = (value: string | null) => value as unknown as string;
@@ -175,7 +187,7 @@ async function processOrder(event: string, order: Order, plan: Plan) {
     _offer_id: nullableRpcString(order.offer?.id ?? null),
     _subscription_id: nullableRpcString(subscription.id),
     _started_at: nullableRpcString(subscription.startedAt),
-    _expires_at: nullableRpcString(subscription.expiresAt),
+    _expires_at: nullableRpcString(effectiveExpiration),
     _canceled_at: nullableRpcString(subscription.canceledAt),
     _payload: sanitizedPayload(event, order),
   });

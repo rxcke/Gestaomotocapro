@@ -33,12 +33,26 @@ function ResetPassword() {
 
   useEffect(() => {
     let active = true;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setValidRecovery(Boolean(data.session));
+    const recoveryInUrl = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery";
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active || event !== "PASSWORD_RECOVERY") return;
+      setValidRecovery(Boolean(session));
       setChecking(false);
     });
-    return () => { active = false; };
+    void supabase.auth.getSession().then(({ data: sessionData }) => {
+      if (!active || !recoveryInUrl) return;
+      setValidRecovery(Boolean(sessionData.session));
+      setChecking(false);
+    });
+    const timer = window.setTimeout(() => {
+      if (!active) return;
+      setChecking(false);
+    }, 1500);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
