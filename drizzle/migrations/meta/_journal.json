@@ -50,6 +50,13 @@
       "when": 1790083413835,
       "tag": "0006_use_invoker_for_user_access_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790084135055,
+      "tag": "0007_allow_safe_cakto_event_replay",
+      "breakpoints": true
     }
   ]
 }
