@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { AppDataProvider } from "@/lib/app-context";
 import { useProfile } from "@/lib/data";
-import { LoadingBlock } from "@/components/glass";
+import { ErrorBlock, LoadingBlock } from "@/components/glass";
 import { PremiumGate } from "@/components/PremiumGate";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
@@ -30,6 +30,14 @@ function AppLayout() {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-canvas p-6">
         <LoadingBlock label="Preparando seu painel..." />
+      </div>
+    );
+  }
+
+  if (profile.isError || access.isError) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-canvas p-6">
+        <ErrorBlock message="Não foi possível preparar seu painel. Atualize a página para tentar novamente." />
       </div>
     );
   }

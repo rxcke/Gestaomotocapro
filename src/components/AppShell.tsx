@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { AmbientBackground } from "./glass";
 import { useApp, ALL_MOTOS } from "@/lib/app-context";
@@ -30,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { authErrorMessage } from "@/lib/auth-errors";
 
 const NAV = [
   { to: "/app", label: "Início", icon: Home, exact: true },
@@ -215,8 +217,11 @@ export function SignOutButton({ full = false }: { full?: boolean }) {
       qc.clear();
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      await navigate({ to: "/auth", replace: true });
+    } catch (error) {
+      toast.error(authErrorMessage(error, "Não foi possível sair da conta. Tente novamente."));
+      void qc.invalidateQueries();
     } finally {
-      navigate({ to: "/auth", replace: true });
       setLoading(false);
     }
   };

@@ -13,9 +13,12 @@ export function authErrorMessage(error: unknown, fallback = "Não foi possível 
   return AUTH_ERROR_MESSAGES.find(([pattern]) => pattern.test(message))?.[1] ?? fallback;
 }
 
-export function readSafeReturnPath() {
+export function peekSafeReturnPath() {
   if (typeof window === "undefined") return "/app";
   const value = window.sessionStorage.getItem("auth:returnTo");
-  window.sessionStorage.removeItem("auth:returnTo");
   return value?.startsWith("/") && !value.startsWith("//") ? value : "/app";
+}
+
+export function clearSafeReturnPath() {
+  if (typeof window !== "undefined") window.sessionStorage.removeItem("auth:returnTo");
 }

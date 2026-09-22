@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { AmbientBackground, GlassCard, LoadingBlock } from "@/components/glass";
+import { toast } from "sonner";
+import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock } from "@/components/glass";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { USAGE_TYPES } from "@/lib/constants";
-import { useProfile, useUpdateProfile, useUpsert } from "@/lib/data";
+import { useMotorcycles, useProfile, useUpdateProfile, useUpsert } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
@@ -28,8 +29,10 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 });
 
 function Onboarding() {
+  const { user } = Route.useRouteContext();
   const navigate = useNavigate();
   const profile = useProfile();
+  const motorcycles = useMotorcycles();
   const updateProfile = useUpdateProfile("");
   const createMoto = useUpsert("motorcycles", "motorcycles", {});
   const fetchAccess = useServerFn(getSubscriptionAccess);
@@ -41,16 +44,53 @@ function Onboarding() {
   const [pro, setPro] = useState(false);
   const [moto, setMoto] = useState({ brand: "", model: "", year: "", plate: "", km: "" });
   const [saving, setSaving] = useState(false);
+  const draftKey = `onboarding:draft:${user.id}`;
 
   const displayName = name || profile.data?.name || "";
 
   const blocked = access.isSuccess && !access.data.active && !access.data.admin;
+  const completed = profile.isSuccess && Boolean(profile.data?.onboarding_completed);
+
+  useEffect(() => {
+    if (!profile.isSuccess || typeof window === "undefined") return;
+    const saved = window.localStorage.getItem(draftKey);
+    if (saved) {
+      try {
+        const draft = JSON.parse(saved) as { step?: number; name?: string; usage?: string[]; pro?: boolean; moto?: typeof moto };
+        setStep(Math.min(2, Math.max(0, draft.step ?? 0)));
+        setName(draft.name ?? profile.data?.name ?? "");
+        setUsage(draft.usage ?? profile.data?.usage_types ?? []);
+        setPro(draft.pro ?? profile.data?.is_professional ?? false);
+        if (draft.moto) setMoto(draft.moto);
+        return;
+      } catch {
+        window.localStorage.removeItem(draftKey);
+      }
+    }
+    setName(profile.data?.name ?? "");
+    setUsage(profile.data?.usage_types ?? []);
+    setPro(profile.data?.is_professional ?? false);
+  }, [draftKey, profile.data, profile.isSuccess]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || completed) return;
+    window.localStorage.setItem(draftKey, JSON.stringify({ step, name: displayName, usage, pro, moto }));
+  }, [completed, displayName, draftKey, moto, pro, step, usage]);
+
   useEffect(() => {
     if (blocked) navigate({ to: "/planos", replace: true });
   }, [blocked, navigate]);
 
-  if (access.isLoading) {
+  useEffect(() => {
+    if (completed) navigate({ to: "/app", replace: true });
+  }, [completed, navigate]);
+
+  if (access.isLoading || profile.isLoading || motorcycles.isLoading || blocked || completed) {
     return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><LoadingBlock label="Verificando sua assinatura..." /></div>;
+  }
+
+  if (access.isError || profile.isError || motorcycles.isError) {
+    return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><ErrorBlock message="Não foi possível preparar seu cadastro. Atualize a página para tentar novamente." /></div>;
   }
 
   if (blocked) return null;
@@ -58,23 +98,78 @@ function Onboarding() {
   const toggleUsage = (u: string) =>
     setUsage((prev) => (prev.includes(u) ? prev.filter((x) => x !== u) : [...prev, u]));
 
-  const finish = async () => {
+  const saveIdentityStep = async () => {
+    const normalizedName = displayName.trim();
+    if (normalizedName.length < 2 || normalizedName.length > 100) {
+      toast.error("Informe seu nome com 2 a 100 caracteres.");
+      return;
+    }
     setSaving(true);
     try {
-      await createMoto.mutateAsync({
-        brand: moto.brand,
-        model: moto.model,
-        year: moto.year ? Number(moto.year) : null,
-        plate: moto.plate || null,
-        current_km: Number(moto.km || 0),
-      });
+      await updateProfile.mutateAsync({ name: normalizedName });
+      setName(normalizedName);
+      setStep(1);
+    } catch {
+      toast.error("Não foi possível salvar seu nome. Tente novamente.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveUsageStep = async () => {
+    setSaving(true);
+    try {
+      await updateProfile.mutateAsync({ usage_types: usage, is_professional: pro });
+      setStep(2);
+    } catch {
+      toast.error("Não foi possível salvar suas preferências. Tente novamente.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const finish = async () => {
+    if (saving) return;
+    const brand = moto.brand.trim();
+    const model = moto.model.trim();
+    const year = moto.year ? Number(moto.year) : null;
+    const currentKm = moto.km ? Number(moto.km) : 0;
+    const currentYear = new Date().getFullYear() + 1;
+    if (brand.length < 2 || model.length < 2) {
+      toast.error("Informe a marca e o modelo da sua moto.");
+      return;
+    }
+    if (year !== null && (!Number.isInteger(year) || year < 1900 || year > currentYear)) {
+      toast.error("Informe um ano válido para a moto.");
+      return;
+    }
+    if (!Number.isFinite(currentKm) || currentKm < 0) {
+      toast.error("Informe uma quilometragem válida.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const refreshedMotorcycles = await motorcycles.refetch();
+      if ((refreshedMotorcycles.data?.length ?? 0) === 0) {
+        await createMoto.mutateAsync({
+          brand,
+          model,
+          year,
+          plate: moto.plate.trim().toUpperCase() || null,
+          current_km: currentKm,
+        });
+      }
       await updateProfile.mutateAsync({
-        name: displayName,
+        name: displayName.trim(),
         usage_types: usage,
         is_professional: pro,
         onboarding_completed: true,
       });
-      navigate({ to: "/app", replace: true });
+      window.localStorage.removeItem(draftKey);
+      await profile.refetch();
+      await navigate({ to: "/app", replace: true });
+    } catch {
+      toast.error("Não foi possível concluir seu cadastro. Seus passos anteriores foram salvos.");
     } finally {
       setSaving(false);
     }
@@ -111,10 +206,12 @@ function Onboarding() {
                   value={displayName}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex.: Lucas"
+                  minLength={2}
+                  maxLength={100}
                 />
               </div>
-              <Button className="h-12 w-full text-base" disabled={!displayName} onClick={() => setStep(1)}>
-                Continuar
+              <Button className="h-12 w-full text-base" disabled={saving} onClick={saveIdentityStep}>
+                {saving ? "Salvando..." : "Continuar"}
               </Button>
             </div>
           ) : null}
@@ -132,7 +229,7 @@ function Onboarding() {
                     type="button"
                     onClick={() => toggleUsage(u)}
                     className={cn(
-                      "rounded-full px-4 py-2 text-sm font-medium transition",
+                      "min-h-11 rounded-full px-4 py-2.5 text-sm font-medium transition",
                       usage.includes(u) ? "bg-accent text-accent-foreground" : "glass-soft text-muted-foreground",
                     )}
                   >
@@ -151,8 +248,8 @@ function Onboarding() {
                 <Button variant="outline" className="h-12 flex-1" onClick={() => setStep(0)}>
                   Voltar
                 </Button>
-                <Button className="h-12 flex-1 text-base" onClick={() => setStep(2)}>
-                  Continuar
+                <Button className="h-12 flex-1 text-base" disabled={saving} onClick={saveUsageStep}>
+                  {saving ? "Salvando..." : "Continuar"}
                 </Button>
               </div>
             </div>
@@ -172,6 +269,8 @@ function Onboarding() {
                   value={moto.brand}
                   onChange={(e) => setMoto({ ...moto, brand: e.target.value })}
                   placeholder="Honda"
+                  minLength={2}
+                  maxLength={80}
                 />
               </div>
               <div className="space-y-1.5">
@@ -182,6 +281,8 @@ function Onboarding() {
                   value={moto.model}
                   onChange={(e) => setMoto({ ...moto, model: e.target.value })}
                   placeholder="CG 160"
+                  minLength={2}
+                  maxLength={80}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -194,6 +295,8 @@ function Onboarding() {
                     className="h-12 text-base"
                     value={moto.year}
                     onChange={(e) => setMoto({ ...moto, year: e.target.value })}
+                    min={1900}
+                    max={new Date().getFullYear() + 1}
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -203,6 +306,8 @@ function Onboarding() {
                     className="h-12 text-base"
                     value={moto.plate}
                     onChange={(e) => setMoto({ ...moto, plate: e.target.value })}
+                    maxLength={8}
+                    autoCapitalize="characters"
                   />
                 </div>
               </div>
@@ -216,6 +321,8 @@ function Onboarding() {
                   value={moto.km}
                   onChange={(e) => setMoto({ ...moto, km: e.target.value })}
                   placeholder="32500"
+                  min={0}
+                  step="0.1"
                 />
               </div>
               <div className="flex gap-2">
@@ -224,7 +331,7 @@ function Onboarding() {
                 </Button>
                 <Button
                   className="h-12 flex-1 text-base"
-                  disabled={!moto.brand || !moto.model || saving}
+                  disabled={saving}
                   onClick={finish}
                 >
                   {saving ? "Salvando..." : "Concluir"}
