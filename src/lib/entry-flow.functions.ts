@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isValidBrazilianMobile } from "@/lib/phone";
+import { needsPhoneCompletion } from "@/lib/phone";
 
 const EntryInput = z.object({ intendedPath: z.string().max(500).optional() });
 
@@ -27,7 +27,7 @@ export const getEntryDestination = createServerFn({ method: "POST" })
 
     const hasAccess = Boolean(accessResult.data || roleResult.data);
     const intendedPath = safeIntendedPath(data.intendedPath);
-    if (!isValidBrazilianMobile(profileResult.data?.phone)) return "/onboarding";
+    if (needsPhoneCompletion(profileResult.data?.phone)) return "/onboarding";
     if (!hasAccess) {
       return intendedPath === "/app/perfil" ? "/app/perfil" : "/planos";
     }

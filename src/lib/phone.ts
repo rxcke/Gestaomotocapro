@@ -20,3 +20,7 @@ export function formatBrazilianMobile(value: string | null | undefined): string 
 export function isValidBrazilianMobile(value: string | null | undefined): boolean {
   return normalizeBrazilianMobile(value ?? "") !== null;
 }
+
+export function needsPhoneCompletion(value: string | null | undefined): boolean {
+  return !isValidBrazilianMobile(value);
+}

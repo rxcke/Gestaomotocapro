@@ -14,7 +14,7 @@ import { useMotorcycles, useProfile, useUpdateProfile, useUpsert } from "@/lib/d
 import { cn } from "@/lib/utils";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
-import { formatBrazilianMobile, normalizeBrazilianMobile } from "@/lib/phone";
+import { formatBrazilianMobile, needsPhoneCompletion, normalizeBrazilianMobile } from "@/lib/phone";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [
@@ -51,8 +51,9 @@ function Onboarding() {
   const displayName = name || profile.data?.name || "";
   const displayPhone = phone || formatBrazilianMobile(profile.data?.phone);
 
-  const blocked = access.isSuccess && !access.data.active && !access.data.admin && Boolean(profile.data?.phone);
-  const completed = profile.isSuccess && Boolean(profile.data?.onboarding_completed) && Boolean(profile.data?.phone);
+  const phoneMissing = needsPhoneCompletion(profile.data?.phone);
+  const blocked = access.isSuccess && !access.data.active && !access.data.admin && !phoneMissing;
+  const completed = profile.isSuccess && Boolean(profile.data?.onboarding_completed) && !phoneMissing;
 
   useEffect(() => {
     if (!profile.isSuccess || typeof window === "undefined") return;

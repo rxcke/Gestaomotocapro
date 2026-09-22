@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { formatBrazilianMobile, isValidBrazilianMobile, normalizeBrazilianMobile } from "./phone";
+import { formatBrazilianMobile, isValidBrazilianMobile, needsPhoneCompletion, normalizeBrazilianMobile } from "./phone";
 
 describe("celular brasileiro", () => {
   test("normaliza número mascarado para formato internacional", () => {
@@ -20,5 +20,11 @@ describe("celular brasileiro", () => {
   test("formata progressivamente sem salvar a máscara", () => {
     assert.equal(formatBrazilianMobile("31999999999"), "(31) 99999-9999");
     assert.equal(formatBrazilianMobile("+5531999999999"), "(31) 99999-9999");
+  });
+
+  test("solicita telefone ausente uma vez e não solicita o já válido", () => {
+    assert.equal(needsPhoneCompletion(null), true);
+    assert.equal(needsPhoneCompletion(""), true);
+    assert.equal(needsPhoneCompletion("+5531999999999"), false);
   });
 });
