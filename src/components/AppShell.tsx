@@ -210,10 +210,15 @@ export function SignOutButton({ full = false }: { full?: boolean }) {
 
   const signOut = async () => {
     setLoading(true);
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+    try {
+      await qc.cancelQueries();
+      qc.clear();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } finally {
+      navigate({ to: "/auth", replace: true });
+      setLoading(false);
+    }
   };
 
   if (full) {

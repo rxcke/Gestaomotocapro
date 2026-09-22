@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "../lib/theme";
 import { Toaster } from "../components/ui/sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -125,9 +126,30 @@ function RootComponent() {
   return (
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
+          <AuthStateSync queryClient={queryClient} />
           <Outlet />
           <Toaster richColors position="top-center" />
         </QueryClientProvider>
       </ThemeProvider>
   );
+}
+
+function AuthStateSync({ queryClient }: { queryClient: QueryClient }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      void router.invalidate();
+      if (event === "SIGNED_OUT") {
+        void queryClient.cancelQueries();
+        queryClient.clear();
+        return;
+      }
+      void queryClient.invalidateQueries();
+    });
+    return () => data.subscription.unsubscribe();
+  }, [queryClient, router]);
+
+  return null;
 }

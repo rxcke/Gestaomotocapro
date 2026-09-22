@@ -4,11 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type SubscriptionPlan = "monthly" | "quarterly" | "annual";
 export type SubscriptionStatus = "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
+export type ProviderSubscriptionStatus = SubscriptionStatus | "paused" | "late";
 
 export type SubscriptionView = {
   id: string;
   plan: SubscriptionPlan;
   status: SubscriptionStatus;
+  providerStatus: ProviderSubscriptionStatus;
   startedAt: string | null;
   expiresAt: string | null;
   canceledAt: string | null;
@@ -31,7 +33,7 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
       context.supabase
         .from("subscriptions")
-        .select("id,plan,status,started_at,expires_at,canceled_at,cakto_subscription_id")
+        .select("id,plan,status,provider_status,started_at,expires_at,canceled_at,cakto_subscription_id")
         .eq("user_id", context.userId)
         .maybeSingle(),
     ]);
@@ -49,6 +51,7 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
             id: row.id,
             plan: row.plan,
             status: row.status,
+            providerStatus: row.provider_status as ProviderSubscriptionStatus,
             startedAt: row.started_at,
             expiresAt: row.expires_at,
             canceledAt: row.canceled_at,
@@ -76,7 +79,9 @@ export const getCheckoutUrl = createServerFn({ method: "POST" })
     } catch {
       throw new Error("O link de checkout configurado é inválido.");
     }
-    if (checkout.protocol !== "https:") throw new Error("O checkout precisa usar uma conexão segura.");
+    if (checkout.protocol !== "https:" || checkout.hostname !== "pay.cakto.com.br") {
+      throw new Error("O checkout configurado não pertence ao domínio oficial da Cakto.");
+    }
 
     return { configured: true as const, url: checkout.toString() };
   });
