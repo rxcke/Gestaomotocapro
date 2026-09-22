@@ -12,6 +12,15 @@ describe("registro simplificado de abastecimento", () => {
     assert.deepEqual(measurements(null, null, null), { total: 80, liters: null, pricePerLiter: null, km: null });
   });
 
+  test("aceita valor total e quilometragem sem inventar litros ou preço", () => {
+    assert.deepEqual(measurements(null, null, 125000), {
+      total: 80,
+      liters: null,
+      pricePerLiter: null,
+      km: 125000,
+    });
+  });
+
   test("aceita litros e calcula o preço derivado", () => {
     assert.deepEqual(measurements(10, null, null), { total: 80, liters: 10, pricePerLiter: 8, km: null });
   });

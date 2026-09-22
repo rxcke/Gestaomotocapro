@@ -17,3 +17,7 @@
 - [x] Garantir valor positivo e tipo válido no formulário e no banco
 - [x] Adaptar histórico e validar cálculos com registros mínimos
 - [x] Testar os doze cenários solicitados sem criar dados reais
+
+- [x] Aplicar na base ativa a correção de campos opcionais do abastecimento
+- [x] Confirmar total obrigatório e positivo, sem exigência de litros, preço ou KM
+- [x] Validar os quatro cenários de abastecimento solicitados
