@@ -18,7 +18,7 @@ import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-acc
 import { formatBrazilianMobile, normalizeBrazilianMobile } from "@/lib/phone";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/app/perfil")({head:()=>({meta:[{title:"Perfil — Gestão Motoboy"},{name:"description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:title",content:"Perfil — Gestão Motoboy"},{property:"og:description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:ProfilePage});
+export const Route = createFileRoute("/_authenticated/app/perfil")({head:()=>({meta:[{title:"Perfil — Gestão Motoca Pro"},{name:"description",content:"Conta e preferências do Gestão Motoca Pro."},{property:"og:title",content:"Perfil — Gestão Motoca Pro"},{property:"og:description",content:"Conta e preferências do Gestão Motoca Pro."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:ProfilePage});
 
 const STATUS_LABELS = { pending: "Pendente", active: "Ativa", canceled: "Cancelada", expired: "Expirada", refunded: "Reembolsada", chargeback: "Chargeback", paused: "Pausada", late: "Em atraso" } as const;
 const PLAN_DETAILS = {

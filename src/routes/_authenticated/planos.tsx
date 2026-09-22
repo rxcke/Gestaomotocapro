@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/planos")({
   head: () => ({ meta: [
-    { title: "Planos — Gestão Motoboy" },
-    { name: "description", content: "Escolha seu plano do Gestão Motoboy." },
-    { property: "og:title", content: "Planos — Gestão Motoboy" },
+    { title: "Planos — Gestão Motoca Pro" },
+    { name: "description", content: "Escolha seu plano do Gestão Motoca Pro." },
+    { property: "og:title", content: "Planos — Gestão Motoca Pro" },
     { property: "og:description", content: "Controle completo da sua rotina e dos custos da moto." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
@@ -56,7 +56,7 @@ function PlansPage() {
     <main className="relative mx-auto max-w-5xl">
       <div className="flex items-center justify-between gap-3"><Logo /><Button asChild variant="ghost"><Link to="/app/perfil">Perfil</Link></Button></div>
       <div className="mx-auto mt-10 max-w-2xl text-center">
-        <p className="text-sm font-semibold text-accent">GESTÃO MOTOBOY PREMIUM</p>
+        <p className="text-sm font-semibold text-accent">GESTÃO MOTOCA PRO PREMIUM</p>
         <h1 className="mt-3 font-display text-3xl font-bold sm:text-5xl">Controle total da sua moto e do seu dinheiro</h1>
         <p className="mt-4 text-muted-foreground">Escolha o período ideal. Seus dados ficam preservados mesmo se você cancelar.</p>
       </div>

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Gestão Motoboy design system — "Frosted Glass Dashboard"
+ * Gestão Motoca Pro design system — "Frosted Glass Dashboard"
  * Canvas claro com luzes ambientes, cards de vidro, tipografia Sora + Inter.
  * Todas as cores em oklch e expostas como tokens semânticos.
  */
@@ -58,24 +58,24 @@
 :root {
   --radius: 0.9rem;
 
-  --canvas: oklch(0.955 0.008 240);
-  --background: oklch(0.955 0.008 240);
-  --foreground: oklch(0.21 0.034 264);
+  --canvas: oklch(0.98 0.005 240);
+  --background: oklch(0.98 0.005 240);
+  --foreground: oklch(0.15 0.01 264);
 
   --card: oklch(1 0 0 / 55%);
-  --card-foreground: oklch(0.21 0.034 264);
+  --card-foreground: oklch(0.15 0.01 264);
   --popover: oklch(0.995 0.003 240);
-  --popover-foreground: oklch(0.21 0.034 264);
+  --popover-foreground: oklch(0.15 0.01 264);
 
-  --primary: oklch(0.21 0.034 264);
+  --primary: oklch(0.15 0.01 264);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(1 0 0 / 70%);
-  --secondary-foreground: oklch(0.21 0.034 264);
+  --secondary-foreground: oklch(0.15 0.01 264);
 
   --muted: oklch(0.93 0.008 247);
   --muted-foreground: oklch(0.52 0.02 257);
 
-  --accent: oklch(0.72 0.19 149);
+  --accent: oklch(0.7 0.2 45);
   --accent-foreground: oklch(0.99 0 0);
 
   --positive: oklch(0.63 0.17 150);
@@ -87,13 +87,13 @@
 
   --border: oklch(0.88 0.01 250);
   --input: oklch(0.88 0.01 250);
-  --ring: oklch(0.72 0.19 149);
+  --ring: oklch(0.7 0.2 45);
 
   --glass: oklch(1 0 0 / 50%);
   --glass-strong: oklch(1 0 0 / 72%);
   --glass-border: oklch(1 0 0 / 65%);
 
-  --chart-1: oklch(0.72 0.19 149);
+  --chart-1: oklch(0.7 0.2 45);
   --chart-2: oklch(0.61 0.21 26);
   --chart-3: oklch(0.65 0.13 240);
   --chart-4: oklch(0.77 0.15 78);
@@ -101,8 +101,8 @@
 }
 
 .dark {
-  --canvas: oklch(0.17 0.02 262);
-  --background: oklch(0.17 0.02 262);
+  --canvas: oklch(0.1 0.01 262);
+  --background: oklch(0.1 0.01 262);
   --foreground: oklch(0.96 0.005 250);
 
   --card: oklch(0.28 0.022 262 / 55%);
@@ -118,7 +118,7 @@
   --muted: oklch(0.3 0.022 262);
   --muted-foreground: oklch(0.72 0.02 258);
 
-  --accent: oklch(0.75 0.19 150);
+  --accent: oklch(0.7 0.2 45);
   --accent-foreground: oklch(0.18 0.02 262);
 
   --positive: oklch(0.76 0.17 152);
@@ -130,13 +130,13 @@
 
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.75 0.19 150);
+  --ring: oklch(0.7 0.2 45);
 
   --glass: oklch(0.3 0.022 262 / 45%);
   --glass-strong: oklch(0.33 0.022 262 / 65%);
   --glass-border: oklch(1 0 0 / 12%);
 
-  --chart-1: oklch(0.75 0.19 150);
+  --chart-1: oklch(0.7 0.2 45);
   --chart-2: oklch(0.68 0.19 24);
   --chart-3: oklch(0.7 0.13 240);
   --chart-4: oklch(0.81 0.15 80);

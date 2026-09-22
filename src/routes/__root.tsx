@@ -80,9 +80,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Gestão Motoboy" },
+      { title: "Gestão Motoca Pro" },
       { name: "description", content: "Controle financeiro completo para motociclistas." },
-      { name: "author", content: "Gestão Motoboy" },
+      { name: "author", content: "Gestão Motoca Pro" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

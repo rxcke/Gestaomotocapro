@@ -151,7 +151,7 @@ export const generateAiInsights = createServerFn({ method: "POST" })
         model: createInsightsModel(apiKey),
         maxRetries: 2,
         output: Output.object({ schema: InsightSchema }),
-        system: "Você é o analista financeiro do Gestão Motoboy. Escreva em português do Brasil, de forma direta, responsável e sem inventar dados. Trate as manutenções marcadas como late/soon como fatos calculados pelo sistema. Não dê diagnóstico mecânico. Valores monetários devem usar R$ e vírgula decimal.",
+        system: "Você é o analista financeiro do Gestão Motoca Pro. Escreva em português do Brasil, de forma direta, responsável e sem inventar dados. Trate as manutenções marcadas como late/soon como fatos calculados pelo sistema. Não dê diagnóstico mecânico. Valores monetários devem usar R$ e vírgula decimal.",
         prompt: `Analise este resumo real: ${JSON.stringify(payload)}. Gere no máximo 3 insights, priorizando combustível, manutenção e custo por km. Só mencione economia quantificada quando os dados sustentarem o cálculo; caso contrário, recomende o próximo registro necessário. A evidência deve citar números do resumo e a recomendação deve ser uma ação curta.`,
         providerOptions: {
           openai: {

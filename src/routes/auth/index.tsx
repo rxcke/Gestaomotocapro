@@ -15,10 +15,10 @@ import { formatBrazilianMobile, normalizeBrazilianMobile } from "@/lib/phone";
 
 export const Route = createFileRoute("/auth/")({
   head: () => ({ meta: [
-    { title: "Entrar no Gestão Motoboy" },
-    { name: "description", content: "Acesse ou crie sua conta no Gestão Motoboy." },
-    { property: "og:title", content: "Entrar no Gestão Motoboy" },
-    { property: "og:description", content: "Acesse ou crie sua conta no Gestão Motoboy." },
+    { title: "Entrar no Gestão Motoca Pro" },
+    { name: "description", content: "Acesse ou crie sua conta no Gestão Motoca Pro." },
+    { property: "og:title", content: "Entrar no Gestão Motoca Pro" },
+    { property: "og:description", content: "Acesse ou crie sua conta no Gestão Motoca Pro." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),

@@ -14,9 +14,9 @@ import type { WorkSession } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/app/jornada")({
   head: () => ({ meta: [
-    { title: "Jornada — Gestão Motoboy" },
+    { title: "Jornada — Gestão Motoca Pro" },
     { name: "description", content: "Acompanhe tempo, ganhos, gastos e lucro por hora durante o trabalho." },
-    { property: "og:title", content: "Jornada — Gestão Motoboy" },
+    { property: "og:title", content: "Jornada — Gestão Motoca Pro" },
     { property: "og:description", content: "Acompanhe tempo, ganhos, gastos e lucro por hora durante o trabalho." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },

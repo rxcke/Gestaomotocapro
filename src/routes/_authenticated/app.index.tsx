@@ -11,9 +11,9 @@ import { brl, brlCompact, greeting, num } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
-      { title: "Painel — Gestão Motoboy" },
+      { title: "Painel — Gestão Motoca Pro" },
       { name: "description", content: "Resultado líquido, metas, combustível e manutenção da sua moto." },
-      { property: "og:title", content: "Painel — Gestão Motoboy" },
+      { property: "og:title", content: "Painel — Gestão Motoca Pro" },
       { property: "og:description", content: "Acompanhe o resultado real da sua moto." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

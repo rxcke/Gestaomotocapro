@@ -1,7 +1,7 @@
 export function LogoMark({ className = "size-10" }: { className?: string }) {
   return (
     <span
-      className={`grid place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 ${className}`}
+      className={`grid place-items-center rounded-2xl bg-accent text-accent-foreground shadow-lg shadow-accent/20 ${className}`}
       aria-hidden="true"
     >
       <svg viewBox="0 0 24 24" fill="none" className="size-[60%]">
@@ -25,7 +25,7 @@ export function Logo({ subtitle = "Seu dinheiro. Sua moto." }: { subtitle?: stri
     <div className="flex min-w-0 items-center gap-3">
       <LogoMark />
       <div className="min-w-0">
-        <p className="font-display text-base leading-none font-bold">Gestão Motoboy</p>
+        <p className="font-display text-base leading-none font-bold">Gestão Motoca Pro</p>
         {subtitle ? <p className="mt-1 truncate text-[11px] text-muted-foreground">{subtitle}</p> : null}
       </div>
     </div>
