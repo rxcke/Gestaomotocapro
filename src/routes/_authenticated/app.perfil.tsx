@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CreditCard } from "lucide-react";
+import { CalendarDays, CheckCircle2, CreditCard, RefreshCw } from "lucide-react";
 import { SignOutButton } from "@/components/AppShell";
-import { GlassCard, PageTitle } from "@/components/glass";
+import { ErrorBlock, GlassCard, LoadingBlock, PageTitle } from "@/components/glass";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,34 @@ import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-acc
 
 export const Route = createFileRoute("/_authenticated/app/perfil")({head:()=>({meta:[{title:"Perfil — Gestão Motoboy"},{name:"description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:title",content:"Perfil — Gestão Motoboy"},{property:"og:description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:ProfilePage});
 
-const STATUS_LABELS = { pending: "Pendente", active: "Ativo", canceled: "Cancelado", expired: "Expirado", refunded: "Reembolsado", chargeback: "Chargeback", paused: "Pausado", late: "Em atraso" } as const;
+const STATUS_LABELS = { pending: "Pendente", active: "Ativa", canceled: "Cancelada", expired: "Expirada", refunded: "Reembolsada", chargeback: "Chargeback", paused: "Pausada", late: "Em atraso" } as const;
+const PLAN_DETAILS = {
+  monthly: { plan: "Start", offer: "Plano Start", period: "Mensal" },
+  quarterly: { plan: "Pro", offer: "Plano Pro", period: "Trimestral" },
+  annual: { plan: "Elite", offer: "Plano Elite", period: "Anual" },
+} as const;
+
+function SubscriptionField({ label, value }: { label: string; value: string }) {
+  return <div className="glass-soft min-w-0 p-4"><p className="text-xs font-medium text-muted-foreground">{label}</p><p className="mt-1 break-words font-semibold">{value}</p></div>;
+}
+
+function SubscriptionSection({ access }: { access: ReturnType<typeof useQuery<Awaited<ReturnType<typeof fetchSubscriptionAccessWhenAuthenticated>>>> }) {
+  const subscription=access.data?.subscription;
+  const active=Boolean(access.data?.active);
+
+  return <GlassCard><div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3"><div className="flex min-w-0 items-center gap-2"><CreditCard className="size-5 shrink-0 text-accent"/><div className="min-w-0"><h2 className="font-display text-lg font-bold">Minha assinatura</h2><p className="mt-0.5 text-sm text-muted-foreground">Dados confirmados pela sua conta.</p></div></div>{active?<Badge className="shrink-0 border-transparent bg-positive/15 text-positive hover:bg-positive/15"><CheckCircle2 className="mr-1 size-3.5"/>Ativa</Badge>:null}</div>
+    {access.isLoading?<div className="mt-4"><LoadingBlock label="Consultando sua assinatura..."/></div>:access.isError?<div className="mt-4 space-y-3"><ErrorBlock message="Não foi possível carregar sua assinatura."/><Button className="h-11 w-full sm:w-auto" variant="outline" disabled={access.isFetching} onClick={()=>void access.refetch()}><RefreshCw className={access.isFetching?"animate-spin":""}/>{access.isFetching?"Tentando novamente...":"Tentar novamente"}</Button></div>:subscription?<SubscriptionDetails subscription={subscription} active={active}/>:<NoSubscription/>}
+  </GlassCard>;
+}
+
+function SubscriptionDetails({ subscription, active }: { subscription: NonNullable<Awaited<ReturnType<typeof fetchSubscriptionAccessWhenAuthenticated>>["subscription"]>; active: boolean }) {
+  const details=PLAN_DETAILS[subscription.plan];
+  const status=STATUS_LABELS[subscription.providerStatus];
+  const statusTone=subscription.providerStatus==="active"?"text-positive":subscription.providerStatus==="late"||subscription.providerStatus==="paused"?"text-warning":"text-negative";
+  return <div className="mt-5"><div className="grid gap-3 sm:grid-cols-2"><SubscriptionField label="Plano atual" value={details.plan}/><SubscriptionField label="Nome da oferta" value={details.offer}/><div className="glass-soft min-w-0 p-4"><p className="text-xs font-medium text-muted-foreground">Status atual</p><p className={`mt-1 font-semibold ${statusTone}`}>{status}</p></div><SubscriptionField label="Periodicidade" value={details.period}/><SubscriptionField label="Data de início" value={dateBR(subscription.startedAt)}/><div className="glass-soft min-w-0 p-4"><div className="flex items-center gap-2"><CalendarDays className="size-4 shrink-0 text-muted-foreground"/><p className="text-xs font-medium text-muted-foreground">{active?"Próxima renovação ou vencimento":"Vencimento"}</p></div><p className="mt-1 font-semibold">{dateBR(subscription.expiresAt)}</p></div>{subscription.canceledAt?<SubscriptionField label="Cancelamento" value={dateBR(subscription.canceledAt)}/>:null}</div>{!active?<div className="mt-5"><Button asChild className="h-12 w-full sm:w-auto"><Link to="/planos">Visualizar planos</Link></Button></div>:null}</div>;
+}
+
+function NoSubscription(){return <div className="mt-5"><div className="glass-soft px-5 py-7 text-center"><p className="font-display font-bold">Nenhuma assinatura ativa</p><p className="mt-2 text-sm text-muted-foreground">Conheça os planos disponíveis para liberar todos os recursos.</p></div><Button asChild className="mt-4 h-12 w-full sm:w-auto"><Link to="/planos">Visualizar planos</Link></Button></div>}
 
 function ProfilePage(){
   const p=useProfile();const save=useUpdateProfile();const{theme,toggle}=useTheme();
@@ -28,5 +56,5 @@ function ProfilePage(){
   const subscription=access.data?.subscription;
   return <div className="space-y-6"><PageTitle title="Perfil" subtitle="Conta, assinatura e preferências."/>
     <GlassCard><h2 className="font-display text-lg font-bold">Conta</h2><div className="mt-4 space-y-4"><div className="space-y-1.5"><Label htmlFor="profile-name">Nome</Label><Input id="profile-name" className="h-12 text-base" value={currentName} onChange={e=>setName(e.target.value)}/></div><div className="space-y-1.5"><Label htmlFor="profile-email">E-mail da conta</Label><Input id="profile-email" className="h-12 text-base" value={p.data?.email??""} readOnly disabled/></div><div className="glass-soft flex items-center justify-between gap-3 p-4"><div><p className="text-sm font-semibold">Modo profissional</p><p className="text-xs text-muted-foreground">Ativa jornada e indicadores de lucro por hora.</p></div><Switch checked={currentPro} onCheckedChange={setPro}/></div><Button onClick={()=>save.mutate({name:currentName,is_professional:currentPro})} disabled={save.isPending}>Salvar perfil</Button></div></GlassCard>
-    <GlassCard><div className="flex items-center gap-2"><CreditCard className="size-5 text-accent"/><h2 className="font-display text-lg font-bold">Minha assinatura</h2></div>{access.isLoading?<p className="mt-4 text-sm text-muted-foreground">Consultando assinatura...</p>:subscription?<div className="mt-4 grid gap-3 sm:grid-cols-2"><div className="glass-soft p-3"><p className="text-xs text-muted-foreground">Plano</p><p className="mt-1 font-semibold">{subscription.plan==="monthly"?"Start · Mensal":subscription.plan==="quarterly"?"Pro · Trimestral":"Elite · Anual"}</p></div><div className="glass-soft p-3"><p className="text-xs text-muted-foreground">Status</p><p className="mt-1 font-semibold">{STATUS_LABELS[subscription.providerStatus]}</p></div><div className="glass-soft p-3"><p className="text-xs text-muted-foreground">Início</p><p className="mt-1 font-semibold">{dateBR(subscription.startedAt)}</p></div><div className="glass-soft p-3"><p className="text-xs text-muted-foreground">Renovação ou expiração</p><p className="mt-1 font-semibold">{dateBR(subscription.expiresAt)}</p></div>{subscription.subscriptionId?<div className="glass-soft p-3 sm:col-span-2"><p className="text-xs text-muted-foreground">ID da assinatura</p><p className="mt-1 break-all font-mono text-xs">{subscription.subscriptionId}</p></div>:null}</div>:<p className="mt-4 text-sm text-muted-foreground">Você ainda não possui uma assinatura.</p>}<div className="mt-5 flex flex-col gap-2 sm:flex-row"><Button asChild><Link to="/planos">{subscription?"Ver planos":"Assinar agora"}</Link></Button></div></GlassCard>
+    <SubscriptionSection access={access}/>
     <GlassCard><h2 className="font-display text-lg font-bold">Preferências</h2><div className="mt-4 grid gap-3 sm:grid-cols-2"><Button variant="outline" className="h-12" onClick={toggle}>Tema {theme==="dark"?"claro":"escuro"}</Button><Button asChild variant="outline" className="h-12"><Link to="/app/metas">Gerenciar metas</Link></Button><Button asChild variant="outline" className="h-12"><Link to="/app/documentos">Documentos</Link></Button><Button asChild variant="outline" className="h-12"><Link to="/app/moto">Minhas motos</Link></Button></div></GlassCard><GlassCard><SignOutButton full/></GlassCard></div>}
