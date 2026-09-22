@@ -287,7 +287,6 @@ export function FuelDialog({
           });
           if (!record) {
             await saveExpense.mutateAsync({
-              maintenance_record_id: String(saved.id),
               motorcycle_id: motoId,
               group_name: "Moto",
               category: "Combustível",
@@ -412,6 +411,7 @@ export function MaintenanceDialog({
           });
           if (!record) {
             await saveExpense.mutateAsync({
+              maintenance_record_id: String(saved.id),
               motorcycle_id: motoId,
               group_name: "Moto",
               category: "Manutenção",
