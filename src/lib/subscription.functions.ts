@@ -51,7 +51,9 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
             id: row.id,
             plan: row.plan,
             status: row.status,
-            providerStatus: row.provider_status as ProviderSubscriptionStatus,
+            providerStatus: (row.provider_status === "pending" && row.status !== "pending"
+              ? row.status
+              : row.provider_status) as ProviderSubscriptionStatus,
             startedAt: row.started_at,
             expiresAt: row.expires_at,
             canceledAt: row.canceled_at,

@@ -55,10 +55,22 @@ function AuthPage() {
     const confirmation = String(form.get("confirmation") ?? "");
     const name = String(form.get("name") ?? "").trim();
 
-    if (email.length > 320) return toast.error("Informe um e-mail válido.");
-    if (mode === "signup" && (name.length < 2 || name.length > 100)) return toast.error("Informe seu nome com 2 a 100 caracteres.");
-    if (mode !== "forgot" && (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password))) return toast.error("Use pelo menos 8 caracteres, com letra e número.");
-    if (mode === "signup" && password !== confirmation) return toast.error("As senhas não coincidem.");
+    if (email.length > 320) {
+      toast.error("Informe um e-mail válido.");
+      return;
+    }
+    if (mode === "signup" && (name.length < 2 || name.length > 100)) {
+      toast.error("Informe seu nome com 2 a 100 caracteres.");
+      return;
+    }
+    if (mode !== "forgot" && (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password))) {
+      toast.error("Use pelo menos 8 caracteres, com letra e número.");
+      return;
+    }
+    if (mode === "signup" && password !== confirmation) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -102,7 +114,10 @@ function AuthPage() {
         redirect_uri: `${window.location.origin}/auth/callback`,
         extraParams: { prompt: "select_account" },
       });
-      if (result.error) return toast.error("O acesso pelo Google foi cancelado ou não pôde ser concluído.");
+      if (result.error) {
+        toast.error("O acesso pelo Google foi cancelado ou não pôde ser concluído.");
+        return;
+      }
       if (result.redirected) return;
       navigate({ href: readSafeReturnPath(), replace: true });
     } finally {
