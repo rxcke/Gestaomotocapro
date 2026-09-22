@@ -88,6 +88,7 @@ export function MotoDialog({
           name="purchase_value"
           type="number"
           step="0.01"
+          min="0.01"
           inputMode="decimal"
           defaultValue={record?.purchase_value ?? ""}
         />
@@ -320,6 +321,7 @@ export function FuelDialog({
           name="price_per_liter"
           type="number"
           step="0.001"
+          min="0.001"
           inputMode="decimal"
           defaultValue={record?.price_per_liter ?? ""}
         />
@@ -328,6 +330,7 @@ export function FuelDialog({
         label="Quilometragem atual (opcional)"
         name="km"
         type="number"
+        min="0"
         inputMode="decimal"
         defaultValue={record?.km ?? ""}
       />
