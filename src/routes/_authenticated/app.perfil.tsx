@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, CheckCircle2, CreditCard, RefreshCw } from "lucide-react";
 import { SignOutButton } from "@/components/AppShell";
@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { useProfile, useUpdateProfile } from "@/lib/data";
 import { useTheme } from "@/lib/theme";
 import { dateBR } from "@/lib/format";
-import { getSubscriptionAccess } from "@/lib/subscription.functions";
+import { getSubscriptionAccess, type SubscriptionAccess, type SubscriptionView } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 
 export const Route = createFileRoute("/_authenticated/app/perfil")({head:()=>({meta:[{title:"Perfil — Gestão Motoboy"},{name:"description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:title",content:"Perfil — Gestão Motoboy"},{property:"og:description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:ProfilePage});
@@ -29,7 +29,7 @@ function SubscriptionField({ label, value }: { label: string; value: string }) {
   return <div className="glass-soft min-w-0 p-4"><p className="text-xs font-medium text-muted-foreground">{label}</p><p className="mt-1 break-words font-semibold">{value}</p></div>;
 }
 
-function SubscriptionSection({ access }: { access: ReturnType<typeof useQuery<Awaited<ReturnType<typeof fetchSubscriptionAccessWhenAuthenticated>>>> }) {
+function SubscriptionSection({ access }: { access: UseQueryResult<SubscriptionAccess, Error> }) {
   const subscription=access.data?.subscription;
   const active=Boolean(access.data?.active);
 
@@ -38,7 +38,7 @@ function SubscriptionSection({ access }: { access: ReturnType<typeof useQuery<Aw
   </GlassCard>;
 }
 
-function SubscriptionDetails({ subscription, active }: { subscription: NonNullable<Awaited<ReturnType<typeof fetchSubscriptionAccessWhenAuthenticated>>["subscription"]>; active: boolean }) {
+function SubscriptionDetails({ subscription, active }: { subscription: SubscriptionView; active: boolean }) {
   const details=PLAN_DETAILS[subscription.plan];
   const status=STATUS_LABELS[subscription.providerStatus];
   const statusTone=subscription.providerStatus==="active"?"text-positive":subscription.providerStatus==="late"||subscription.providerStatus==="paused"?"text-warning":"text-negative";
@@ -53,7 +53,6 @@ function ProfilePage(){
   const access=useQuery({queryKey:["subscription","access"],queryFn:()=>fetchSubscriptionAccessWhenAuthenticated(fetchAccess)});
   const[name,setName]=useState<string|undefined>(undefined);const[pro,setPro]=useState<boolean|undefined>(undefined);
   const currentName=name??p.data?.name??"";const currentPro=pro??p.data?.is_professional??false;
-  const subscription=access.data?.subscription;
   return <div className="space-y-6"><PageTitle title="Perfil" subtitle="Conta, assinatura e preferências."/>
     <GlassCard><h2 className="font-display text-lg font-bold">Conta</h2><div className="mt-4 space-y-4"><div className="space-y-1.5"><Label htmlFor="profile-name">Nome</Label><Input id="profile-name" className="h-12 text-base" value={currentName} onChange={e=>setName(e.target.value)}/></div><div className="space-y-1.5"><Label htmlFor="profile-email">E-mail da conta</Label><Input id="profile-email" className="h-12 text-base" value={p.data?.email??""} readOnly disabled/></div><div className="glass-soft flex items-center justify-between gap-3 p-4"><div><p className="text-sm font-semibold">Modo profissional</p><p className="text-xs text-muted-foreground">Ativa jornada e indicadores de lucro por hora.</p></div><Switch checked={currentPro} onCheckedChange={setPro}/></div><Button onClick={()=>save.mutate({name:currentName,is_professional:currentPro})} disabled={save.isPending}>Salvar perfil</Button></div></GlassCard>
     <SubscriptionSection access={access}/>
