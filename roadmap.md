@@ -32,4 +32,4 @@
 - [x] Aplicar nova logo e ícone fornecidos
 - [x] Substituir referências visuais da marca e tagline
 - [x] Atualizar identidade para preto, laranja, branco e cinza
-- [ ] Validar contraste e responsividade em desktop e celular
+- [x] Validar contraste e responsividade em desktop e celular
