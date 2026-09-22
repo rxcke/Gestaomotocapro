@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authErrorMessage, readSafeReturnPath } from "@/lib/auth-errors";
 
-export const Route = createFileRoute("/auth")({
+export const Route = createFileRoute("/auth/")({
   head: () => ({ meta: [
     { title: "Entrar no Gestão Motoboy" },
     { name: "description", content: "Acesse ou crie sua conta no Gestão Motoboy." },
