@@ -6,7 +6,6 @@ import {
   BarChart3,
   Bike,
   Check,
-  ChevronDown,
   CircleDollarSign,
   Clock3,
   Fuel,
@@ -76,6 +75,14 @@ const PLANS = [
   { name: "Pro", price: "R$ 69,90", period: "/trimestre", plan: "trimestral", featured: true },
   { name: "Elite", price: "R$ 199,90", period: "/ano", plan: "anual" },
 ] as const;
+
+type LandingPlan = {
+  name: string;
+  price: string;
+  period: string;
+  plan: string;
+  featured?: boolean;
+};
 
 const PLAN_FEATURES = ["Ganhos e gastos", "Combustível", "Manutenção", "Metas", "Relatórios"];
 
@@ -161,7 +168,7 @@ function PreviewStat({ label, value, icon: Icon, tone }: { label: string; value:
   );
 }
 
-function PlanCard({ name, price, period, plan, featured }: (typeof PLANS)[number]) {
+function PlanCard({ name, price, period, plan, featured = false }: LandingPlan) {
   return (
     <article className={cn("relative flex h-full flex-col rounded-lg border bg-card p-5 sm:p-6", featured ? "border-accent shadow-lg shadow-accent/10" : "border-border")}>
       {featured ? <span className="absolute top-0 right-5 -translate-y-1/2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase text-accent-foreground">Mais escolhido</span> : null}
