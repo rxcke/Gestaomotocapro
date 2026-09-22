@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import type { Json } from "@/integrations/supabase/types";
+import {
+  hasDistinctWebhookOfferIds,
+  resolveCaktoPlan,
+  type CaktoPlan,
+} from "@/lib/cakto-offers";
 
 const MAX_BODY_BYTES = 256_000;
 const MAX_TIMESTAMP_DRIFT_SECONDS = 300;
@@ -41,7 +46,6 @@ const payloadSchema = z.object({
 });
 
 type Order = z.infer<typeof orderSchema>;
-type Plan = "monthly" | "quarterly" | "annual";
 
 function hexToBytes(value: string): ArrayBuffer | null {
   if (!/^[0-9a-f]+$/i.test(value) || value.length % 2 !== 0) return null;
@@ -131,7 +135,7 @@ function sanitizedPayload(event: string, order: Order): Json {
   };
 }
 
-function fallbackExpiration(event: string, plan: Plan, startedAt: string | null, expiresAt: string | null) {
+function fallbackExpiration(event: string, plan: CaktoPlan, startedAt: string | null, expiresAt: string | null) {
   if (expiresAt) return expiresAt;
   const initialEvent = event === "purchase_approved" || event === "subscription_created";
   const base = initialEvent && startedAt ? new Date(startedAt) : new Date();
@@ -171,7 +175,7 @@ function logWebhook(
   else console.info(entry);
 }
 
-async function processOrder(event: string, order: Order, plan: Plan) {
+async function processOrder(event: string, order: Order, plan: CaktoPlan) {
   const subscription = subscriptionFields(order);
   const effectiveExpiration = fallbackExpiration(event, plan, subscription.startedAt, subscription.expiresAt);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -230,7 +234,12 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
           logWebhook("error", { outcome: "webhook_not_configured" });
           return Response.json({ error: "webhook_not_configured" }, { status: 503 });
         }
-        if (new Set([startOfferId, proOfferId, eliteOfferId]).size !== 3) {
+        const offerConfiguration = {
+          start: startOfferId,
+          pro: proOfferId,
+          elite: eliteOfferId,
+        };
+        if (!hasDistinctWebhookOfferIds(offerConfiguration)) {
           logWebhook("error", { outcome: "offer_configuration_conflict" });
           return Response.json({ error: "webhook_not_configured" }, { status: 503 });
         }
@@ -274,13 +283,7 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
             }
 
             const offerId = order.offer?.id ?? null;
-            const plan: Plan | null = offerId === startOfferId
-              ? "monthly"
-              : offerId === proOfferId
-                ? "quarterly"
-              : offerId === eliteOfferId
-                ? "annual"
-                : null;
+            const plan = resolveCaktoPlan(offerId, offerConfiguration);
             if (!plan) {
               await recordRejectedEvent(event, order, "unknown_offer");
               logWebhook("warn", { event, eventId: order.id, outcome: "unknown_offer" });
