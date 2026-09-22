@@ -253,12 +253,12 @@ export function FuelDialog({
       submitting={saving}
       submitLabel="Salvar abastecimento"
       onSubmit={async (f) => {
-        const liters = numberOrNull(f.get("liters")) ?? 0;
+        const liters = numberOrNull(f.get("liters"));
         let pricePerLiter = numberOrNull(f.get("price_per_liter"));
         let total = numberOrNull(f.get("total"));
-        if (total == null && pricePerLiter != null) total = liters * pricePerLiter;
-        if (pricePerLiter == null && total != null && liters > 0) pricePerLiter = total / liters;
-        const kmValue = numberOrNull(f.get("km")) ?? 0;
+        if (total == null && pricePerLiter != null && liters != null) total = liters * pricePerLiter;
+        if (pricePerLiter == null && total != null && liters != null && liters > 0) pricePerLiter = total / liters;
+        const kmValue = numberOrNull(f.get("km"));
         const motoId = motoValue(f.get("motorcycle_id"));
         const date = String(f.get("date"));
 
@@ -270,7 +270,7 @@ export function FuelDialog({
             date,
             km: kmValue,
             liters,
-            price_per_liter: pricePerLiter ?? 0,
+            price_per_liter: pricePerLiter,
             total: total ?? 0,
             station: textOrNull(f.get("station")),
             description: textOrNull(f.get("description")),
@@ -284,7 +284,7 @@ export function FuelDialog({
               date,
               description: `Abastecimento${f.get("station") ? ` · ${String(f.get("station"))}` : ""}`,
             });
-            if (motoId) await saveMoto.mutateAsync({ id: motoId, current_km: kmValue });
+            if (motoId && kmValue !== null) await saveMoto.mutateAsync({ id: motoId, current_km: kmValue });
           }
           onOpenChange(false);
         } finally {
