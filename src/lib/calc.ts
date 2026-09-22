@@ -42,7 +42,7 @@ export function daysUntil(date: string) {
 
 /** Consumo médio (km/L) a partir de abastecimentos sucessivos do mesmo veículo. */
 export function fuelStats(records: FuelRecord[]) {
-  const valid = records.filter(r => r.km !== null && r.liters !== null);
+  const valid = records.filter((record) => record.km != null && record.liters != null);
   const sorted = [...valid].sort((a, b) => Number(a.km) - Number(b.km));
   let distance = 0;
   let liters = 0;
@@ -68,15 +68,15 @@ export function fuelStats(records: FuelRecord[]) {
     distance,
     liters,
     cost,
-    avgKmL: liters > 0 ? distance / liters : 0,
-    fuelCostPerKm: distance > 0 ? cost / distance : 0,
+    avgKmL: liters > 0 ? distance / liters : null,
+    fuelCostPerKm: distance > 0 ? cost / distance : null,
     history: history.reverse(),
   };
 }
 
 /** Distância percorrida no período, estimada pelos abastecimentos. */
 export function distanceInPeriod(records: FuelRecord[], p: Period) {
-  const valid = records.filter(r => r.km !== null);
+  const valid = records.filter((record) => record.km != null);
   const sorted = [...valid].sort((a, b) => Number(a.km) - Number(b.km));
   const inside = sorted.filter((r) => r.date >= p.start && r.date <= p.end);
   if (inside.length === 0) return 0;
@@ -149,7 +149,8 @@ export function costPerKm(expenses: Expense[], distance: number) {
 }
 
 export function activeMotoKm(moto: Motorcycle | null | undefined, fuel: FuelRecord[]) {
-  const maxFuelKm = fuel.length ? Math.max(0, ...fuel.map((f) => Number(f.km ?? 0))) : 0;
+  const recordedKm = fuel.flatMap((record) => record.km == null ? [] : [record.km]);
+  const maxFuelKm = recordedKm.length ? Math.max(...recordedKm) : 0;
   return Math.max(Number(moto?.current_km ?? 0), maxFuelKm);
 }
 

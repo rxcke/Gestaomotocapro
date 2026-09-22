@@ -72,13 +72,13 @@ export const generateAiInsights = createServerFn({ method: "POST" })
     const currentKm = Math.max(
       0,
       ...motos.filter((m) => !selectedMoto || m.id === selectedMoto).map((m) => Number(m.current_km)),
-      ...fuels.map((f) => Number(f.km)),
+      ...fuels.flatMap((fuel) => fuel.km == null ? [] : [Number(fuel.km)]),
     );
 
     let distance = 0;
     let measuredLiters = 0;
     let measuredFuelCost = 0;
-    const validFuels = fuels.filter(f => f.km !== null && f.liters !== null);
+    const validFuels = fuels.filter((fuel) => fuel.km != null && fuel.liters != null);
     const sortedFuels = [...validFuels].sort((a, b) => Number(a.km) - Number(b.km));
     for (let index = 1; index < sortedFuels.length; index += 1) {
       const previousFuel = sortedFuels[index - 1];
@@ -120,10 +120,13 @@ export const generateAiInsights = createServerFn({ method: "POST" })
         : { fleetSize: motos.length, currentKm },
       fuel: {
         records: fuels.length,
-        measuredIntervals: Math.max(0, sortedFuels.length - 1),
+        measuredIntervals: distance > 0 ? sortedFuels.length - 1 : 0,
         averageKmPerLiter: measuredLiters > 0 ? distance / measuredLiters : null,
         fuelCostPerKm: distance > 0 ? measuredFuelCost / distance : null,
-        averageLiterPrice: fuels.length ? fuels.reduce((sum, fuel) => sum + Number(fuel.price_per_liter), 0) / fuels.length : null,
+        averageLiterPrice: (() => {
+          const prices = fuels.flatMap((fuel) => fuel.price_per_liter == null ? [] : [Number(fuel.price_per_liter)]);
+          return prices.length ? prices.reduce((sum, price) => sum + price, 0) / prices.length : null;
+        })(),
       },
       cost: {
         monthMotorcycleExpenses: motorcycleCost,
