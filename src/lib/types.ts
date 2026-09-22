@@ -44,6 +44,7 @@ export type Expense = {
   id: string;
   user_id: string;
   motorcycle_id: string | null;
+  maintenance_record_id: string | null;
   work_session_id: string | null;
   category: string;
   group_name: string;

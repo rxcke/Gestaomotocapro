@@ -1,5 +1,10 @@
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import { Field, FormDialog, SelectField, numberOrNull, textOrNull } from "./fields";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { supabase } from "@/integrations/supabase/client";
 import { useApp, ALL_MOTOS } from "@/lib/app-context";
 import { useUpsert } from "@/lib/data";
 import {
@@ -11,6 +16,7 @@ import {
 } from "@/lib/constants";
 import { todayISO } from "@/lib/format";
 import { normalizeFuelMeasurements } from "@/lib/fuel";
+import { normalizeMaintenanceInput } from "@/lib/maintenance";
 import type {
   AppDocument,
   Expense,
@@ -368,37 +374,70 @@ export function MaintenanceDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={record ? "Editar manutenção" : "Registrar manutenção"}
-      description="Novos registros com valor entram automaticamente como gasto da moto."
+      description="Escolha o tipo e informe o valor. A data de hoje será registrada automaticamente."
       submitting={saving}
       submitLabel="Salvar manutenção"
+      actionClassName="h-12"
       onSubmit={async (f) => {
-        const cost = numberOrNull(f.get("cost")) ?? 0;
+        const cost = numberOrNull(f.get("cost"));
         const motoId = motoValue(f.get("motorcycle_id"));
-        const date = String(f.get("date"));
         const category = String(f.get("category"));
+        const parsed = normalizeMaintenanceInput({
+          category,
+          cost,
+          description: textOrNull(f.get("description")),
+          km: numberOrNull(f.get("km")),
+          nextKm: numberOrNull(f.get("next_km")),
+          nextDate: textOrNull(f.get("next_date")),
+          workshop: textOrNull(f.get("workshop")),
+        });
+        if (!parsed.success) {
+          toast.error("Informe o tipo e um valor maior que zero.");
+          return;
+        }
         setSaving(true);
         try {
-          await saveMaintenance.mutateAsync({
+          const saved = await saveMaintenance.mutateAsync({
             ...(record ? { id: record.id } : {}),
             motorcycle_id: motoId,
-            category,
-            description: textOrNull(f.get("description")),
-            date,
-            km: numberOrNull(f.get("km")),
-            cost,
-            next_km: numberOrNull(f.get("next_km")),
-            next_date: textOrNull(f.get("next_date")),
-            workshop: textOrNull(f.get("workshop")),
+            category: parsed.data.category,
+            description: parsed.data.description,
+            ...(record ? { date: textOrNull(f.get("date")) ?? record.date } : {}),
+            km: parsed.data.km,
+            cost: parsed.data.cost,
+            next_km: parsed.data.nextKm,
+            next_date: parsed.data.nextDate,
+            workshop: parsed.data.workshop,
           });
-          if (!record && cost > 0) {
+          if (!record) {
             await saveExpense.mutateAsync({
+              maintenance_record_id: String(saved.id),
               motorcycle_id: motoId,
               group_name: "Moto",
               category: "Manutenção",
-              amount: cost,
-              date,
-              description: category,
+              amount: parsed.data.cost,
+              date: String(saved.date),
+              description: parsed.data.category,
             });
+          } else {
+            const { data: linkedExpense, error } = await supabase
+              .from("expenses")
+              .select("id")
+              .eq("maintenance_record_id", record.id)
+              .maybeSingle();
+            if (error) throw error;
+            if (linkedExpense) {
+              await saveExpense.mutateAsync({
+                id: linkedExpense.id,
+                maintenance_record_id: record.id,
+                motorcycle_id: motoId,
+                group_name: "Moto",
+                category: "Manutenção",
+                amount: parsed.data.cost,
+                date: String(saved.date),
+                description: parsed.data.category,
+              });
+            }
           }
           onOpenChange(false);
         } finally {
@@ -407,39 +446,52 @@ export function MaintenanceDialog({
       }}
     >
       <SelectField
-        label="Tipo"
+        label="Tipo de manutenção *"
         name="category"
         options={MAINTENANCE_CATEGORIES.map((c) => ({ value: c, label: c }))}
         defaultValue={record?.category ?? "Óleo"}
       />
-      <Field label="Descrição" name="description" defaultValue={record?.description ?? ""} placeholder="Troca de óleo + filtro" />
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Data" name="date" type="date" required defaultValue={record?.date ?? todayISO()} />
-        <Field label="KM atual" name="km" type="number" inputMode="decimal" defaultValue={record?.km ?? ""} />
-      </div>
       <Field
-        label="Valor (R$)"
+        label="Valor (R$) *"
         name="cost"
         type="number"
         step="0.01"
+        min="0.01"
         inputMode="decimal"
+        required
         defaultValue={record?.cost ?? ""}
+        placeholder="80,00"
       />
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Próximo KM" name="next_km" type="number" inputMode="decimal" defaultValue={record?.next_km ?? ""} />
-        <Field label="Próxima data" name="next_date" type="date" defaultValue={record?.next_date ?? ""} />
-      </div>
-      {options.length > 1 ? (
-        <SelectField
-          label="Moto"
-          name="motorcycle_id"
-          options={options}
-          defaultValue={record?.motorcycle_id ?? preselect}
-        />
-      ) : (
-        <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
-      )}
-      <Field label="Oficina (opcional)" name="workshop" defaultValue={record?.workshop ?? ""} />
+      <Collapsible defaultOpen={Boolean(record)} className="rounded-md border border-border">
+        <CollapsibleTrigger asChild>
+          <Button type="button" variant="ghost" className="group h-12 w-full justify-between px-3">
+            Adicionar detalhes
+            <ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-4 border-t border-border p-3">
+          <Field label="Descrição (opcional)" name="description" defaultValue={record?.description ?? ""} placeholder="Troca de óleo + filtro" />
+          <div className={record ? "grid grid-cols-2 gap-3" : "grid gap-3"}>
+            {record ? <Field label="Data (opcional)" name="date" type="date" defaultValue={record.date} /> : null}
+            <Field label="KM atual (opcional)" name="km" type="number" min="0" inputMode="decimal" defaultValue={record?.km ?? ""} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Próximo KM (opcional)" name="next_km" type="number" min="0" inputMode="decimal" defaultValue={record?.next_km ?? ""} />
+            <Field label="Próxima data (opcional)" name="next_date" type="date" defaultValue={record?.next_date ?? ""} />
+          </div>
+          {options.length > 1 ? (
+            <SelectField
+              label="Moto (opcional)"
+              name="motorcycle_id"
+              options={options}
+              defaultValue={record?.motorcycle_id ?? preselect}
+            />
+          ) : (
+            <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
+          )}
+          <Field label="Oficina/local (opcional)" name="workshop" defaultValue={record?.workshop ?? ""} />
+        </CollapsibleContent>
+      </Collapsible>
     </FormDialog>
   );
 }

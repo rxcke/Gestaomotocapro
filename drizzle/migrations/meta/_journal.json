@@ -71,6 +71,34 @@
       "when": 1790087243892,
       "tag": "0009_validate_optional_fuel_measurements",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790088431131,
+      "tag": "0010_validate_maintenance_required_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790088597875,
+      "tag": "0011_use_local_date_for_maintenance",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790088661213,
+      "tag": "0012_link_maintenance_expenses",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790088742932,
+      "tag": "0013_validate_optional_maintenance_details",
+      "breakpoints": true
     }
   ]
 }

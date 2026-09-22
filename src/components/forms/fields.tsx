@@ -19,6 +19,7 @@ export function FormDialog({
   onSubmit,
   submitting,
   submitLabel = "Salvar",
+  actionClassName,
   children,
 }: {
   open: boolean;
@@ -28,6 +29,7 @@ export function FormDialog({
   onSubmit: (form: FormData) => void;
   submitting?: boolean;
   submitLabel?: string;
+  actionClassName?: string;
   children: ReactNode;
 }) {
   return (
@@ -46,10 +48,10 @@ export function FormDialog({
         >
           {children}
           <div className="flex gap-2 pt-2">
-            <Button type="button" variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" className={`flex-1 ${actionClassName ?? ""}`} onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" className="flex-1" disabled={submitting}>
+            <Button type="submit" className={`flex-1 ${actionClassName ?? ""}`} disabled={submitting}>
               {submitting ? "Salvando..." : submitLabel}
             </Button>
           </div>

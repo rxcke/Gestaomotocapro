@@ -64,6 +64,7 @@ export type Database = {
           description: string | null
           group_name: string
           id: string
+          maintenance_record_id: string | null
           motorcycle_id: string | null
           user_id: string
           work_session_id: string | null
@@ -76,6 +77,7 @@ export type Database = {
           description?: string | null
           group_name?: string
           id?: string
+          maintenance_record_id?: string | null
           motorcycle_id?: string | null
           user_id: string
           work_session_id?: string | null
@@ -88,11 +90,19 @@ export type Database = {
           description?: string | null
           group_name?: string
           id?: string
+          maintenance_record_id?: string | null
           motorcycle_id?: string | null
           user_id?: string
           work_session_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "expenses_maintenance_record_id_fkey"
+            columns: ["maintenance_record_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_records"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "expenses_motorcycle_id_fkey"
             columns: ["motorcycle_id"]
