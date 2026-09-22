@@ -21,3 +21,9 @@
 - [x] Aplicar na base ativa a correção de campos opcionais do abastecimento
 - [x] Confirmar total obrigatório e positivo, sem exigência de litros, preço ou KM
 - [x] Validar os quatro cenários de abastecimento solicitados
+
+## WhatsApp do usuário
+- [ ] Reutilizar o campo phone existente no perfil, sem duplicidade
+- [ ] Validar e normalizar celular brasileiro no cadastro, onboarding e perfil
+- [ ] Garantir fluxo Google condicional ao telefone
+- [ ] Testar cadastro, persistência, edição e celular
