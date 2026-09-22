@@ -326,6 +326,7 @@ export function FuelDialog({
         type="number"
         step="0.01"
         inputMode="decimal"
+        required
         defaultValue={record?.total ?? ""}
       />
       {options.length > 1 ? (

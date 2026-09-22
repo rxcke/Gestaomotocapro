@@ -78,7 +78,8 @@ export const generateAiInsights = createServerFn({ method: "POST" })
     let distance = 0;
     let measuredLiters = 0;
     let measuredFuelCost = 0;
-    const sortedFuels = [...fuels].sort((a, b) => Number(a.km) - Number(b.km));
+    const validFuels = fuels.filter(f => f.km !== null && f.liters !== null);
+    const sortedFuels = [...validFuels].sort((a, b) => Number(a.km) - Number(b.km));
     for (let index = 1; index < sortedFuels.length; index += 1) {
       const previousFuel = sortedFuels[index - 1];
       const fuel = sortedFuels[index];

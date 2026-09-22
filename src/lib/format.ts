@@ -12,14 +12,18 @@ export const brlCompact = (value: number | null | undefined) => {
   }).format(Number.isFinite(n) ? n : 0);
 };
 
-export const num = (value: number | null | undefined, digits = 1) =>
-  new Intl.NumberFormat("pt-BR", {
+export const num = (value: number | null | undefined, digits = 1) => {
+  if (value === null || value === undefined) return "—";
+  return new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-  }).format(Number(value ?? 0));
+  }).format(Number(value));
+};
 
-export const km = (value: number | null | undefined) =>
-  `${new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(Number(value ?? 0))} km`;
+export const km = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return "— km";
+  return `${new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(Number(value))} km`;
+};
 
 export const dateBR = (value: string | null | undefined) => {
   if (!value) return "—";
