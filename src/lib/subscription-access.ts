@@ -1,0 +1,16 @@
+import { supabase } from "@/integrations/supabase/client";
+import type { SubscriptionAccess } from "@/lib/subscription.functions";
+
+const NO_ACCESS: SubscriptionAccess = {
+  active: false,
+  admin: false,
+  subscription: null,
+};
+
+export async function fetchSubscriptionAccessWhenAuthenticated(
+  fetchAccess: () => Promise<SubscriptionAccess>,
+): Promise<SubscriptionAccess> {
+  const { data, error } = await supabase.auth.getSession();
+  if (error || !data.session?.access_token) return NO_ACCESS;
+  return fetchAccess();
+}

@@ -8,6 +8,7 @@ import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock } from "@/compon
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { getCheckoutUrl, getSubscriptionAccess, type SubscriptionPlan } from "@/lib/subscription.functions";
+import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/planos")({
@@ -28,7 +29,7 @@ function PlansPage() {
   const navigate = useNavigate();
   const fetchAccess = useServerFn(getSubscriptionAccess);
   const fetchCheckout = useServerFn(getCheckoutUrl);
-  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
+  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess) });
   const [opening, setOpening] = useState<SubscriptionPlan | null>(null);
 
   const subscribe = async (plan: SubscriptionPlan) => {
