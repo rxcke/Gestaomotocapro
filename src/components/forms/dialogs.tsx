@@ -376,6 +376,7 @@ export function MaintenanceDialog({
       description="Escolha o tipo e informe o valor. A data de hoje será registrada automaticamente."
       submitting={saving}
       submitLabel="Salvar manutenção"
+      actionClassName="h-12"
       onSubmit={async (f) => {
         const cost = numberOrNull(f.get("cost"));
         const motoId = motoValue(f.get("motorcycle_id"));
