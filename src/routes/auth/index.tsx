@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -8,7 +9,8 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authErrorMessage, readSafeReturnPath } from "@/lib/auth-errors";
+import { authErrorMessage, clearSafeReturnPath, peekSafeReturnPath } from "@/lib/auth-errors";
+import { getEntryDestination } from "@/lib/entry-flow.functions";
 
 export const Route = createFileRoute("/auth/")({
   head: () => ({ meta: [
@@ -31,14 +33,22 @@ function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
   const [confirmationEmail, setConfirmationEmail] = useState("");
+  const resolveEntry = useServerFn(getEntryDestination);
+
+  const continueIntoApp = useCallback(async () => {
+    const intendedPath = peekSafeReturnPath();
+    const destination = await resolveEntry({ data: { intendedPath } });
+    clearSafeReturnPath();
+    await navigate({ href: destination, replace: true });
+  }, [navigate, resolveEntry]);
 
   useEffect(() => {
     const requestedMode = new URLSearchParams(window.location.search).get("mode");
     if (requestedMode === "signup" || requestedMode === "forgot" || requestedMode === "signin") setMode(requestedMode);
     void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ href: readSafeReturnPath(), replace: true });
+      if (data.session) void continueIntoApp();
     });
-  }, [navigate]);
+  }, [continueIntoApp]);
 
   const changeMode = (next: Mode) => {
     setMode(next);
@@ -93,12 +103,12 @@ function AuthPage() {
           return;
         }
         toast.success("Conta criada com sucesso.");
-        navigate({ to: "/planos", replace: true });
+        await continueIntoApp();
         return;
       }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate({ href: readSafeReturnPath(), replace: true });
+      await continueIntoApp();
     } catch (error) {
       toast.error(authErrorMessage(error));
     } finally {
@@ -119,7 +129,7 @@ function AuthPage() {
         return;
       }
       if (result.redirected) return;
-      navigate({ href: readSafeReturnPath(), replace: true });
+      await continueIntoApp();
     } finally {
       setGoogleLoading(false);
     }
