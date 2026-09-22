@@ -13,3 +13,4 @@
 - [x] Confirmação concluída; integração Cakto retomada por solicitação
 - [x] Reavaliar payload oficial: um produto Cakto com três ofertas; usar `data.offer.id` para identificar cada plano
 - [x] Publicar `cakto-webhook` sem exigir o segredo na etapa de publicação e confirmar a URL pública exata
+- [x] Registrar Product ID, Offer ID, nome e preço da oferta na auditoria sanitizada do webhook, sem alterar a identificação por IDs
