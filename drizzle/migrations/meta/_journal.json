@@ -85,6 +85,13 @@
       "when": 1790088597875,
       "tag": "0011_use_local_date_for_maintenance",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790088661213,
+      "tag": "0012_link_maintenance_expenses",
+      "breakpoints": true
     }
   ]
 }
