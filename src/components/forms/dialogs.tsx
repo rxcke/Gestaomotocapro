@@ -298,7 +298,7 @@ export function FuelDialog({
         name="km"
         type="number"
         inputMode="decimal"
-        required
+        
         defaultValue={record?.km ?? ""}
       />
       <div className="grid grid-cols-2 gap-3">
@@ -308,7 +308,7 @@ export function FuelDialog({
           type="number"
           step="0.01"
           inputMode="decimal"
-          required
+          
           defaultValue={record?.liters ?? ""}
         />
         <Field
