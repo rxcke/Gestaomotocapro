@@ -15,4 +15,4 @@
 - [x] Publicar `cakto-webhook` sem exigir o segredo na etapa de publicação e confirmar a URL pública exata
 - [x] Registrar Product ID, Offer ID, nome e preço da oferta na auditoria sanitizada do webhook, sem alterar a identificação por IDs
 - [x] Auditar e fortalecer autenticação, Google, perfis, assinaturas, checkout e segurança sem alterar IDs ou regras da Cakto
-- [ ] Validar os fluxos de conta, acesso pago e webhook em desktop e celular
+- [x] Validar os fluxos de conta, acesso pago e webhook em desktop e celular
