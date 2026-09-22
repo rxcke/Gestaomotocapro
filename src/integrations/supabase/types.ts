@@ -115,10 +115,10 @@ export type Database = {
           date: string
           description: string | null
           id: string
-          km: number
-          liters: number
+          km: number | null
+          liters: number | null
           motorcycle_id: string | null
-          price_per_liter: number
+          price_per_liter: number | null
           station: string | null
           total: number
           user_id: string
@@ -128,10 +128,10 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
-          km: number
-          liters: number
+          km?: number | null
+          liters?: number | null
           motorcycle_id?: string | null
-          price_per_liter: number
+          price_per_liter?: number | null
           station?: string | null
           total: number
           user_id: string
@@ -141,10 +141,10 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
-          km?: number
-          liters?: number
+          km?: number | null
+          liters?: number | null
           motorcycle_id?: string | null
-          price_per_liter?: number
+          price_per_liter?: number | null
           station?: string | null
           total?: number
           user_id?: string
