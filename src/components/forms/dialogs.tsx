@@ -249,18 +249,18 @@ export function FuelDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={record ? "Editar abastecimento" : "Adicionar abastecimento"}
-      description="Informe litros com preço por litro ou com o total — o que faltar é calculado."
+      description="Informe o valor total. Os demais detalhes podem ser adicionados agora ou depois."
       submitting={saving}
       submitLabel="Salvar abastecimento"
       onSubmit={async (f) => {
         const liters = numberOrNull(f.get("liters"));
         let pricePerLiter = numberOrNull(f.get("price_per_liter"));
-        let total = numberOrNull(f.get("total"));
-        if (total == null && pricePerLiter != null && liters != null) total = liters * pricePerLiter;
+        const total = numberOrNull(f.get("total"));
+        if (total == null || total <= 0) return;
         if (pricePerLiter == null && total != null && liters != null && liters > 0) pricePerLiter = total / liters;
         const kmValue = numberOrNull(f.get("km"));
         const motoId = motoValue(f.get("motorcycle_id"));
-        const date = String(f.get("date"));
+        const date = textOrNull(f.get("date")) ?? todayISO();
 
         setSaving(true);
         try {
@@ -271,7 +271,7 @@ export function FuelDialog({
             km: kmValue,
             liters,
             price_per_liter: pricePerLiter,
-            total: total ?? 0,
+            total,
             station: textOrNull(f.get("station")),
             description: textOrNull(f.get("description")),
           });
@@ -280,11 +280,11 @@ export function FuelDialog({
               motorcycle_id: motoId,
               group_name: "Moto",
               category: "Combustível",
-              amount: total ?? 0,
+              amount: total,
               date,
               description: `Abastecimento${f.get("station") ? ` · ${String(f.get("station"))}` : ""}`,
             });
-            if (motoId && kmValue !== null) await saveMoto.mutateAsync({ id: motoId, current_km: kmValue });
+            if (motoId && kmValue != null) await saveMoto.mutateAsync({ id: motoId, current_km: kmValue });
           }
           onOpenChange(false);
         } finally {
@@ -292,27 +292,28 @@ export function FuelDialog({
         }
       }}
     >
-      <Field label="Data" name="date" type="date" required defaultValue={record?.date ?? todayISO()} />
       <Field
-        label="Quilometragem no painel"
-        name="km"
+        label="Valor do abastecimento *"
+        name="total"
         type="number"
+        step="0.01"
+        min="0.01"
         inputMode="decimal"
-        
-        defaultValue={record?.km ?? ""}
+        required
+        defaultValue={record?.total ?? ""}
+        placeholder="80,00"
       />
       <div className="grid grid-cols-2 gap-3">
         <Field
-          label="Litros"
+          label="Litros (opcional)"
           name="liters"
           type="number"
           step="0.01"
           inputMode="decimal"
-          
           defaultValue={record?.liters ?? ""}
         />
         <Field
-          label="Preço por litro"
+          label="Preço por litro (opcional)"
           name="price_per_liter"
           type="number"
           step="0.001"
@@ -321,14 +322,13 @@ export function FuelDialog({
         />
       </div>
       <Field
-        label="Total pago (R$)"
-        name="total"
+        label="Quilometragem atual (opcional)"
+        name="km"
         type="number"
-        step="0.01"
         inputMode="decimal"
-        required
-        defaultValue={record?.total ?? ""}
+        defaultValue={record?.km ?? ""}
       />
+      <Field label="Data (opcional)" name="date" type="date" defaultValue={record?.date ?? todayISO()} />
       {options.length > 1 ? (
         <SelectField
           label="Moto"

@@ -58,9 +58,9 @@ export type FuelRecord = {
   user_id: string;
   motorcycle_id: string | null;
   date: string;
-  km: number;
-  liters: number;
-  price_per_liter: number;
+  km: number | null;
+  liters: number | null;
+  price_per_liter: number | null;
   total: number;
   station: string | null;
   description: string | null;

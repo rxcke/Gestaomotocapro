@@ -67,6 +67,7 @@ export function Field({
   required,
   placeholder,
   step,
+  min,
   inputMode,
 }: {
   label: string;
@@ -76,6 +77,7 @@ export function Field({
   required?: boolean;
   placeholder?: string;
   step?: string;
+  min?: string;
   inputMode?: "decimal" | "numeric" | "text";
 }) {
   return (
@@ -89,6 +91,7 @@ export function Field({
         defaultValue={defaultValue ?? ""}
         placeholder={placeholder ?? ""}
         step={step ?? ""}
+        min={min}
         inputMode={inputMode ?? "text"}
         className="h-12 text-base"
       />
