@@ -20,7 +20,7 @@ function AppLayout() {
   const fetchAccess = useServerFn(getSubscriptionAccess);
   const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess) });
   const hasPremium = Boolean(access.data?.active || access.data?.admin);
-  const needsOnboarding = hasPremium && profile.isSuccess && !(profile.data?.onboarding_completed ?? false);
+  const needsOnboarding = profile.isSuccess && (!profile.data?.phone || (hasPremium && !(profile.data?.onboarding_completed ?? false)));
 
   useEffect(() => {
     if (needsOnboarding) navigate({ to: "/onboarding", replace: true });

@@ -17,7 +17,7 @@ export const getEntryDestination = createServerFn({ method: "POST" })
     const [accessResult, roleResult, profileResult] = await Promise.all([
       context.supabase.rpc("has_active_subscription", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
-      context.supabase.from("profiles").select("onboarding_completed").eq("id", context.userId).maybeSingle(),
+      context.supabase.from("profiles").select("onboarding_completed,phone").eq("id", context.userId).maybeSingle(),
     ]);
 
     if (accessResult.error || roleResult.error || profileResult.error) {
@@ -26,6 +26,7 @@ export const getEntryDestination = createServerFn({ method: "POST" })
 
     const hasAccess = Boolean(accessResult.data || roleResult.data);
     const intendedPath = safeIntendedPath(data.intendedPath);
+    if (!profileResult.data?.phone) return "/onboarding";
     if (!hasAccess) {
       return intendedPath === "/app/perfil" ? "/app/perfil" : "/planos";
     }

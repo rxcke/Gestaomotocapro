@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authErrorMessage, clearSafeReturnPath, peekSafeReturnPath } from "@/lib/auth-errors";
 import { getEntryDestination } from "@/lib/entry-flow.functions";
+import { formatBrazilianMobile, normalizeBrazilianMobile } from "@/lib/phone";
 
 export const Route = createFileRoute("/auth/")({
   head: () => ({ meta: [
@@ -33,6 +34,7 @@ function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [sent, setSent] = useState<string | null>(null);
   const [confirmationEmail, setConfirmationEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const resolveEntry = useServerFn(getEntryDestination);
 
   const continueIntoApp = useCallback(async () => {
@@ -64,6 +66,7 @@ function AuthPage() {
     const password = String(form.get("password") ?? "");
     const confirmation = String(form.get("confirmation") ?? "");
     const name = String(form.get("name") ?? "").trim();
+    const normalizedPhone = normalizeBrazilianMobile(phone);
 
     if (email.length > 320) {
       toast.error("Informe um e-mail válido.");
@@ -71,6 +74,10 @@ function AuthPage() {
     }
     if (mode === "signup" && (name.length < 2 || name.length > 100)) {
       toast.error("Informe seu nome com 2 a 100 caracteres.");
+      return;
+    }
+    if (mode === "signup" && !normalizedPhone) {
+      toast.error("Informe um celular brasileiro válido com DDD.");
       return;
     }
     if (mode !== "forgot" && (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password))) {
@@ -94,7 +101,7 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback`, data: { name } },
+          options: { emailRedirectTo: `${window.location.origin}/auth/callback`, data: { name, phone: normalizedPhone } },
         });
         if (error) throw error;
         if (!data.session) {
@@ -157,7 +164,7 @@ function AuthPage() {
         <h1 className="font-display text-2xl font-bold">{mode === "signin" ? "Entrar" : mode === "signup" ? "Criar conta" : "Recuperar senha"}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{mode === "forgot" ? "Informe seu e-mail para receber o link de redefinição." : "Seu dinheiro. Sua moto. Seu resultado."}</p>
         {sent ? <div className="glass-soft mt-5 p-4 text-sm text-positive"><p>{sent}</p>{confirmationEmail ? <Button type="button" variant="outline" className="mt-4 w-full" disabled={loading} onClick={resendConfirmation}>{loading ? "Enviando..." : "Reenviar confirmação"}</Button> : null}</div> : <form className="mt-5 space-y-4" onSubmit={handle}>
-          {mode === "signup" ? <div className="space-y-1.5"><Label htmlFor="name">Nome</Label><Input id="name" name="name" required minLength={2} maxLength={100} autoComplete="name" className="h-12 text-base" placeholder="Seu nome" /></div> : null}
+          {mode === "signup" ? <><div className="space-y-1.5"><Label htmlFor="name">Nome completo *</Label><Input id="name" name="name" required minLength={2} maxLength={100} autoComplete="name" className="h-12 text-base" placeholder="Seu nome completo" /></div><div className="space-y-1.5"><Label htmlFor="phone">WhatsApp / Celular *</Label><Input id="phone" name="phone" type="tel" required inputMode="tel" autoComplete="tel-national" className="h-12 text-base" placeholder="(31) 99999-9999" value={phone} onChange={(event)=>setPhone(formatBrazilianMobile(event.target.value))} maxLength={15} /></div></> : null}
           <div className="space-y-1.5"><Label htmlFor="email">E-mail</Label><Input id="email" name="email" type="email" required maxLength={320} autoComplete="email" className="h-12 text-base" /></div>
           {mode !== "forgot" ? <div className="space-y-1.5"><Label htmlFor="password">Senha</Label><Input id="password" name="password" type="password" required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="h-12 text-base" /></div> : null}
           {mode === "signup" ? <div className="space-y-1.5"><Label htmlFor="confirmation">Confirmar senha</Label><Input id="confirmation" name="confirmation" type="password" required minLength={8} autoComplete="new-password" className="h-12 text-base" /></div> : null}
