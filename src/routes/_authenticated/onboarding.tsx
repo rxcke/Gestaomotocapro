@@ -85,7 +85,7 @@ function Onboarding() {
     if (completed) navigate({ to: "/app", replace: true });
   }, [completed, navigate]);
 
-  if (access.isLoading || profile.isLoading || motorcycles.isLoading || completed) {
+  if (access.isLoading || profile.isLoading || motorcycles.isLoading || blocked || completed) {
     return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><LoadingBlock label="Verificando sua assinatura..." /></div>;
   }
 

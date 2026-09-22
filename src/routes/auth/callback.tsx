@@ -36,10 +36,14 @@ function AuthCallbackPage() {
       const { data } = await supabase.auth.getSession();
       if (!active) return;
       if (data.session) {
-        const destination = await resolveEntry({ data: { intendedPath: peekSafeReturnPath() } });
-        if (!active) return;
-        clearSafeReturnPath();
-        await navigate({ href: destination, replace: true });
+        try {
+          const destination = await resolveEntry({ data: { intendedPath: peekSafeReturnPath() } });
+          if (!active) return;
+          clearSafeReturnPath();
+          await navigate({ href: destination, replace: true });
+        } catch {
+          if (active) setFailed(true);
+        }
         return;
       }
       finishing = false;

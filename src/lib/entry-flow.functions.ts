@@ -25,9 +25,11 @@ export const getEntryDestination = createServerFn({ method: "POST" })
     }
 
     const hasAccess = Boolean(accessResult.data || roleResult.data);
+    const intendedPath = safeIntendedPath(data.intendedPath);
     if (!hasAccess) {
-      return safeIntendedPath(data.intendedPath) === "/app/perfil" ? "/app/perfil" : "/planos";
+      return intendedPath === "/app/perfil" ? "/app/perfil" : "/planos";
     }
     if (!profileResult.data?.onboarding_completed) return "/onboarding";
-    return safeIntendedPath(data.intendedPath) ?? "/app";
+    if (intendedPath === "/admin" && !roleResult.data) return "/app";
+    return intendedPath ?? "/app";
   });
