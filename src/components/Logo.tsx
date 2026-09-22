@@ -1,7 +1,7 @@
 export function LogoMark({ className = "size-10" }: { className?: string }) {
   return (
     <span
-      className={`grid place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 ${className}`}
+      className={`grid place-items-center rounded-2xl bg-accent text-accent-foreground shadow-lg shadow-accent/20 ${className}`}
       aria-hidden="true"
     >
       <svg viewBox="0 0 24 24" fill="none" className="size-[60%]">
