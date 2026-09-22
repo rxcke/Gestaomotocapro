@@ -10,6 +10,7 @@ import {
   MAINTENANCE_CATEGORIES,
 } from "@/lib/constants";
 import { todayISO } from "@/lib/format";
+import { normalizeFuelMeasurements } from "@/lib/fuel";
 import type {
   AppDocument,
   Expense,
@@ -253,12 +254,14 @@ export function FuelDialog({
       submitting={saving}
       submitLabel="Salvar abastecimento"
       onSubmit={async (f) => {
-        const liters = numberOrNull(f.get("liters"));
-        let pricePerLiter = numberOrNull(f.get("price_per_liter"));
-        const total = numberOrNull(f.get("total"));
-        if (total == null || total <= 0) return;
-        if (pricePerLiter == null && total != null && liters != null && liters > 0) pricePerLiter = total / liters;
-        const kmValue = numberOrNull(f.get("km"));
+        const measurements = normalizeFuelMeasurements({
+          total: numberOrNull(f.get("total")),
+          liters: numberOrNull(f.get("liters")),
+          pricePerLiter: numberOrNull(f.get("price_per_liter")),
+          km: numberOrNull(f.get("km")),
+        });
+        if (!measurements) return;
+        const { total, liters, pricePerLiter, km: kmValue } = measurements;
         const motoId = motoValue(f.get("motorcycle_id"));
         const date = textOrNull(f.get("date")) ?? todayISO();
 
