@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Gestão Motoca Pro design system — "Frosted Glass Dashboard"
- * Canvas claro com luzes ambientes, cards de vidro, tipografia Sora + Inter.
+ * Gestão Motoca Pro — painel escuro, preciso e profissional.
+ * Preto estrutural, laranja de ação, branco de alto contraste e cinza auxiliar.
  * Todas as cores em oklch e expostas como tokens semânticos.
  */
 
@@ -56,70 +56,70 @@
 }
 
 :root {
-  --radius: 0.9rem;
+  --radius: 0.5rem;
 
-  --canvas: oklch(0.98 0.005 240);
-  --background: oklch(0.98 0.005 240);
-  --foreground: oklch(0.15 0.01 264);
+  --canvas: oklch(0.155 0.006 240);
+  --background: oklch(0.155 0.006 240);
+  --foreground: oklch(1 0 0);
 
-  --card: oklch(1 0 0 / 55%);
-  --card-foreground: oklch(0.15 0.01 264);
-  --popover: oklch(0.995 0.003 240);
-  --popover-foreground: oklch(0.15 0.01 264);
+  --card: oklch(0.205 0.006 240 / 94%);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.19 0.006 240);
+  --popover-foreground: oklch(1 0 0);
 
-  --primary: oklch(0.15 0.01 264);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(1 0 0 / 70%);
-  --secondary-foreground: oklch(0.15 0.01 264);
+  --primary: oklch(0.69 0.21 46);
+  --primary-foreground: oklch(0.15 0.006 240);
+  --secondary: oklch(0.255 0.007 240);
+  --secondary-foreground: oklch(1 0 0);
 
-  --muted: oklch(0.93 0.008 247);
-  --muted-foreground: oklch(0.52 0.02 257);
+  --muted: oklch(0.25 0.006 240);
+  --muted-foreground: oklch(0.66 0.01 250);
 
-  --accent: oklch(0.7 0.2 45);
-  --accent-foreground: oklch(0.99 0 0);
+  --accent: oklch(0.69 0.21 46);
+  --accent-foreground: oklch(0.15 0.006 240);
 
-  --positive: oklch(0.63 0.17 150);
+  --positive: oklch(0.76 0.16 145);
   --negative: oklch(0.61 0.21 26);
   --warning: oklch(0.77 0.15 78);
 
   --destructive: oklch(0.58 0.24 27);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.88 0.01 250);
-  --input: oklch(0.88 0.01 250);
-  --ring: oklch(0.7 0.2 45);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.69 0.21 46);
 
-  --glass: oklch(1 0 0 / 50%);
-  --glass-strong: oklch(1 0 0 / 72%);
-  --glass-border: oklch(1 0 0 / 65%);
+  --glass: oklch(0.205 0.006 240 / 92%);
+  --glass-strong: oklch(0.245 0.007 240 / 96%);
+  --glass-border: oklch(1 0 0 / 12%);
 
   --chart-1: oklch(0.7 0.2 45);
   --chart-2: oklch(0.61 0.21 26);
-  --chart-3: oklch(0.65 0.13 240);
-  --chart-4: oklch(0.77 0.15 78);
-  --chart-5: oklch(0.6 0.12 300);
+  --chart-3: oklch(0.72 0.12 60);
+  --chart-4: oklch(0.66 0.01 250);
+  --chart-5: oklch(0.9 0 0);
 }
 
 .dark {
-  --canvas: oklch(0.1 0.01 262);
-  --background: oklch(0.1 0.01 262);
-  --foreground: oklch(0.96 0.005 250);
+  --canvas: oklch(0.12 0.005 240);
+  --background: oklch(0.12 0.005 240);
+  --foreground: oklch(1 0 0);
 
-  --card: oklch(0.28 0.022 262 / 55%);
-  --card-foreground: oklch(0.96 0.005 250);
-  --popover: oklch(0.23 0.022 262);
-  --popover-foreground: oklch(0.96 0.005 250);
+  --card: oklch(0.18 0.006 240 / 94%);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.17 0.006 240);
+  --popover-foreground: oklch(1 0 0);
 
-  --primary: oklch(0.96 0.005 250);
-  --primary-foreground: oklch(0.2 0.02 262);
-  --secondary: oklch(0.3 0.022 262 / 70%);
-  --secondary-foreground: oklch(0.96 0.005 250);
+  --primary: oklch(0.69 0.21 46);
+  --primary-foreground: oklch(0.12 0.005 240);
+  --secondary: oklch(0.23 0.006 240);
+  --secondary-foreground: oklch(1 0 0);
 
-  --muted: oklch(0.3 0.022 262);
-  --muted-foreground: oklch(0.72 0.02 258);
+  --muted: oklch(0.22 0.006 240);
+  --muted-foreground: oklch(0.66 0.01 250);
 
-  --accent: oklch(0.7 0.2 45);
-  --accent-foreground: oklch(0.18 0.02 262);
+  --accent: oklch(0.69 0.21 46);
+  --accent-foreground: oklch(0.12 0.005 240);
 
   --positive: oklch(0.76 0.17 152);
   --negative: oklch(0.68 0.19 24);
@@ -130,10 +130,10 @@
 
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.7 0.2 45);
+  --ring: oklch(0.69 0.21 46);
 
-  --glass: oklch(0.3 0.022 262 / 45%);
-  --glass-strong: oklch(0.33 0.022 262 / 65%);
+  --glass: oklch(0.18 0.006 240 / 94%);
+  --glass-strong: oklch(0.22 0.006 240 / 96%);
   --glass-border: oklch(1 0 0 / 12%);
 
   --chart-1: oklch(0.7 0.2 45);
@@ -170,16 +170,16 @@
 @utility glass-panel {
   background-color: var(--glass);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-3xl);
-  backdrop-filter: blur(28px) saturate(140%);
-  box-shadow: 0 20px 45px -30px oklch(0 0 0 / 45%);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(18px) saturate(115%);
+  box-shadow: 0 18px 42px -30px oklch(0 0 0 / 80%);
 }
 
 @utility glass-soft {
   background-color: var(--glass-strong);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-2xl);
-  backdrop-filter: blur(20px) saturate(135%);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(14px) saturate(110%);
 }
 
 @utility num-display {

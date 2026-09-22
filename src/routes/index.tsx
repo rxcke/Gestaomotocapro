@@ -8,13 +8,13 @@ import { APP_NAME, APP_TAGLINE } from "@/lib/constants";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Gestão Motoca Pro — Sua moto gera dinheiro ou só leva dinheiro?" },
+      { title: "Gestão Motoca Pro — Seu corre sob controle." },
       {
         name: "description",
         content:
-          "Controle ganhos, gastos, combustível e manutenção da sua moto em um só lugar e descubra quanto sobra no seu bolso.",
+          "Ganhos, gastos, combustível, manutenção e lucro para quem trabalha sobre duas rodas.",
       },
-      { property: "og:title", content: "Gestão Motoca Pro — Seu dinheiro. Sua moto. Seu resultado." },
+      { property: "og:title", content: "Gestão Motoca Pro — Seu corre sob controle." },
       {
         property: "og:description",
         content: "Ganhos, gastos, combustível, manutenção e custo por km da sua moto em um só app.",
@@ -57,12 +57,12 @@ function Landing() {
         </header>
 
         <main className="py-14 sm:py-20">
-          <p className="text-sm font-semibold text-accent">{APP_TAGLINE}</p>
-          <h1 className="mt-4 max-w-2xl font-display text-4xl leading-[1.05] font-bold tracking-tight sm:text-6xl">
-            Sua moto gera dinheiro ou só leva dinheiro?
+          <p className="text-sm font-semibold uppercase text-accent">{APP_TAGLINE}</p>
+          <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.05] font-bold sm:text-6xl">
+            Gestão profissional para quem vive sobre duas rodas.
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Controle seus ganhos, gastos, combustível e manutenção em um só lugar.
+            Controle ganhos, gastos, combustível, manutenção e lucro em um só lugar.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="h-12 px-7 text-base">
