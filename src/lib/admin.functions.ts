@@ -13,6 +13,7 @@ export type AdminData = {
     email: string;
     plan: "monthly" | "quarterly" | "annual";
     status: "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
+    provider_status: string;
     cakto_transaction_id: string | null;
     started_at: string | null;
     expires_at: string | null;
@@ -103,7 +104,7 @@ export const getAdminData = createServerFn({ method: "GET" })
           .order("date", { ascending: false })
           .limit(500),
         supabaseAdmin.from("profiles").select("id,name,email").limit(500),
-        supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,cakto_transaction_id,started_at,expires_at,created_at").order("created_at", { ascending: false }).limit(500),
+        supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at").order("created_at", { ascending: false }).limit(500),
         supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
       ]);
 

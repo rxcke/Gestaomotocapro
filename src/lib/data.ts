@@ -125,9 +125,16 @@ export function useRemove(table: string, message = "Registro excluído.") {
 export function useUpdateProfile(successMessage = "Perfil atualizado.") {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (values: Partial<Profile>) => {
+    mutationFn: async (values: Pick<Profile, "name" | "phone" | "usage_types" | "is_professional" | "onboarding_completed">) => {
       const uid = await currentUserId();
-      const { error } = await db.from("profiles").update(values).eq("id", uid);
+      const allowedValues = {
+        ...(values.name !== undefined ? { name: values.name } : {}),
+        ...(values.phone !== undefined ? { phone: values.phone } : {}),
+        ...(values.usage_types !== undefined ? { usage_types: values.usage_types } : {}),
+        ...(values.is_professional !== undefined ? { is_professional: values.is_professional } : {}),
+        ...(values.onboarding_completed !== undefined ? { onboarding_completed: values.onboarding_completed } : {}),
+      };
+      const { error } = await db.from("profiles").update(allowedValues).eq("id", uid);
       if (error) throw error;
     },
     onSuccess: () => {
