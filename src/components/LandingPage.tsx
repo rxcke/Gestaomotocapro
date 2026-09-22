@@ -192,7 +192,7 @@ export function LandingPage() {
     <div className="min-h-dvh overflow-x-clip bg-canvas text-foreground selection:bg-accent selection:text-accent-foreground">
       <header className="sticky top-0 z-50 border-b border-border bg-background/92 backdrop-blur-xl">
         <div className="mx-auto grid min-h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 lg:flex lg:h-[76px] lg:px-8">
-          <a href="#inicio" aria-label="Gestão Motoca Pro — início" className="min-w-0"><Logo /></a>
+          <a href="#inicio" aria-label="Gestão Motoca Pro — início" className="flex min-h-12 min-w-0 items-center"><Logo /></a>
           <nav className="ml-auto hidden items-center gap-7 lg:flex" aria-label="Navegação principal">
             {NAV_ITEMS.map((item) => <a key={item.href} href={item.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{item.label}</a>)}
           </nav>
