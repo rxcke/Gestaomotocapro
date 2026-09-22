@@ -29,7 +29,10 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     let active = true;
+    let finishing = false;
     const finish = async () => {
+      if (finishing) return;
+      finishing = true;
       const { data } = await supabase.auth.getSession();
       if (!active) return;
       if (data.session) {
@@ -39,6 +42,7 @@ function AuthCallbackPage() {
         await navigate({ href: destination, replace: true });
         return;
       }
+      finishing = false;
     };
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN") void finish();

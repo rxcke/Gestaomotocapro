@@ -206,6 +206,8 @@ function Onboarding() {
                   value={displayName}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex.: Lucas"
+                  minLength={2}
+                  maxLength={100}
                 />
               </div>
               <Button className="h-12 w-full text-base" disabled={saving} onClick={saveIdentityStep}>
@@ -267,6 +269,8 @@ function Onboarding() {
                   value={moto.brand}
                   onChange={(e) => setMoto({ ...moto, brand: e.target.value })}
                   placeholder="Honda"
+                  minLength={2}
+                  maxLength={80}
                 />
               </div>
               <div className="space-y-1.5">
@@ -277,6 +281,8 @@ function Onboarding() {
                   value={moto.model}
                   onChange={(e) => setMoto({ ...moto, model: e.target.value })}
                   placeholder="CG 160"
+                  minLength={2}
+                  maxLength={80}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -289,6 +295,8 @@ function Onboarding() {
                     className="h-12 text-base"
                     value={moto.year}
                     onChange={(e) => setMoto({ ...moto, year: e.target.value })}
+                    min={1900}
+                    max={new Date().getFullYear() + 1}
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -298,6 +306,8 @@ function Onboarding() {
                     className="h-12 text-base"
                     value={moto.plate}
                     onChange={(e) => setMoto({ ...moto, plate: e.target.value })}
+                    maxLength={8}
+                    autoCapitalize="characters"
                   />
                 </div>
               </div>
@@ -311,6 +321,8 @@ function Onboarding() {
                   value={moto.km}
                   onChange={(e) => setMoto({ ...moto, km: e.target.value })}
                   placeholder="32500"
+                  min={0}
+                  step="0.1"
                 />
               </div>
               <div className="flex gap-2">
