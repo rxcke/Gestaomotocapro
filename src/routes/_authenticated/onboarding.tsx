@@ -12,6 +12,7 @@ import { USAGE_TYPES } from "@/lib/constants";
 import { useProfile, useUpdateProfile, useUpsert } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
+import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [
@@ -32,7 +33,7 @@ function Onboarding() {
   const updateProfile = useUpdateProfile("");
   const createMoto = useUpsert("motorcycles", "motorcycles", {});
   const fetchAccess = useServerFn(getSubscriptionAccess);
-  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
+  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess) });
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");

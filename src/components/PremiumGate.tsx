@@ -5,11 +5,12 @@ import { LockKeyhole } from "lucide-react";
 import { GlassCard, LoadingBlock } from "@/components/glass";
 import { Button } from "@/components/ui/button";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
+import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 
 export function PremiumGate({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const fetchAccess = useServerFn(getSubscriptionAccess);
-  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
+  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess) });
   const basicProfile = pathname === "/app/perfil";
 
   if (access.isLoading) return <LoadingBlock label="Verificando sua assinatura..." />;

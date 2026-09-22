@@ -8,6 +8,7 @@ import { useProfile } from "@/lib/data";
 import { LoadingBlock } from "@/components/glass";
 import { PremiumGate } from "@/components/PremiumGate";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
+import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppLayout,
@@ -17,7 +18,7 @@ function AppLayout() {
   const profile = useProfile();
   const navigate = useNavigate();
   const fetchAccess = useServerFn(getSubscriptionAccess);
-  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchAccess() });
+  const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess) });
   const hasPremium = Boolean(access.data?.active || access.data?.admin);
   const needsOnboarding = hasPremium && profile.isSuccess && !(profile.data?.onboarding_completed ?? false);
 

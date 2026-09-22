@@ -13,6 +13,7 @@ import { useProfile, useUpdateProfile } from "@/lib/data";
 import { useTheme } from "@/lib/theme";
 import { dateBR } from "@/lib/format";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
+import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 
 export const Route = createFileRoute("/_authenticated/app/perfil")({head:()=>({meta:[{title:"Perfil — Gestão Motoboy"},{name:"description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:title",content:"Perfil — Gestão Motoboy"},{property:"og:description",content:"Conta e preferências do Gestão Motoboy."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:ProfilePage});
 
@@ -21,7 +22,7 @@ const STATUS_LABELS = { pending: "Pendente", active: "Ativo", canceled: "Cancela
 function ProfilePage(){
   const p=useProfile();const save=useUpdateProfile();const{theme,toggle}=useTheme();
   const fetchAccess=useServerFn(getSubscriptionAccess);
-  const access=useQuery({queryKey:["subscription","access"],queryFn:()=>fetchAccess()});
+  const access=useQuery({queryKey:["subscription","access"],queryFn:()=>fetchSubscriptionAccessWhenAuthenticated(fetchAccess)});
   const[name,setName]=useState<string|undefined>(undefined);const[pro,setPro]=useState<boolean|undefined>(undefined);
   const currentName=name??p.data?.name??"";const currentPro=pro??p.data?.is_professional??false;
   const subscription=access.data?.subscription;
