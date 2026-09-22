@@ -52,7 +52,7 @@ export const useProfile = () =>
 export const useMotorcycles = () => useTable<Motorcycle>("motorcycles", "motorcycles", { column: "created_at", asc: true });
 export const useIncomes = () => useTable<Income>("incomes", "incomes", { column: "date" });
 export const useExpenses = () => useTable<Expense>("expenses", "expenses", { column: "date" });
-export const useFuelRecords = () => useTable<FuelRecord>("fuel_records", "fuel_records", { column: "km" });
+export const useFuelRecords = () => useTable<FuelRecord>("fuel_records", "fuel_records", { column: "date" });
 export const useMaintenance = () =>
   useTable<MaintenanceRecord>("maintenance_records", "maintenance_records", { column: "date" });
 export const useGoals = () => useTable<Goal>("goals", "goals", { column: "created_at" });

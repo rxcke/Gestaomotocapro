@@ -100,11 +100,11 @@ function Dashboard() {
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div>
               <p className="text-xs text-muted-foreground">Consumo médio</p>
-              <p className="num-display mt-1 text-2xl">{num(fuels.avgKmL)} km/L</p>
+              <p className="num-display mt-1 text-2xl">{fuels.avgKmL == null ? "Dados insuficientes" : `${num(fuels.avgKmL)} km/L`}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Custo por km</p>
-              <p className="num-display mt-1 text-2xl">{brl(fuels.fuelCostPerKm)}</p>
+              <p className="num-display mt-1 text-2xl">{fuels.fuelCostPerKm == null ? "Dados insuficientes" : brl(fuels.fuelCostPerKm)}</p>
             </div>
           </div>
           <Button asChild variant="ghost" size="sm" className="mt-4 px-0 text-accent">
