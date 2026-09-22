@@ -64,6 +64,13 @@
       "when": 1790087099175,
       "tag": "0008_enforce_positive_fuel_total",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790087243892,
+      "tag": "0009_validate_optional_fuel_measurements",
+      "breakpoints": true
     }
   ]
 }
