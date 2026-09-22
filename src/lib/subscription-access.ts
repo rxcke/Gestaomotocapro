@@ -12,5 +12,13 @@ export async function fetchSubscriptionAccessWhenAuthenticated(
 ): Promise<SubscriptionAccess> {
   const { data, error } = await supabase.auth.getSession();
   if (error || !data.session?.access_token) return NO_ACCESS;
-  return fetchAccess();
+  try {
+    return await fetchAccess();
+  } catch (requestError) {
+    const message = requestError instanceof Error ? requestError.message : "";
+    if (message.includes("Unauthorized") || message.includes("authorization header")) {
+      return NO_ACCESS;
+    }
+    throw requestError;
+  }
 }
