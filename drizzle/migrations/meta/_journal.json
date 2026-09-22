@@ -99,6 +99,13 @@
       "when": 1790088742932,
       "tag": "0013_validate_optional_maintenance_details",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790103658806,
+      "tag": "0014_make_fuel_fields_nullable",
+      "breakpoints": true
     }
   ]
 }
