@@ -14,6 +14,7 @@ import { useMotorcycles, useProfile, useUpdateProfile, useUpsert } from "@/lib/d
 import { cn } from "@/lib/utils";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
+import { formatBrazilianMobile, needsPhoneCompletion, normalizeBrazilianMobile } from "@/lib/phone";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [
@@ -40,6 +41,7 @@ function Onboarding() {
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [usage, setUsage] = useState<string[]>([]);
   const [pro, setPro] = useState(false);
   const [moto, setMoto] = useState({ brand: "", model: "", year: "", plate: "", km: "" });
@@ -47,18 +49,21 @@ function Onboarding() {
   const draftKey = `onboarding:draft:${user.id}`;
 
   const displayName = name || profile.data?.name || "";
+  const displayPhone = phone || formatBrazilianMobile(profile.data?.phone);
 
-  const blocked = access.isSuccess && !access.data.active && !access.data.admin;
-  const completed = profile.isSuccess && Boolean(profile.data?.onboarding_completed);
+  const phoneMissing = needsPhoneCompletion(profile.data?.phone);
+  const blocked = access.isSuccess && !access.data.active && !access.data.admin && !phoneMissing;
+  const completed = profile.isSuccess && Boolean(profile.data?.onboarding_completed) && !phoneMissing;
 
   useEffect(() => {
     if (!profile.isSuccess || typeof window === "undefined") return;
     const saved = window.localStorage.getItem(draftKey);
     if (saved) {
       try {
-        const draft = JSON.parse(saved) as { step?: number; name?: string; usage?: string[]; pro?: boolean; moto?: typeof moto };
+        const draft = JSON.parse(saved) as { step?: number; name?: string; phone?: string; usage?: string[]; pro?: boolean; moto?: typeof moto };
         setStep(Math.min(2, Math.max(0, draft.step ?? 0)));
         setName(draft.name ?? profile.data?.name ?? "");
+        setPhone(draft.phone ?? formatBrazilianMobile(profile.data?.phone));
         setUsage(draft.usage ?? profile.data?.usage_types ?? []);
         setPro(draft.pro ?? profile.data?.is_professional ?? false);
         if (draft.moto) setMoto(draft.moto);
@@ -68,14 +73,15 @@ function Onboarding() {
       }
     }
     setName(profile.data?.name ?? "");
+    setPhone(formatBrazilianMobile(profile.data?.phone));
     setUsage(profile.data?.usage_types ?? []);
     setPro(profile.data?.is_professional ?? false);
   }, [draftKey, profile.data, profile.isSuccess]);
 
   useEffect(() => {
     if (typeof window === "undefined" || completed) return;
-    window.localStorage.setItem(draftKey, JSON.stringify({ step, name: displayName, usage, pro, moto }));
-  }, [completed, displayName, draftKey, moto, pro, step, usage]);
+    window.localStorage.setItem(draftKey, JSON.stringify({ step, name: displayName, phone: displayPhone, usage, pro, moto }));
+  }, [completed, displayName, displayPhone, draftKey, moto, pro, step, usage]);
 
   useEffect(() => {
     if (blocked) navigate({ to: "/planos", replace: true });
@@ -100,14 +106,25 @@ function Onboarding() {
 
   const saveIdentityStep = async () => {
     const normalizedName = displayName.trim();
+    const normalizedPhone = normalizeBrazilianMobile(displayPhone);
     if (normalizedName.length < 2 || normalizedName.length > 100) {
       toast.error("Informe seu nome com 2 a 100 caracteres.");
       return;
     }
+    if (!normalizedPhone) {
+      toast.error("Informe um celular brasileiro válido com DDD.");
+      return;
+    }
     setSaving(true);
     try {
-      await updateProfile.mutateAsync({ name: normalizedName });
+      await updateProfile.mutateAsync({ name: normalizedName, phone: normalizedPhone });
       setName(normalizedName);
+      setPhone(formatBrazilianMobile(normalizedPhone));
+      if (!access.data?.active && !access.data?.admin) {
+        window.localStorage.removeItem(draftKey);
+        await navigate({ to: "/planos", replace: true });
+        return;
+      }
       setStep(1);
     } catch {
       toast.error("Não foi possível salvar seu nome. Tente novamente.");
@@ -196,19 +213,23 @@ function Onboarding() {
             <div className="space-y-4">
               <div>
                 <h1 className="font-display text-2xl font-bold">Bem-vindo!</h1>
-                <p className="mt-1 text-sm text-muted-foreground">Como podemos te chamar?</p>
+                <p className="mt-1 text-sm text-muted-foreground">Complete seus dados de contato.</p>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="name">Seu nome</Label>
+                <Label htmlFor="name">Nome completo *</Label>
                 <Input
                   id="name"
                   className="h-12 text-base"
                   value={displayName}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex.: Lucas"
+                  placeholder="Seu nome completo"
                   minLength={2}
                   maxLength={100}
                 />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="onboarding-phone">WhatsApp / Celular *</Label>
+                <Input id="onboarding-phone" type="tel" inputMode="tel" autoComplete="tel-national" className="h-12 text-base" value={displayPhone} onChange={(event) => setPhone(formatBrazilianMobile(event.target.value))} placeholder="(31) 99999-9999" maxLength={15} required />
               </div>
               <Button className="h-12 w-full text-base" disabled={saving} onClick={saveIdentityStep}>
                 {saving ? "Salvando..." : "Continuar"}

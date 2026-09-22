@@ -23,7 +23,7 @@
 - [x] Validar os quatro cenários de abastecimento solicitados
 
 ## WhatsApp do usuário
-- [ ] Reutilizar o campo phone existente no perfil, sem duplicidade
-- [ ] Validar e normalizar celular brasileiro no cadastro, onboarding e perfil
-- [ ] Garantir fluxo Google condicional ao telefone
-- [ ] Testar cadastro, persistência, edição e celular
+- [x] Reutilizar o campo phone existente no perfil, sem duplicidade
+- [x] Validar e normalizar celular brasileiro no cadastro, onboarding e perfil
+- [x] Garantir fluxo Google condicional ao telefone
+- [x] Testar cadastro, persistência, edição e celular
