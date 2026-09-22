@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Field, FormDialog, SelectField, numberOrNull, textOrNull } from "./fields";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { supabase } from "@/integrations/supabase/client";
 import { useApp, ALL_MOTOS } from "@/lib/app-context";
 import { useUpsert } from "@/lib/data";
 import {
@@ -286,6 +287,7 @@ export function FuelDialog({
           });
           if (!record) {
             await saveExpense.mutateAsync({
+              maintenance_record_id: String(saved.id),
               motorcycle_id: motoId,
               group_name: "Moto",
               category: "Combustível",
@@ -417,6 +419,25 @@ export function MaintenanceDialog({
               date: String(saved.date),
               description: parsed.data.category,
             });
+          } else {
+            const { data: linkedExpense, error } = await supabase
+              .from("expenses")
+              .select("id")
+              .eq("maintenance_record_id", record.id)
+              .maybeSingle();
+            if (error) throw error;
+            if (linkedExpense) {
+              await saveExpense.mutateAsync({
+                id: linkedExpense.id,
+                maintenance_record_id: record.id,
+                motorcycle_id: motoId,
+                group_name: "Moto",
+                category: "Manutenção",
+                amount: parsed.data.cost,
+                date: String(saved.date),
+                description: parsed.data.category,
+              });
+            }
           }
           onOpenChange(false);
         } finally {
@@ -450,7 +471,7 @@ export function MaintenanceDialog({
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 border-t border-border p-3">
           <Field label="Descrição (opcional)" name="description" defaultValue={record?.description ?? ""} placeholder="Troca de óleo + filtro" />
-          <div className="grid grid-cols-2 gap-3">
+          <div className={record ? "grid grid-cols-2 gap-3" : "grid gap-3"}>
             {record ? <Field label="Data (opcional)" name="date" type="date" defaultValue={record.date} /> : null}
             <Field label="KM atual (opcional)" name="km" type="number" min="0" inputMode="decimal" defaultValue={record?.km ?? ""} />
           </div>

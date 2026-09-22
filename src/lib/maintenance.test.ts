@@ -84,6 +84,7 @@ describe("normalizeMaintenanceInput", () => {
       id: "expense-1",
       user_id: "user-1",
       motorcycle_id: null,
+      maintenance_record_id: "maintenance-1",
       work_session_id: null,
       category: "Manutenção",
       group_name: "Moto",
