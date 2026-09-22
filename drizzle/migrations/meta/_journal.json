@@ -57,6 +57,13 @@
       "when": 1790084135055,
       "tag": "0007_allow_safe_cakto_event_replay",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790087099175,
+      "tag": "0008_enforce_positive_fuel_total",
+      "breakpoints": true
     }
   ]
 }
