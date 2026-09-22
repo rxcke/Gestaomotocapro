@@ -18,9 +18,9 @@ import { formatBrazilianMobile, needsPhoneCompletion, normalizeBrazilianMobile }
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [
-    { title: "Configurar conta — Gestão Motoboy" },
+    { title: "Configurar conta — Gestão Motoca Pro" },
     { name: "description", content: "Configure seu perfil e cadastre sua primeira moto." },
-    { property: "og:title", content: "Configurar conta — Gestão Motoboy" },
+    { property: "og:title", content: "Configurar conta — Gestão Motoca Pro" },
     { property: "og:description", content: "Configure seu perfil e cadastre sua primeira moto." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },

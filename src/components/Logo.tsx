@@ -25,7 +25,7 @@ export function Logo({ subtitle = "Seu dinheiro. Sua moto." }: { subtitle?: stri
     <div className="flex min-w-0 items-center gap-3">
       <LogoMark />
       <div className="min-w-0">
-        <p className="font-display text-base leading-none font-bold">Gestão Motoboy</p>
+        <p className="font-display text-base leading-none font-bold">Gestão Motoca Pro</p>
         {subtitle ? <p className="mt-1 truncate text-[11px] text-muted-foreground">{subtitle}</p> : null}
       </div>
     </div>

@@ -11,10 +11,10 @@ import { getEntryDestination } from "@/lib/entry-flow.functions";
 export const Route = createFileRoute("/auth/callback")({
   ssr: false,
   head: () => ({ meta: [
-    { title: "Confirmando acesso — Gestão Motoboy" },
-    { name: "description", content: "Confirmação segura de acesso ao Gestão Motoboy." },
-    { property: "og:title", content: "Confirmando acesso — Gestão Motoboy" },
-    { property: "og:description", content: "Confirmação segura de acesso ao Gestão Motoboy." },
+    { title: "Confirmando acesso — Gestão Motoca Pro" },
+    { name: "description", content: "Confirmação segura de acesso ao Gestão Motoca Pro." },
+    { property: "og:title", content: "Confirmando acesso — Gestão Motoca Pro" },
+    { property: "og:description", content: "Confirmação segura de acesso ao Gestão Motoca Pro." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex" },

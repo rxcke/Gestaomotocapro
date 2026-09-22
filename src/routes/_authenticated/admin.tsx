@@ -21,10 +21,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
     if (!isAdmin) throw redirect({ to: "/app" });
   },
   head: () => ({ meta: [
-    { title: "Administração — Gestão Motoboy" },
-    { name: "description", content: "Visão administrativa dos registros do Gestão Motoboy." },
-    { property: "og:title", content: "Administração — Gestão Motoboy" },
-    { property: "og:description", content: "Visão administrativa dos registros do Gestão Motoboy." },
+    { title: "Administração — Gestão Motoca Pro" },
+    { name: "description", content: "Visão administrativa dos registros do Gestão Motoca Pro." },
+    { property: "og:title", content: "Administração — Gestão Motoca Pro" },
+    { property: "og:description", content: "Visão administrativa dos registros do Gestão Motoca Pro." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
