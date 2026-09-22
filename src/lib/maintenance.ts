@@ -15,6 +15,6 @@ const maintenanceInputSchema = z.object({
 
 export type MaintenanceInput = z.infer<typeof maintenanceInputSchema>;
 
-export function normalizeMaintenanceInput(input: MaintenanceInput) {
+export function normalizeMaintenanceInput(input: unknown) {
   return maintenanceInputSchema.safeParse(input);
 }

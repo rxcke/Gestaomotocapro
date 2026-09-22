@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { normalizeMaintenanceInput } from "./maintenance";
 
 const minimum = {
@@ -13,43 +14,43 @@ const minimum = {
 
 describe("normalizeMaintenanceInput", () => {
   test("accepts only type and positive cost", () => {
-    expect(normalizeMaintenanceInput(minimum).success).toBe(true);
+    assert.equal(normalizeMaintenanceInput(minimum).success, true);
   });
 
   test("accepts current mileage", () => {
-    expect(normalizeMaintenanceInput({ ...minimum, km: 125430 }).success).toBe(true);
+    assert.equal(normalizeMaintenanceInput({ ...minimum, km: 125430 }).success, true);
   });
 
   test("accepts a description", () => {
-    expect(normalizeMaintenanceInput({ ...minimum, description: "Troca de óleo" }).success).toBe(true);
+    assert.equal(normalizeMaintenanceInput({ ...minimum, description: "Troca de óleo" }).success, true);
   });
 
   test("accepts all optional details", () => {
-    expect(normalizeMaintenanceInput({
+    assert.equal(normalizeMaintenanceInput({
       ...minimum,
       description: "Troca de óleo e filtro",
       km: 125430,
       nextKm: 130430,
       nextDate: "2026-12-22",
       workshop: "Oficina Central",
-    }).success).toBe(true);
+    }).success, true);
   });
 
   test("rejects a missing cost", () => {
-    expect(normalizeMaintenanceInput({ ...minimum, cost: Number.NaN }).success).toBe(false);
+    assert.equal(normalizeMaintenanceInput({ ...minimum, cost: Number.NaN }).success, false);
   });
 
   test("rejects zero cost", () => {
-    expect(normalizeMaintenanceInput({ ...minimum, cost: 0 }).success).toBe(false);
+    assert.equal(normalizeMaintenanceInput({ ...minimum, cost: 0 }).success, false);
   });
 
   test("rejects negative cost", () => {
-    expect(normalizeMaintenanceInput({ ...minimum, cost: -80 }).success).toBe(false);
+    assert.equal(normalizeMaintenanceInput({ ...minimum, cost: -80 }).success, false);
   });
 
   test("allows optional details to be cleared during editing", () => {
     const edited = normalizeMaintenanceInput({ ...minimum, category: "Pneus", cost: 120 });
-    expect(edited.success).toBe(true);
-    if (edited.success) expect(edited.data.description).toBeNull();
+    assert.equal(edited.success, true);
+    if (edited.success) assert.equal(edited.data.description, null);
   });
 });
