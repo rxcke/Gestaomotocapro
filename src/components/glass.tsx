@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 export function AmbientBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-      <div className="floaty absolute -top-24 -left-20 size-[520px] rounded-full bg-accent/25 blur-3xl" />
-      <div className="absolute top-40 -right-32 size-[460px] rounded-full bg-sky-300/40 blur-3xl dark:bg-sky-500/15" />
-      <div className="absolute -bottom-40 left-1/3 size-[520px] rounded-full bg-indigo-200/50 blur-3xl dark:bg-indigo-500/15" />
+      <div className="absolute inset-x-0 top-0 h-px bg-accent/70" />
+      <div className="absolute top-0 left-[8%] h-64 w-64 bg-accent/8 blur-3xl" />
+      <div className="absolute right-[5%] bottom-0 h-72 w-72 bg-muted/30 blur-3xl" />
     </div>
   );
 }
@@ -98,7 +98,7 @@ export function ErrorBlock({ message }: { message?: string }) {
 export function PageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="min-w-0">
-      <h1 className="font-display text-2xl font-bold tracking-tight">{title}</h1>
+      <h1 className="font-display text-2xl font-bold">{title}</h1>
       {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
     </div>
   );

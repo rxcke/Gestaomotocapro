@@ -1,5 +1,5 @@
 export const APP_NAME = "Gestão Motoca Pro";
-export const APP_TAGLINE = "Seu dinheiro. Sua moto. Seu resultado.";
+export const APP_TAGLINE = "Seu corre sob controle.";
 
 export const INCOME_CATEGORIES = [
   "Entrega",
