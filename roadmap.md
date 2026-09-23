@@ -42,6 +42,6 @@
 - [x] Validar SEO, acessibilidade e responsividade de celular a ultrawide
 
 ## Tema claro
-- [ ] Aplicar fundo branco, cartões claros e fundo secundário suave via tokens globais
+- [x] Aplicar fundo branco, cartões claros e fundo secundário suave via tokens globais
 - [ ] Garantir contraste de textos, bordas, estados e logo sem alterar o tema escuro
 - [ ] Validar as telas do aplicativo em tema claro no celular e desktop
