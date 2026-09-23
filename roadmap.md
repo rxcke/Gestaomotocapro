@@ -86,3 +86,8 @@
 - [x] Permitir que administradores operem somente os próprios dados sem assinatura
 - [x] Validar perfis de acesso, falsificação de identidade e regressões
 
+
+## Página pública de obrigado
+- [ ] Mapear login e confirmação segura da assinatura
+- [ ] Criar /obrigado sem alterar fluxos existentes
+- [ ] Validar estados, botão e responsividade
