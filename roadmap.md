@@ -76,8 +76,8 @@
 - [x] Validar os dez cenários e regressões
 
 ## Vínculo entre jornada e custos
-- [ ] Vincular novos abastecimentos e manutenções à jornada ativa do próprio usuário
-- [ ] Propagar o vínculo ao gasto automático sem duplicidade
-- [ ] Preservar vínculo em edições e remoção sincronizada em exclusões
-- [ ] Validar cálculos, isolamento, dez cenários e regressões
+- [x] Vincular novos abastecimentos e manutenções à jornada ativa do próprio usuário
+- [x] Propagar o vínculo ao gasto automático sem duplicidade
+- [x] Preservar vínculo em edições e remoção sincronizada em exclusões
+- [x] Validar cálculos, isolamento, dez cenários e regressões
 
