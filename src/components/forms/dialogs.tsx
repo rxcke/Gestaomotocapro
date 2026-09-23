@@ -358,7 +358,6 @@ export function MaintenanceDialog({
   const { options, preselect } = useMotoOptions();
   const [saving, setSaving] = useState(false);
   const saveMaintenance = useUpsert("maintenance_records", "maintenance_records", {});
-  const saveExpense = useUpsert("expenses", "expenses", {});
 
   return (
     <FormDialog
@@ -388,7 +387,7 @@ export function MaintenanceDialog({
         }
         setSaving(true);
         try {
-          const saved = await saveMaintenance.mutateAsync({
+          await saveMaintenance.mutateAsync({
             ...(record ? { id: record.id } : {}),
             motorcycle_id: motoId,
             category: parsed.data.category,
@@ -400,36 +399,6 @@ export function MaintenanceDialog({
             next_date: parsed.data.nextDate,
             workshop: parsed.data.workshop,
           });
-          if (!record) {
-            await saveExpense.mutateAsync({
-              maintenance_record_id: String(saved.id),
-              motorcycle_id: motoId,
-              group_name: "Moto",
-              category: "Manutenção",
-              amount: parsed.data.cost,
-              date: String(saved.date),
-              description: parsed.data.category,
-            });
-          } else {
-            const { data: linkedExpense, error } = await supabase
-              .from("expenses")
-              .select("id")
-              .eq("maintenance_record_id", record.id)
-              .maybeSingle();
-            if (error) throw error;
-            if (linkedExpense) {
-              await saveExpense.mutateAsync({
-                id: linkedExpense.id,
-                maintenance_record_id: record.id,
-                motorcycle_id: motoId,
-                group_name: "Moto",
-                category: "Manutenção",
-                amount: parsed.data.cost,
-                date: String(saved.date),
-                description: parsed.data.category,
-              });
-            }
-          }
           onOpenChange(false);
         } finally {
           setSaving(false);

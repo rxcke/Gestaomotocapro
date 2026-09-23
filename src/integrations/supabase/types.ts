@@ -107,11 +107,11 @@ export type Database = {
             referencedColumns: ["id", "user_id"]
           },
           {
-            foreignKeyName: "expenses_maintenance_record_id_fkey"
-            columns: ["maintenance_record_id"]
+            foreignKeyName: "expenses_maintenance_record_owner_fkey"
+            columns: ["maintenance_record_id", "user_id"]
             isOneToOne: false
             referencedRelation: "maintenance_records"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "user_id"]
           },
           {
             foreignKeyName: "expenses_motorcycle_id_fkey"

@@ -69,3 +69,9 @@
 - [x] Criar vínculo seguro e sincronização transacional
 - [x] Validar criação, edições repetidas, exclusão, isolamento e totais
 - [x] Rodar testes existentes e checagem de tipos
+## Sincronização de manutenções e gastos
+- [x] Auditar fluxo atual e identificar registros legados
+- [x] Criar vínculo seguro e sincronização transacional
+- [x] Remover a gravação financeira duplicada da tela
+- [x] Validar os dez cenários e regressões
+

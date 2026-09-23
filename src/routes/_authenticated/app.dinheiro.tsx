@@ -96,7 +96,7 @@ function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense }: 
     <div key={`${r.kind}-${r.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
       <div className="min-w-0"><p className="truncate text-sm font-semibold">{r.category}</p><p className="truncate text-xs text-muted-foreground">{dateBR(r.date)}{r.description ? ` · ${r.description}` : ""}</p></div>
       <div className="flex items-center gap-1"><span className={`mr-1 num-display text-sm ${r.kind === "income" ? "text-positive" : "text-negative"}`}>{r.kind === "income" ? "+" : "−"}{brl(r.amount)}</span>
-        {r.kind === "expense" && r.fuel_record_id ? null : <>
+        {r.kind === "expense" && (r.fuel_record_id || r.maintenance_record_id) ? null : <>
           <Button variant="ghost" size="icon" className="size-8" aria-label="Editar" onClick={() => onEdit(r.kind === "income" ? {kind:"income",record:r} : {kind:"expense",record:r})}><Pencil className="size-3.5" /></Button>
           <Button variant="ghost" size="icon" className="size-8 text-negative" aria-label="Excluir" onClick={() => { if (window.confirm("Excluir este lançamento?")) r.kind === "income" ? onRemoveIncome(r.id) : onRemoveExpense(r.id); }}><Trash2 className="size-3.5" /></Button>
         </>}
