@@ -9,6 +9,8 @@ import {
   CircleDollarSign,
   Clock3,
   Fuel,
+  Instagram,
+  Mail,
   Menu,
   Minus,
   ReceiptText,
@@ -343,11 +345,31 @@ export function LandingPage() {
       <footer id="contato" className="border-t border-border bg-background">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <Logo />
-          <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground" aria-label="Links institucionais">
-            <a href="#faq" className="min-h-12 content-center transition-colors hover:text-foreground">Termos de Uso</a>
-            <a href="#faq" className="min-h-12 content-center transition-colors hover:text-foreground">Política de Privacidade</a>
-            <a href="#contato" className="min-h-12 content-center transition-colors hover:text-foreground">Contato</a>
-          </nav>
+          <div className="flex flex-col gap-5 lg:items-end">
+            <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground" aria-label="Links institucionais">
+              <a href="#faq" className="min-h-12 content-center transition-colors hover:text-foreground">Termos de Uso</a>
+              <a href="#faq" className="min-h-12 content-center transition-colors hover:text-foreground">Política de Privacidade</a>
+              <a href="#contato" className="min-h-12 content-center transition-colors hover:text-foreground">Contato</a>
+            </nav>
+            <div className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-6" aria-label="Informações de contato">
+              <a
+                href="https://www.instagram.com/gestaomotocapro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center gap-2 transition-colors hover:text-accent"
+              >
+                <Instagram className="size-4 shrink-0" aria-hidden="true" />
+                @gestaomotocapro
+              </a>
+              <a
+                href="mailto:contato@gestaomotocapro.com.br"
+                className="inline-flex min-h-12 items-center gap-2 transition-colors hover:text-accent"
+              >
+                <Mail className="size-4 shrink-0" aria-hidden="true" />
+                contato@gestaomotocapro.com.br
+              </a>
+            </div>
+          </div>
         </div>
         <div className="border-t border-border px-4 py-5 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Gestão Motoca Pro. Todos os direitos reservados.</div>
       </footer>
