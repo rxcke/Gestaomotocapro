@@ -34,8 +34,8 @@ export function QuickActions({ sessionId }: { sessionId?: string | null }) {
 
       <IncomeDialog open={open === "income"} onOpenChange={close} sessionId={sessionId ?? null} />
       <ExpenseDialog open={open === "expense"} onOpenChange={close} sessionId={sessionId ?? null} />
-      <FuelDialog open={open === "fuel"} onOpenChange={close} />
-      <MaintenanceDialog open={open === "maintenance"} onOpenChange={close} />
+      <FuelDialog open={open === "fuel"} onOpenChange={close} sessionId={sessionId ?? null} />
+      <MaintenanceDialog open={open === "maintenance"} onOpenChange={close} sessionId={sessionId ?? null} />
     </>
   );
 }

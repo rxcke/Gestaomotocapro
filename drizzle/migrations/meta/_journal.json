@@ -176,6 +176,13 @@
       "when": 1790177119491,
       "tag": "0024_sync_maintenance_expenses_atomically",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790177373821,
+      "tag": "0025_link_active_sessions_to_operating_costs",
+      "breakpoints": true
     }
   ]
 }

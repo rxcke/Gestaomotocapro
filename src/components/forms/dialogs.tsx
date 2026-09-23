@@ -245,7 +245,8 @@ export function FuelDialog({
   open,
   onOpenChange,
   record,
-}: DialogProps & { record?: FuelRecord | null }) {
+  sessionId,
+}: DialogProps & { record?: FuelRecord | null; sessionId?: string | null }) {
   const { options, preselect } = useMotoOptions();
   const [saving, setSaving] = useState(false);
   const saveFuel = useUpsert("fuel_records", "fuel_records", {});
@@ -283,6 +284,7 @@ export function FuelDialog({
             total,
             station: textOrNull(f.get("station")),
             description: textOrNull(f.get("description")),
+            work_session_id: record?.work_session_id ?? sessionId ?? null,
           });
           if (!record) {
             if (motoId && kmValue != null) await saveMoto.mutateAsync({ id: motoId, current_km: kmValue });
@@ -354,7 +356,8 @@ export function MaintenanceDialog({
   open,
   onOpenChange,
   record,
-}: DialogProps & { record?: MaintenanceRecord | null }) {
+  sessionId,
+}: DialogProps & { record?: MaintenanceRecord | null; sessionId?: string | null }) {
   const { options, preselect } = useMotoOptions();
   const [saving, setSaving] = useState(false);
   const saveMaintenance = useUpsert("maintenance_records", "maintenance_records", {});
@@ -398,6 +401,7 @@ export function MaintenanceDialog({
             next_km: parsed.data.nextKm,
             next_date: parsed.data.nextDate,
             workshop: parsed.data.workshop,
+            work_session_id: record?.work_session_id ?? sessionId ?? null,
           });
           onOpenChange(false);
         } finally {

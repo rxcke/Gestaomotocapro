@@ -61,6 +61,7 @@ describe("normalizeMaintenanceInput", () => {
       id: "maintenance-1",
       user_id: "user-1",
       motorcycle_id: null,
+      work_session_id: null,
       category: "Óleo",
       description: null,
       date: "2026-09-22",
