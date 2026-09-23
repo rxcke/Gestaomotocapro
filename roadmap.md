@@ -43,5 +43,5 @@
 
 ## Tema claro
 - [x] Aplicar fundo branco, cartões claros e fundo secundário suave via tokens globais
-- [ ] Garantir contraste de textos, bordas, estados e logo sem alterar o tema escuro
-- [ ] Validar as telas do aplicativo em tema claro no celular e desktop
+- [x] Garantir contraste de textos, bordas, estados e logo sem alterar o tema escuro
+- [x] Validar as telas do aplicativo em tema claro no celular e desktop
