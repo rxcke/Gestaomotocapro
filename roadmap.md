@@ -45,3 +45,8 @@
 - [x] Aplicar fundo branco, cartões claros e fundo secundário suave via tokens globais
 - [x] Garantir contraste de textos, bordas, estados e logo sem alterar o tema escuro
 - [x] Validar as telas do aplicativo em tema claro no celular e desktop
+
+## Acesso administrativo à jornada
+- [x] Permitir que administradores criem apenas a própria jornada sem assinatura ativa
+- [ ] Validar os cinco cenários de acesso da política de jornadas
+- [ ] Confirmar a política final aplicada na base ativa
