@@ -80,7 +80,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#0B0D0F" },
+      { name: "theme-color", content: "#FFFFFF", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#0B0D0F", media: "(prefers-color-scheme: dark)" },
       { title: "Gestão Motoca Pro" },
       { name: "description", content: "Ganhos, gastos, combustível, manutenção e lucro para quem trabalha com moto." },
       { name: "author", content: "Gestão Motoca Pro" },
