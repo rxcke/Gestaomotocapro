@@ -71,7 +71,7 @@
 - [x] Rodar testes existentes e checagem de tipos
 ## Sincronização de manutenções e gastos
 - [x] Auditar fluxo atual e identificar registros legados
-- [ ] Criar vínculo seguro e sincronização transacional
-- [ ] Remover a gravação financeira duplicada da tela
-- [ ] Validar os dez cenários e regressões
+- [x] Criar vínculo seguro e sincronização transacional
+- [x] Remover a gravação financeira duplicada da tela
+- [x] Validar os dez cenários e regressões
 
