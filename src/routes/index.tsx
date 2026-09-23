@@ -16,10 +16,10 @@ export const Route = createFileRoute("/")({
         content: "Uma forma simples de registrar ganhos e gastos e entender o resultado real do seu trabalho com moto.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://gear-gain-guide.lovable.app/" },
+      { property: "og:url", content: "https://gestaomotocapro.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://gear-gain-guide.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://gestaomotocapro.lovable.app/" }],
   }),
   component: LandingPage,
 });
