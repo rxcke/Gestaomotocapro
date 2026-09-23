@@ -3,7 +3,7 @@ import logoImage from "@/assets/gestao-motoca-pro-logo.png";
 export function LogoMark({ className = "size-10" }: { className?: string }) {
   return (
     <span className={`grid shrink-0 place-items-center overflow-hidden rounded-md bg-logo-surface ${className}`} aria-hidden="true">
-      <img src={logoImage} alt="" className="size-full object-contain" />
+      <img src={logoImage} alt="" width={630} height={413} className="size-full object-contain" />
     </span>
   );
 }

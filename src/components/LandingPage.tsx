@@ -172,7 +172,7 @@ function PlanCard({ name, price, period, plan, featured = false }: LandingPlan) 
   return (
     <article className={cn("relative flex h-full flex-col rounded-lg border bg-card p-5 sm:p-6", featured ? "border-accent shadow-lg shadow-accent/10" : "border-border")}>
       {featured ? <span className="absolute top-0 right-5 -translate-y-1/2 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase text-accent-foreground">Mais escolhido</span> : null}
-      <p className="text-sm font-bold uppercase text-accent">{name}</p>
+      <h3 className="text-sm font-bold uppercase text-accent">{name}</h3>
       <p className="mt-4 flex items-end gap-1"><span className="num-display text-3xl sm:text-4xl">{price}</span><span className="pb-1 text-sm text-muted-foreground">{period}</span></p>
       <div className="my-6 h-px bg-border" />
       <ul className="flex-1 space-y-3">
@@ -247,7 +247,7 @@ export function LandingPage() {
 
         <section className="border-b border-border bg-background py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="A realidade de quem está na rua" title="Você trabalha. O dinheiro entra. O dinheiro sai. E no fim do mês... cadê o dinheiro?" />
+            <SectionHeading eyebrow="A realidade de quem está na rua" title="Controle seus ganhos, gastos e lucro" text="Quem trabalha como motoboy, entregador ou mototaxista precisa saber mais do que o faturamento: precisa entender quanto realmente sobra." />
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {PAINS.map(({ icon: Icon, title, text }) => (
                 <article key={title} className="rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent/35 sm:p-6">
@@ -262,11 +262,11 @@ export function LandingPage() {
 
         <section id="como-funciona" className="scroll-mt-20 border-b border-border py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="Sem complicação" title="Seu trabalho não precisa ser complicado. Sua gestão também não." text="Registre o que aconteceu e deixe o aplicativo organizar o resto." centered />
+            <SectionHeading eyebrow="Sem complicação" title="Feito para quem vive sobre duas rodas" text="Registre ganhos, gastos e custos da moto em poucos segundos. O aplicativo organiza o controle financeiro sem planilhas complicadas." centered />
             <div className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-5 sm:gap-2">
               {[{ icon: TrendingUp, label: "Ganhos" }, { icon: TrendingDown, label: "Gastos" }, { icon: Fuel, label: "Combustível" }, { icon: Wrench, label: "Manutenção" }, { icon: BarChart3, label: "Resultado" }].map(({ icon: Icon, label }, index) => (
                 <div key={label} className={cn("relative flex min-h-28 flex-col items-center justify-center rounded-lg border p-3 text-center", index === 4 ? "col-span-2 border-accent bg-accent/8 sm:col-span-1" : "border-border bg-card")}>
-                  <Icon className="size-6 text-accent" /><span className="mt-3 text-xs font-bold uppercase sm:text-sm">{label}</span>
+                  <Icon className="size-6 text-accent" /><h3 className="mt-3 text-xs font-bold uppercase sm:text-sm">{label}</h3>
                   {index < 4 ? <ArrowRight className="absolute top-1/2 -right-3 z-10 hidden size-5 -translate-y-1/2 text-muted-foreground sm:block" /> : null}
                 </div>
               ))}
@@ -276,7 +276,7 @@ export function LandingPage() {
 
         <section id="beneficios" className="scroll-mt-20 border-b border-border bg-background py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="Tudo que importa" title="Seus números claros. Sua decisão mais segura." text="Um lugar simples para acompanhar o dinheiro e a moto que fazem seu trabalho acontecer." />
+            <SectionHeading eyebrow="Tudo que importa" title="Controle seu combustível e manutenção" text="Acompanhe os custos da moto junto com ganhos, gastos e metas para tomar decisões mais seguras no dia a dia." />
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
               {BENEFITS.map(({ icon: Icon, title, text }, index) => (
                 <article key={title} className={cn("rounded-lg border border-border bg-card p-5 sm:p-6 lg:col-span-2", index >= 3 && "lg:col-span-3")}>
@@ -289,7 +289,7 @@ export function LandingPage() {
 
         <section className="border-b border-border py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="Clareza muda o jogo" title="Pare de trabalhar no escuro." centered />
+            <SectionHeading eyebrow="Clareza muda o jogo" title="Saiba quanto realmente sobra" text="Veja seu resultado e lucro com base no que entrou e no que você gastou para trabalhar." centered />
             <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2">
               <article className="rounded-lg border border-border bg-card p-5 sm:p-7">
                 <div className="flex items-center gap-3"><div className="grid size-10 place-items-center rounded-md bg-secondary text-muted-foreground"><Minus /></div><h3 className="text-xl font-bold">Antes</h3></div>
@@ -305,7 +305,7 @@ export function LandingPage() {
 
         <section className="border-b border-border bg-background py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="Do registro ao resultado" title="Simples assim." centered />
+            <SectionHeading eyebrow="Simples assim" title="Como funciona" text="Um controle financeiro para motoboy e entregador que acompanha a rotina sem tomar seu tempo." centered />
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {STEPS.map((step) => <article key={step.number} className="border-t-2 border-accent bg-card p-5 sm:p-6"><span className="num-display text-3xl text-accent">{step.number}</span><h3 className="mt-5 text-lg font-bold uppercase">{step.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{step.text}</p></article>)}
             </div>
@@ -314,7 +314,7 @@ export function LandingPage() {
 
         <section id="planos" className="scroll-mt-20 border-b border-border py-20 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading eyebrow="Escolha seu plano" title="Controle hoje o dinheiro que você trabalha tanto para ganhar." text="Todos os planos dão acesso aos recursos essenciais. Escolha o período que faz mais sentido para você." centered />
+            <SectionHeading eyebrow="Escolha o melhor período" title="Planos" text="Todos os planos dão acesso ao controle de ganhos, gastos, combustível, manutenção, metas e relatórios." centered />
             <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3 md:items-stretch">{PLANS.map((plan) => <PlanCard key={plan.name} {...plan} />)}</div>
             <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground"><ShieldCheck className="size-4" /> Pagamento processado em ambiente seguro.</p>
           </div>
@@ -322,7 +322,7 @@ export function LandingPage() {
 
         <section id="faq" className="scroll-mt-20 border-b border-border bg-background py-20 sm:py-24">
           <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:px-8">
-            <SectionHeading eyebrow="Dúvidas frequentes" title="Respostas diretas, sem enrolação." text="O básico para você começar com segurança." />
+            <SectionHeading eyebrow="Respostas diretas" title="Perguntas frequentes" text="O que motoboys e profissionais de moto precisam saber antes de começar." />
             <Accordion type="single" collapsible className="border-t border-border">
               {FAQS.map((item, index) => <AccordionItem key={item.question} value={`faq-${index}`}><AccordionTrigger className="min-h-16 text-left text-base font-semibold hover:no-underline">{item.question}</AccordionTrigger><AccordionContent className="pr-8 leading-6 text-muted-foreground">{item.answer}</AccordionContent></AccordionItem>)}
             </Accordion>

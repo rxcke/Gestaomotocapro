@@ -50,3 +50,10 @@
 - [x] Permitir que administradores criem apenas a própria jornada sem assinatura ativa
 - [x] Validar os cinco cenários de acesso da política de jornadas
 - [x] Confirmar a política final aplicada na base ativa
+
+## SEO da landing pública
+- [x] Otimizar conteúdo e hierarquia de títulos da landing sem keyword stuffing
+- [x] Configurar metadados, canonical, Open Graph, Twitter Card e SoftwareApplication
+- [x] Criar sitemap apenas com a landing e atualizar robots.txt
+- [x] Bloquear indexação de autenticação e áreas internas
+- [x] Validar HTML renderizado, celular, desktop, testes e checagem de tipos
