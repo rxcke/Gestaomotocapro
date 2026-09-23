@@ -43,9 +43,9 @@ describe("registro simplificado de abastecimento", () => {
 
   test("ignora registros incompletos nas métricas sem perder o valor total", () => {
     const records = [
-      { id: "1", user_id: "u", motorcycle_id: "m", date: "2026-09-20", km: null, liters: null, price_per_liter: null, total: 80, station: null, description: null, created_at: "2026-09-20" },
-      { id: "2", user_id: "u", motorcycle_id: "m", date: "2026-09-21", km: 1000, liters: 10, price_per_liter: 8, total: 80, station: null, description: null, created_at: "2026-09-21" },
-      { id: "3", user_id: "u", motorcycle_id: "m", date: "2026-09-22", km: 1300, liters: 10, price_per_liter: 8, total: 80, station: null, description: null, created_at: "2026-09-22" },
+      { id: "1", user_id: "u", motorcycle_id: "m", work_session_id: null, date: "2026-09-20", km: null, liters: null, price_per_liter: null, total: 80, station: null, description: null, created_at: "2026-09-20" },
+      { id: "2", user_id: "u", motorcycle_id: "m", work_session_id: null, date: "2026-09-21", km: 1000, liters: 10, price_per_liter: 8, total: 80, station: null, description: null, created_at: "2026-09-21" },
+      { id: "3", user_id: "u", motorcycle_id: "m", work_session_id: null, date: "2026-09-22", km: 1300, liters: 10, price_per_liter: 8, total: 80, station: null, description: null, created_at: "2026-09-22" },
     ] satisfies FuelRecord[];
 
     assert.deepEqual(fuelStats(records), {
