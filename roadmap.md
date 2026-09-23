@@ -84,5 +84,5 @@
 ## Acesso administrativo sem assinatura
 - [x] Auditar roles, assinatura, RLS, telas e autorização interna
 - [x] Permitir que administradores operem somente os próprios dados sem assinatura
-- [ ] Validar perfis de acesso, falsificação de identidade e regressões
+- [x] Validar perfis de acesso, falsificação de identidade e regressões
 
