@@ -40,3 +40,8 @@
 - [x] Exibir os três planos reais usando o fluxo atual de assinatura
 - [x] Criar FAQ, CTA final e rodapé
 - [x] Validar SEO, acessibilidade e responsividade de celular a ultrawide
+
+## Tema claro
+- [ ] Aplicar fundo branco, cartões claros e fundo secundário suave via tokens globais
+- [ ] Garantir contraste de textos, bordas, estados e logo sem alterar o tema escuro
+- [ ] Validar as telas do aplicativo em tema claro no celular e desktop
