@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { authErrorMessage } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/reset-password")({
+  staticData: { sitemap: false },
   ssr: false,
   head: () => ({
     meta: [

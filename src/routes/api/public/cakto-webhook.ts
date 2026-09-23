@@ -200,6 +200,7 @@ async function processOrder(event: string, order: Order, plan: CaktoPlan) {
 }
 
 export const Route = createFileRoute("/api/public/cakto-webhook")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {
