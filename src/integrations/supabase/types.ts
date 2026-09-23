@@ -142,6 +142,7 @@ export type Database = {
           station: string | null
           total: number
           user_id: string
+          work_session_id: string | null
         }
         Insert: {
           created_at?: string
@@ -155,6 +156,7 @@ export type Database = {
           station?: string | null
           total: number
           user_id: string
+          work_session_id?: string | null
         }
         Update: {
           created_at?: string
@@ -168,6 +170,7 @@ export type Database = {
           station?: string | null
           total?: number
           user_id?: string
+          work_session_id?: string | null
         }
         Relationships: [
           {
@@ -176,6 +179,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "motorcycles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_records_work_session_owner_fkey"
+            columns: ["work_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "work_sessions"
+            referencedColumns: ["id", "user_id"]
           },
         ]
       }
@@ -279,6 +289,7 @@ export type Database = {
           next_date: string | null
           next_km: number | null
           user_id: string
+          work_session_id: string | null
           workshop: string | null
         }
         Insert: {
@@ -293,6 +304,7 @@ export type Database = {
           next_date?: string | null
           next_km?: number | null
           user_id: string
+          work_session_id?: string | null
           workshop?: string | null
         }
         Update: {
@@ -307,6 +319,7 @@ export type Database = {
           next_date?: string | null
           next_km?: number | null
           user_id?: string
+          work_session_id?: string | null
           workshop?: string | null
         }
         Relationships: [
@@ -316,6 +329,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "motorcycles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_work_session_owner_fkey"
+            columns: ["work_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "work_sessions"
+            referencedColumns: ["id", "user_id"]
           },
         ]
       }
