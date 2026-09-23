@@ -88,6 +88,6 @@
 
 
 ## Página pública de obrigado
-- [ ] Mapear login e confirmação segura da assinatura
-- [ ] Criar /obrigado sem alterar fluxos existentes
-- [ ] Validar estados, botão e responsividade
+- [x] Mapear login e confirmação segura da assinatura
+- [x] Criar /obrigado sem alterar fluxos existentes
+- [x] Validar estados, botão e responsividade
