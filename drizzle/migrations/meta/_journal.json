@@ -162,6 +162,13 @@
       "when": 1790176739160,
       "tag": "0022_finalize_fuel_expense_sync_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1790176789846,
+      "tag": "0023_preserve_unlinked_legacy_fuel_records",
+      "breakpoints": true
     }
   ]
 }
