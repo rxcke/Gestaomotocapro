@@ -59,6 +59,7 @@ export type FuelRecord = {
   id: string;
   user_id: string;
   motorcycle_id: string | null;
+  work_session_id: string | null;
   date: string;
   km: number | null;
   liters: number | null;
@@ -73,6 +74,7 @@ export type MaintenanceRecord = {
   id: string;
   user_id: string;
   motorcycle_id: string | null;
+  work_session_id: string | null;
   category: string;
   description: string | null;
   date: string;
