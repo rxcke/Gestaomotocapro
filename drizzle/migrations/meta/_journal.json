@@ -169,6 +169,13 @@
       "when": 1790176789846,
       "tag": "0023_preserve_unlinked_legacy_fuel_records",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790177119491,
+      "tag": "0024_sync_maintenance_expenses_atomically",
+      "breakpoints": true
     }
   ]
 }
