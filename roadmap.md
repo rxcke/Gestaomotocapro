@@ -81,3 +81,8 @@
 - [x] Preservar vínculo em edições e remoção sincronizada em exclusões
 - [x] Validar cálculos, isolamento, dez cenários e regressões
 
+## Acesso administrativo sem assinatura
+- [x] Auditar roles, assinatura, RLS, telas e autorização interna
+- [x] Permitir que administradores operem somente os próprios dados sem assinatura
+- [ ] Validar perfis de acesso, falsificação de identidade e regressões
+
