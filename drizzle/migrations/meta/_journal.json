@@ -141,6 +141,13 @@
       "when": 1790176633467,
       "tag": "0019_protect_linked_fuel_expenses",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790176703033,
+      "tag": "0020_remove_redundant_fuel_save_function",
+      "breakpoints": true
     }
   ]
 }

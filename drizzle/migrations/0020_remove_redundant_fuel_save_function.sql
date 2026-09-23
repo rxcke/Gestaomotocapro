@@ -1,0 +1,1 @@
+DROP FUNCTION public.save_fuel_record_with_expense(uuid, uuid, date, numeric, numeric, numeric, numeric, text, text);
