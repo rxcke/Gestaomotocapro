@@ -134,6 +134,13 @@
       "when": 1790176610823,
       "tag": "0018_trigger_fuel_expense_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790176633467,
+      "tag": "0019_protect_linked_fuel_expenses",
+      "breakpoints": true
     }
   ]
 }
