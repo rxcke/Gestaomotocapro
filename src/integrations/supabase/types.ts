@@ -62,6 +62,7 @@ export type Database = {
           created_at: string
           date: string
           description: string | null
+          fuel_record_id: string | null
           group_name: string
           id: string
           maintenance_record_id: string | null
@@ -75,6 +76,7 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string | null
+          fuel_record_id?: string | null
           group_name?: string
           id?: string
           maintenance_record_id?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           created_at?: string
           date?: string
           description?: string | null
+          fuel_record_id?: string | null
           group_name?: string
           id?: string
           maintenance_record_id?: string | null
@@ -96,6 +99,13 @@ export type Database = {
           work_session_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "expenses_fuel_record_owner_fkey"
+            columns: ["fuel_record_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "fuel_records"
+            referencedColumns: ["id", "user_id"]
+          },
           {
             foreignKeyName: "expenses_maintenance_record_id_fkey"
             columns: ["maintenance_record_id"]
@@ -643,6 +653,38 @@ export type Database = {
           _transaction_id: string
         }
         Returns: Json
+      }
+      save_fuel_record_with_expense: {
+        Args: {
+          _date: string
+          _description: string
+          _fuel_record_id: string
+          _km: number
+          _liters: number
+          _motorcycle_id: string
+          _price_per_liter: number
+          _station: string
+          _total: number
+        }
+        Returns: {
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          km: number | null
+          liters: number | null
+          motorcycle_id: string | null
+          price_per_liter: number | null
+          station: string | null
+          total: number
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "fuel_records"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {

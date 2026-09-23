@@ -120,6 +120,13 @@
       "when": 1790161842187,
       "tag": "0016_allow_admin_own_work_sessions_without_subscription",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790176533981,
+      "tag": "0017_link_fuel_expenses_atomically",
+      "breakpoints": true
     }
   ]
 }
