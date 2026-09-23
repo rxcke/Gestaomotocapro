@@ -127,6 +127,13 @@
       "when": 1790176533981,
       "tag": "0017_link_fuel_expenses_atomically",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790176610823,
+      "tag": "0018_trigger_fuel_expense_sync",
+      "breakpoints": true
     }
   ]
 }
