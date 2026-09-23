@@ -113,6 +113,13 @@
       "when": 1790104067474,
       "tag": "0015_validate_and_capture_profile_phone",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790161842187,
+      "tag": "0016_allow_admin_own_work_sessions_without_subscription",
+      "breakpoints": true
     }
   ]
 }
