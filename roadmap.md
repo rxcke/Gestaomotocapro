@@ -75,3 +75,9 @@
 - [x] Remover a gravação financeira duplicada da tela
 - [x] Validar os dez cenários e regressões
 
+## Vínculo entre jornada e custos
+- [ ] Vincular novos abastecimentos e manutenções à jornada ativa do próprio usuário
+- [ ] Propagar o vínculo ao gasto automático sem duplicidade
+- [ ] Preservar vínculo em edições e remoção sincronizada em exclusões
+- [ ] Validar cálculos, isolamento, dez cenários e regressões
+
