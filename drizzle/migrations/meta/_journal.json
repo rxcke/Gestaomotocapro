@@ -183,6 +183,13 @@
       "when": 1790177373821,
       "tag": "0025_link_active_sessions_to_operating_costs",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790178072389,
+      "tag": "0026_allow_admin_own_data_without_subscription",
+      "breakpoints": true
     }
   ]
 }
