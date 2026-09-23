@@ -249,7 +249,6 @@ export function FuelDialog({
   const { options, preselect } = useMotoOptions();
   const [saving, setSaving] = useState(false);
   const saveFuel = useUpsert("fuel_records", "fuel_records", {});
-  const saveExpense = useUpsert("expenses", "expenses", {});
   const saveMoto = useUpsert("motorcycles", "motorcycles", {});
 
   return (
@@ -286,14 +285,6 @@ export function FuelDialog({
             description: textOrNull(f.get("description")),
           });
           if (!record) {
-            await saveExpense.mutateAsync({
-              motorcycle_id: motoId,
-              group_name: "Moto",
-              category: "Combustível",
-              amount: total,
-              date,
-              description: `Abastecimento${f.get("station") ? ` · ${String(f.get("station"))}` : ""}`,
-            });
             if (motoId && kmValue != null) await saveMoto.mutateAsync({ id: motoId, current_km: kmValue });
           }
           onOpenChange(false);

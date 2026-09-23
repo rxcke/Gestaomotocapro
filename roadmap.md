@@ -62,3 +62,10 @@
 - [x] Auditar as respostas públicas do sitemap e robots.txt
 - [x] Servir sitemap.xml como arquivo público estático, sem autenticação
 - [x] Publicar e confirmar HTTP 200, Content-Type XML e conteúdo no domínio oficial
+
+## Sincronização de abastecimentos e gastos
+- [x] Auditar a criação, edição e exclusão atuais
+- [x] Identificar registros legados sem alterar dados reais
+- [x] Criar vínculo seguro e sincronização transacional
+- [x] Validar criação, edições repetidas, exclusão, isolamento e totais
+- [x] Rodar testes existentes e checagem de tipos

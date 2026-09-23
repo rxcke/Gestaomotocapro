@@ -120,6 +120,55 @@
       "when": 1790161842187,
       "tag": "0016_allow_admin_own_work_sessions_without_subscription",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790176533981,
+      "tag": "0017_link_fuel_expenses_atomically",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790176610823,
+      "tag": "0018_trigger_fuel_expense_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790176633467,
+      "tag": "0019_protect_linked_fuel_expenses",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790176703033,
+      "tag": "0020_remove_redundant_fuel_save_function",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790176716025,
+      "tag": "0021_allow_internal_fuel_expense_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1790176739160,
+      "tag": "0022_finalize_fuel_expense_sync_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1790176789846,
+      "tag": "0023_preserve_unlinked_legacy_fuel_records",
+      "breakpoints": true
     }
   ]
 }
