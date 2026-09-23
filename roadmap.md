@@ -48,5 +48,5 @@
 
 ## Acesso administrativo à jornada
 - [x] Permitir que administradores criem apenas a própria jornada sem assinatura ativa
-- [ ] Validar os cinco cenários de acesso da política de jornadas
-- [ ] Confirmar a política final aplicada na base ativa
+- [x] Validar os cinco cenários de acesso da política de jornadas
+- [x] Confirmar a política final aplicada na base ativa
