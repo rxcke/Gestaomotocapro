@@ -67,5 +67,5 @@
 - [x] Auditar a criação, edição e exclusão atuais
 - [x] Identificar registros legados sem alterar dados reais
 - [x] Criar vínculo seguro e sincronização transacional
-- [ ] Validar criação, edições repetidas, exclusão, isolamento e totais
-- [ ] Rodar testes existentes e checagem de tipos
+- [x] Validar criação, edições repetidas, exclusão, isolamento e totais
+- [x] Rodar testes existentes e checagem de tipos
