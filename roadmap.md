@@ -91,3 +91,8 @@
 - [x] Mapear login e confirmação segura da assinatura
 - [x] Criar /obrigado sem alterar fluxos existentes
 - [x] Validar estados, botão e responsividade
+
+## Correção do registro de manutenção em produção
+- [ ] Identificar a falha exata entre formulário, banco, RLS, jornada e gasto automático
+- [ ] Aplicar somente a menor correção necessária
+- [ ] Validar os dez cenários solicitados sem alterar dados reais
