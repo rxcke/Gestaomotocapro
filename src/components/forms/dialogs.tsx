@@ -426,6 +426,9 @@ export function MaintenanceDialog({
         defaultValue={record?.cost ?? ""}
         placeholder="80,00"
       />
+      {options.length <= 1 ? (
+        <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
+      ) : null}
       <Collapsible defaultOpen={Boolean(record)} className="rounded-md border border-border">
         <CollapsibleTrigger asChild>
           <Button type="button" variant="ghost" className="group h-12 w-full justify-between px-3">
@@ -450,9 +453,7 @@ export function MaintenanceDialog({
               options={options}
               defaultValue={record?.motorcycle_id ?? preselect}
             />
-          ) : (
-            <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
-          )}
+          ) : null}
           <Field label="Oficina/local (opcional)" name="workshop" defaultValue={record?.workshop ?? ""} />
         </CollapsibleContent>
       </Collapsible>
