@@ -37,20 +37,25 @@ export function Stat({
   value,
   tone = "default",
   hint,
+  className,
+  valueClassName,
 }: {
   label: string;
   value: ReactNode;
   tone?: "default" | "positive" | "negative";
   hint?: string;
+  className?: string;
+  valueClassName?: string;
 }) {
   return (
-    <div className="glass-soft min-w-0 p-4">
+    <div className={cn("glass-soft min-w-0 p-4", className)}>
       <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
       <p
         className={cn(
           "num-display mt-1 truncate text-xl",
           tone === "positive" && "text-positive",
           tone === "negative" && "text-negative",
+          valueClassName,
         )}
       >
         {value}
