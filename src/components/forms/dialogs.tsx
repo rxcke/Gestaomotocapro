@@ -356,7 +356,6 @@ export function MaintenanceDialog({
   open,
   onOpenChange,
   record,
-  sessionId,
 }: DialogProps & { record?: MaintenanceRecord | null; sessionId?: string | null }) {
   const { options, preselect } = useMotoOptions();
   const [saving, setSaving] = useState(false);
@@ -401,7 +400,7 @@ export function MaintenanceDialog({
             next_km: parsed.data.nextKm,
             next_date: parsed.data.nextDate,
             workshop: parsed.data.workshop,
-            work_session_id: record?.work_session_id ?? sessionId ?? null,
+            work_session_id: record?.work_session_id ?? null,
           });
           onOpenChange(false);
         } finally {
@@ -426,6 +425,9 @@ export function MaintenanceDialog({
         defaultValue={record?.cost ?? ""}
         placeholder="80,00"
       />
+      {options.length <= 1 ? (
+        <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
+      ) : null}
       <Collapsible defaultOpen={Boolean(record)} className="rounded-md border border-border">
         <CollapsibleTrigger asChild>
           <Button type="button" variant="ghost" className="group h-12 w-full justify-between px-3">
@@ -450,9 +452,7 @@ export function MaintenanceDialog({
               options={options}
               defaultValue={record?.motorcycle_id ?? preselect}
             />
-          ) : (
-            <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
-          )}
+          ) : null}
           <Field label="Oficina/local (opcional)" name="workshop" defaultValue={record?.workshop ?? ""} />
         </CollapsibleContent>
       </Collapsible>
