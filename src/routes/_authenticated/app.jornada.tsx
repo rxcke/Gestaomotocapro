@@ -85,9 +85,9 @@ function JourneyPage() {
         <p className="num-display mt-3 text-5xl">{durationLabel(elapsed)}</p>
         <p className="mt-2 text-sm text-muted-foreground">Iniciada em {dateTimeBR(active.start_time)}</p>
         <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          <Stat className="p-3 sm:p-4" valueClassName="whitespace-nowrap text-base sm:text-xl" label="Ganhos" value={brl(sessionIncome)} tone="positive" />
-          <Stat className="p-3 sm:p-4" valueClassName="whitespace-nowrap text-base sm:text-xl" label="Gastos" value={brl(sessionExpense)} tone="negative" />
-          <Stat className="col-span-2 p-3 sm:col-span-1 sm:p-4" valueClassName="whitespace-nowrap text-base sm:text-xl" label="Lucro/hora" value={brl(hourly)} tone={hourly >= 0 ? "positive" : "negative"} />
+          <Stat className="p-3 sm:p-4" valueClassName="overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:truncate sm:text-xl" label="Ganhos" value={brl(sessionIncome)} tone="positive" />
+          <Stat className="p-3 sm:p-4" valueClassName="overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:truncate sm:text-xl" label="Gastos" value={brl(sessionExpense)} tone="negative" />
+          <Stat className="col-span-2 p-3 sm:col-span-1 sm:p-4" valueClassName="overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:truncate sm:text-xl" label="Lucro/hora" value={brl(hourly)} tone={hourly >= 0 ? "positive" : "negative"} />
         </div>
         <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
           <div className="space-y-1.5 text-left"><Label htmlFor="end-km">KM ao encerrar</Label><Input id="end-km" type="number" inputMode="decimal" className="h-12 text-base" value={endKm} onChange={(e) => setEndKm(e.target.value)} /></div>
