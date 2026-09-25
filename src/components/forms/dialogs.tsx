@@ -356,7 +356,6 @@ export function MaintenanceDialog({
   open,
   onOpenChange,
   record,
-  sessionId,
 }: DialogProps & { record?: MaintenanceRecord | null; sessionId?: string | null }) {
   const { options, preselect } = useMotoOptions();
   const [saving, setSaving] = useState(false);
@@ -401,7 +400,7 @@ export function MaintenanceDialog({
             next_km: parsed.data.nextKm,
             next_date: parsed.data.nextDate,
             workshop: parsed.data.workshop,
-            work_session_id: record?.work_session_id ?? sessionId ?? null,
+            work_session_id: record?.work_session_id ?? null,
           });
           onOpenChange(false);
         } finally {
