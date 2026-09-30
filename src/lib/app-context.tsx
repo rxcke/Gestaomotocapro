@@ -8,6 +8,7 @@ import {
   useMotorcycles,
   useProfile,
   useWorkSessions,
+  useWorkSessionPauses,
 } from "./data";
 import type { Motorcycle } from "./types";
 
@@ -78,6 +79,7 @@ export function useScopedData() {
   const maintenance = useMaintenance();
   const goals = useGoals();
   const sessions = useWorkSessions();
+  const pauses = useWorkSessionPauses();
 
   const filter = <T extends { motorcycle_id: string | null }>(rows: T[] | undefined) =>
     (rows ?? []).filter((r) => motoId === ALL_MOTOS || r.motorcycle_id === motoId);
@@ -90,6 +92,7 @@ export function useScopedData() {
     maintenance: filter(maintenance.data),
     goals: goals.data ?? [],
     sessions: filter(sessions.data),
+    pauses: (pauses.data ?? []).filter((pause) => (sessions.data ?? []).some((session) => session.id === pause.work_session_id && (motoId === ALL_MOTOS || session.motorcycle_id === motoId))),
     isLoading:
       profile.isLoading ||
       incomes.isLoading ||
@@ -97,7 +100,8 @@ export function useScopedData() {
       fuel.isLoading ||
       maintenance.isLoading ||
       goals.isLoading ||
-      sessions.isLoading,
+      sessions.isLoading ||
+      pauses.isLoading,
     isError:
       profile.isError ||
       incomes.isError ||
@@ -105,6 +109,7 @@ export function useScopedData() {
       fuel.isError ||
       maintenance.isError ||
       goals.isError ||
-      sessions.isError,
+      sessions.isError ||
+      pauses.isError,
   };
 }

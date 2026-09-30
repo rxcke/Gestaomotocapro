@@ -1,5 +1,6 @@
 import { distanceInPeriod, financeSummary, inPeriod, sum, variation, type Period } from "./calc";
-import type { Expense, FuelRecord, Income, WorkSession } from "./types";
+import type { Expense, FuelRecord, Income, WorkSession, WorkSessionPause } from "./types";
+import { workedDuration } from "./work-duration";
 
 /** Datas financeiras são DATEs locais; a semana começa na segunda-feira local. */
 export function weekPeriod(reference = new Date(), offset = 0): Period {
@@ -10,7 +11,7 @@ export function weekPeriod(reference = new Date(), offset = 0): Period {
   return { start: localDate(start), end: localDate(end) };
 }
 
-type WeeklyRows = { incomes: Income[]; expenses: Expense[]; fuel: FuelRecord[]; sessions: WorkSession[] };
+type WeeklyRows = { incomes: Income[]; expenses: Expense[]; fuel: FuelRecord[]; sessions: WorkSession[]; pauses?: WorkSessionPause[] };
 
 export function weeklyReport(rows: WeeklyRows, period: Period) {
   // expenses já contém o gasto automático de combustível e manutenção: nunca somar os custos da origem ao total novamente.
@@ -23,8 +24,7 @@ export function weeklyReport(rows: WeeklyRows, period: Period) {
     const date = `${localEnd.getFullYear()}-${String(localEnd.getMonth() + 1).padStart(2, "0")}-${String(localEnd.getDate()).padStart(2, "0")}`;
     return date >= period.start && date <= period.end;
   });
-  // Pausas ainda são apenas estado local da tela de Jornada: não existe duração persistida para subtrair.
-  const hours = sum(finished.map((session) => Math.max(0, new Date(session.end_time ?? session.start_time).getTime() - new Date(session.start_time).getTime()))) / 3600000;
+  const hours = sum(finished.map((session) => workedDuration(session, rows.pauses ?? []))) / 3600000;
 
   // Preferir distâncias medidas no começo e fim de jornadas encerradas. Sem elas, usar
   // pares de odômetros de abastecimento da mesma moto (nunca cruzar veículos distintos).

@@ -29,7 +29,7 @@ function ReportsPage() {
   const period = monthPeriod();
   const f = financeSummary(d.incomes, d.expenses, period);
   const distance = distanceInPeriod(d.fuel, period);
-  const rows = { incomes: d.incomes, expenses: d.expenses, fuel: d.fuel, sessions: d.sessions };
+  const rows = { incomes: d.incomes, expenses: d.expenses, fuel: d.fuel, sessions: d.sessions, pauses: d.pauses };
   const week = weekPeriod();
   const current = weeklyReport(rows, week);
   const previous = weeklyReport(rows, weekPeriod(new Date(), -1));
@@ -68,7 +68,6 @@ function ReportsPage() {
         <p className="mt-1 text-muted-foreground">Registre seus ganhos e gastos para acompanhar seu resultado.</p>
       </div>}
       <p className="border-t border-border pt-4 text-sm leading-relaxed text-foreground">Você trabalhou {num(current.hours, 1)} horas nesta semana e teve {current.profit < 0 ? `${brl(Math.abs(current.profit))} de prejuízo` : `${brl(current.profit)} de lucro`}.</p>
-      {current.hours > 0 && <p className="text-xs text-muted-foreground">Pausas não registradas na jornada não estão descontadas das horas.</p>}
       {changes.some(([, value]) => value != null) && <div className="border-t border-border pt-4">
         <h3 className="text-sm font-semibold">Comparado à semana anterior</h3>
         <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">

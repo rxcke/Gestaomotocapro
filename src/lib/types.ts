@@ -111,6 +111,15 @@ export type WorkSession = {
   created_at: string;
 };
 
+export type WorkSessionPause = {
+  id: string;
+  user_id: string;
+  work_session_id: string;
+  started_at: string;
+  ended_at: string | null;
+  created_at: string;
+};
+
 export type AppDocument = {
   id: string;
   user_id: string;
