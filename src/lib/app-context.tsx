@@ -100,7 +100,7 @@ export function useScopedData() {
       fuel.isLoading ||
       maintenance.isLoading ||
       goals.isLoading ||
-      sessions.isLoading,
+      sessions.isLoading ||
       pauses.isLoading,
     isError:
       profile.isError ||
@@ -109,7 +109,7 @@ export function useScopedData() {
       fuel.isError ||
       maintenance.isError ||
       goals.isError ||
-      sessions.isError,
+      sessions.isError ||
       pauses.isError,
   };
 }
