@@ -61,7 +61,7 @@ function PlansPage() {
         <p className="mt-4 text-muted-foreground">Escolha o período ideal. Seus dados ficam preservados mesmo se você cancelar.</p>
       </div>
 
-      {access.data?.active ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">Sua assinatura está ativa</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-3 md:items-stretch">
+      {access.data?.hasAppAccess ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">{access.data.active ? "Sua assinatura está ativa" : "Seu acesso está liberado"}</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-3 md:items-stretch">
          <PlanCard name="Start" price="R$ 29,90" period="/mês" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} />
          <PlanCard name="Pro" price="R$ 69,90" period="/trimestre" plan="quarterly" featured loading={opening === "quarterly"} onSubscribe={subscribe} />
          <PlanCard name="Elite" price="R$ 199,90" period="/ano" plan="annual" loading={opening === "annual"} onSubscribe={subscribe} />

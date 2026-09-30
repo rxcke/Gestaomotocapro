@@ -4,6 +4,8 @@ import type { SubscriptionAccess } from "@/lib/subscription.functions";
 const NO_ACCESS: SubscriptionAccess = {
   active: false,
   admin: false,
+  ambassador: false,
+  hasAppAccess: false,
   subscription: null,
 };
 

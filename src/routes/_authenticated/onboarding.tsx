@@ -52,7 +52,7 @@ function Onboarding() {
   const displayPhone = phone || formatBrazilianMobile(profile.data?.phone);
 
   const phoneMissing = needsPhoneCompletion(profile.data?.phone);
-  const blocked = access.isSuccess && !access.data.active && !access.data.admin && !phoneMissing;
+  const blocked = access.isSuccess && !access.data.hasAppAccess && !phoneMissing;
   const completed = profile.isSuccess && Boolean(profile.data?.onboarding_completed) && !phoneMissing;
 
   useEffect(() => {
@@ -120,7 +120,7 @@ function Onboarding() {
       await updateProfile.mutateAsync({ name: normalizedName, phone: normalizedPhone });
       setName(normalizedName);
       setPhone(formatBrazilianMobile(normalizedPhone));
-      if (!access.data?.active && !access.data?.admin) {
+      if (!access.data?.hasAppAccess) {
         window.localStorage.removeItem(draftKey);
         await navigate({ to: "/planos", replace: true });
         return;

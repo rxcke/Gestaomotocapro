@@ -670,6 +670,7 @@ export type Database = {
     }
     Functions: {
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
+      has_app_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -715,7 +716,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "ambassador"
       subscription_plan: "monthly" | "quarterly" | "annual"
       subscription_status:
         | "pending"
@@ -851,7 +852,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "ambassador"],
       subscription_plan: ["monthly", "quarterly", "annual"],
       subscription_status: [
         "pending",

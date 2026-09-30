@@ -1,7 +1,7 @@
 type AuthenticatedClient = {
   rpc: (
-    name: "has_active_subscription" | "has_role",
-    args: { _user_id: string; _role?: "admin" },
+    name: "has_active_subscription" | "has_app_access",
+    args: { _user_id: string },
   ) => PromiseLike<{
     data: boolean | null;
     error: { message: string } | null;
@@ -15,14 +15,11 @@ export async function hasActiveSubscription(supabase: AuthenticatedClient, userI
 }
 
 export async function requireActiveSubscription(supabase: AuthenticatedClient, userId: string) {
-  const [subscriptionResult, adminResult] = await Promise.all([
-    supabase.rpc("has_active_subscription", { _user_id: userId }),
-    supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
-  ]);
-  if (subscriptionResult.error || adminResult.error) {
+  const access = await supabase.rpc("has_app_access", { _user_id: userId });
+  if (access.error) {
     throw new Error("Não foi possível validar seu acesso.");
   }
-  if (!subscriptionResult.data && !adminResult.data) {
+  if (!access.data) {
     throw new Error("Esse recurso faz parte do plano premium.");
   }
 }
