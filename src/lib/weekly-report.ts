@@ -24,7 +24,8 @@ export function weeklyReport(rows: WeeklyRows, period: Period) {
     const date = `${localEnd.getFullYear()}-${String(localEnd.getMonth() + 1).padStart(2, "0")}-${String(localEnd.getDate()).padStart(2, "0")}`;
     return date >= period.start && date <= period.end;
   });
-  const hours = sum(finished.map((session) => workedDuration(session, rows.pauses ?? []))) / 3600000;
+  const workedMs = sum(finished.map((session) => workedDuration(session, rows.pauses ?? [])));
+  const hours = workedMs / 3600000;
 
   // Preferir distâncias medidas no começo e fim de jornadas encerradas. Sem elas, usar
   // pares de odômetros de abastecimento da mesma moto (nunca cruzar veículos distintos).
@@ -50,7 +51,9 @@ export function weeklyReport(rows: WeeklyRows, period: Period) {
     expenses: finances.totalExpense,
     profit: finances.net,
     hours,
-    profitPerHour: hours > 0 ? finances.net / hours : null,
+    // A interface exibe horas com uma casa decimal: abaixo de 3 minutos aparece 0,0 h.
+    // Não dividir por essa fração invisível (inclusive quando o tempo restante é pós-pausa).
+    profitPerHour: workedMs >= 3 * 60000 ? finances.net / hours : null,
     distance,
     fuel: sum(fuel.map((record) => Number(record.total))),
     hasActivity: finances.incomes.length > 0 || finances.expenses.length > 0 || finished.length > 0,
