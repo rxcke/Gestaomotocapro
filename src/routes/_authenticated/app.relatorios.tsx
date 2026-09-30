@@ -18,7 +18,8 @@ export const Route = createFileRoute("/_authenticated/app/relatorios")({
   component: ReportsPage,
 });
 
-const numberClasses = "overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:text-xl";
+const numberClasses = "overflow-visible whitespace-normal break-words text-base leading-tight sm:text-xl";
+const moneyClasses = "overflow-visible whitespace-normal break-words text-base leading-tight sm:text-xl";
 
 function ReportsPage() {
   const d = useScopedData();
@@ -54,15 +55,19 @@ function ReportsPage() {
         <p className="text-sm text-muted-foreground">Segunda a domingo · {week.start.split("-").reverse().join("/")} a {week.end.split("-").reverse().join("/")}</p>
       </div>
       <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
-        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="Faturamento" value={brl(current.income)} tone="positive" />
-        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="Gastos" value={brl(current.expenses)} tone="negative" />
-        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="Lucro" value={brl(current.profit)} tone={current.profit >= 0 ? "positive" : "negative"} />
+        <Stat className="p-3 sm:p-4" valueClassName={moneyClasses} label="Faturamento" value={brl(current.income)} tone="positive" />
+        <Stat className="p-3 sm:p-4" valueClassName={moneyClasses} label="Gastos" value={brl(current.expenses)} tone="negative" />
+        <Stat className="col-span-2 border-l-4 border-l-accent p-4 sm:p-5 lg:col-span-2" valueClassName="overflow-visible whitespace-normal break-words text-2xl leading-tight sm:text-3xl" label="LUCRO" value={brl(current.profit)} tone={current.profit >= 0 ? "positive" : "negative"} />
         <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="Horas trabalhadas" value={`${num(current.hours, 1)} h`} />
-        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="Lucro/hora" value={current.profitPerHour == null ? "—" : brl(current.profitPerHour)} tone={current.profit >= 0 ? "positive" : "negative"} />
-        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="KM rodados" value={current.distance == null ? "Sem dados" : `${num(current.distance, 0)} km`} />
-        <Stat className="col-span-2 p-3 sm:col-span-1 sm:p-4" valueClassName={numberClasses} label="Combustível" value={brl(current.fuel)} />
+        <Stat className="p-3 sm:p-4" valueClassName={moneyClasses} label="Lucro/hora" value={current.profitPerHour == null ? "—" : brl(current.profitPerHour)} tone={current.profit >= 0 ? "positive" : "negative"} />
+        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="KM rodados" value={current.distance == null ? "Ainda não informado" : `${num(current.distance, 0)} km`} hint={current.distance == null ? "Registre os KM para acompanhar sua distância." : undefined} />
+        <Stat className="p-3 sm:p-4" valueClassName={moneyClasses} label="Combustível" value={brl(current.fuel)} />
       </div>
-      <p className="text-sm text-foreground">Você trabalhou {num(current.hours, 1)} horas e teve {brl(current.profit)} de lucro nesta semana.</p>
+      {!current.hasActivity && <div className="border-l-2 border-l-accent bg-muted px-4 py-3 text-sm">
+        <p className="font-semibold text-foreground">Nenhum movimento registrado nesta semana.</p>
+        <p className="mt-1 text-muted-foreground">Registre seus ganhos e gastos para acompanhar seu resultado.</p>
+      </div>}
+      <p className="border-t border-border pt-4 text-sm leading-relaxed text-foreground">Você trabalhou {num(current.hours, 1)} horas nesta semana e teve {current.profit < 0 ? `${brl(Math.abs(current.profit))} de prejuízo` : `${brl(current.profit)} de lucro`}.</p>
       {current.hours > 0 && <p className="text-xs text-muted-foreground">Pausas não registradas na jornada não estão descontadas das horas.</p>}
       {changes.some(([, value]) => value != null) && <div className="border-t border-border pt-4">
         <h3 className="text-sm font-semibold">Comparado à semana anterior</h3>
@@ -74,10 +79,15 @@ function ReportsPage() {
       </div>}
     </section>
 
-    <div className="grid gap-3 sm:grid-cols-3">
-      <Stat label="Resultado mensal" value={brlCompact(f.net)} tone={f.net >= 0 ? "positive" : "negative"} />
-      <Stat label="Distância estimada" value={distance > 0 ? `${Math.round(distance)} km` : "Dados insuficientes"} />
-      <Stat label="Custo real por km" value={distance > 0 ? brl(costPerKm(f.expenses, distance)) : "Dados insuficientes"} />
+    <div className="space-y-4 border-t border-border pt-5">
+      <Stat className="p-4 sm:p-5" valueClassName="overflow-visible whitespace-normal break-words text-xl sm:text-2xl" label="Resultado acumulado no mês" value={brlCompact(f.net)} tone={f.net >= 0 ? "positive" : "negative"} />
+      <section className="space-y-3" aria-labelledby="moto-indicators-heading">
+        <h2 id="moto-indicators-heading" className="font-display text-lg font-bold">Indicadores da moto</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Stat valueClassName={numberClasses} label="KM rodados" value={distance > 0 ? `${Math.round(distance)} km` : "Ainda não informado"} hint={distance > 0 ? undefined : "Registre os KM para acompanhar sua distância."} />
+          <Stat valueClassName={moneyClasses} label="Custo por km" value={distance > 0 ? brl(costPerKm(f.expenses, distance)) : "Ainda não calculado"} hint={distance > 0 ? undefined : "Registre os KM e abastecimentos para calcular."} />
+        </div>
+      </section>
     </div>
     <AiInsightsPanel />
     <GlassCard>
