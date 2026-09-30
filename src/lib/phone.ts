@@ -24,3 +24,15 @@ export function isValidBrazilianMobile(value: string | null | undefined): boolea
 export function needsPhoneCompletion(value: string | null | undefined): boolean {
   return !isValidBrazilianMobile(value);
 }
+
+/** Read-only display for numbers already stored on a profile. Never guess or truncate a DDD. */
+export function displayProfilePhone(value: string | null | undefined): string {
+  const original = value?.trim();
+  if (!original) return "Não informado";
+  const digits = original.replace(/\D/g, "");
+  const local = digits.length === 13 && digits.startsWith("55") ? digits.slice(2) : digits;
+  if (local.length === 11 && /^[1-9]{2}9\d{8}$/.test(local)) {
+    return `(${local.slice(0, 2)}) ${local.slice(2, 7)}-${local.slice(7)}`;
+  }
+  return original;
+}

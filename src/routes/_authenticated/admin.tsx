@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getAdminData, setAmbassadorAccess, type AdminData } from "@/lib/admin.functions";
 import { brl, dateBR, km } from "@/lib/format";
+import { displayProfilePhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -80,6 +81,10 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
   const expiredSubscriptions = data.subscriptions.filter((item) => item.status === "expired").length;
   const refundedSubscriptions = data.subscriptions.filter((item) => item.status === "refunded").length;
   const chargebackSubscriptions = data.subscriptions.filter((item) => item.status === "chargeback").length;
+  const subscriptionsByUser = new Map<string, AdminData["subscriptions"][number]>();
+  for (const subscription of data.subscriptions) {
+    if (!subscriptionsByUser.has(subscription.user_id)) subscriptionsByUser.set(subscription.user_id, subscription);
+  }
   const sections = [
     { id: "users" as const, label: "Usuários", icon: Users, count: data.users.length },
     { id: "motorcycles" as const, label: "Motos", icon: Bike, count: data.motorcycles.length },
@@ -110,7 +115,22 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
     </div>
     <GlassCard padded={false} className="overflow-hidden">
       <div className="divide-y divide-border">
-        {section === "users" && data.users.map((user) => <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div className="min-w-0"><p className="text-sm font-semibold">{user.name || "Usuário"}</p><p className="break-all text-xs text-muted-foreground">{user.email || "E-mail não informado"}</p><p className="mt-1 text-xs text-muted-foreground">{user.ambassador ? "Embaixador" : user.subscribed ? "Assinante" : "Sem assinatura ativa"}{user.ambassador && user.subscribed ? " · Assinante" : ""}</p></div><Button variant="outline" className="min-h-12" onClick={() => setPendingUser(user)}>{user.ambassador ? "Remover acesso de embaixador" : "Tornar embaixador"}</Button></div>)}
+        {section === "users" && <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,.65fr)_minmax(0,.75fr)_minmax(0,1.4fr)] gap-3 px-4 py-3 text-xs font-semibold text-muted-foreground lg:grid"><span>Nome</span><span>E-mail</span><span>WhatsApp</span><span>Acesso</span><span>Plano</span><span>Status</span><span>Ações</span></div>}
+        {section === "users" && data.users.map((user) => {
+          const subscription = subscriptionsByUser.get(user.id);
+          const access = user.admin ? "Admin" : user.ambassador ? "Embaixador" : user.subscribed ? "Assinante" : "Sem assinatura ativa";
+          const plan = subscription ? ({ monthly: "Start", quarterly: "Pro", annual: "Elite" } as const)[subscription.plan] : "—";
+          const status = subscription ? subscriptionStatus(subscription.provider_status === "pending" && subscription.status !== "pending" ? subscription.status : subscription.provider_status) : "—";
+          return <div key={user.id} className="grid min-w-0 grid-cols-2 items-start gap-x-3 gap-y-3 p-4 text-sm lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,.65fr)_minmax(0,.75fr)_minmax(0,1.4fr)] lg:items-center">
+            <div className="col-span-2 min-w-0 lg:col-span-1"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Nome</span><p className="break-words font-semibold">{user.name || "Usuário"}</p></div>
+            <div className="col-span-2 min-w-0 lg:col-span-1"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">E-mail</span><p className="break-all">{user.email || "E-mail não informado"}</p></div>
+            <div className="col-span-2 min-w-0 lg:col-span-1"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">WhatsApp</span><p className="break-all tabular-nums">{displayProfilePhone(user.phone)}</p></div>
+            <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Acesso</span><p className="break-words">{access}</p></div>
+            <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Plano</span><p>{plan}</p></div>
+            <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Status</span><p className="break-words">{status}</p></div>
+            <div className="col-span-2 min-w-0 lg:col-span-1"><Button variant="outline" className="h-auto min-h-12 w-full whitespace-normal text-center" onClick={() => setPendingUser(user)}>{user.ambassador ? "Remover acesso de embaixador" : "Tornar embaixador"}</Button></div>
+          </div>;
+        })}
         {section === "motorcycles" && data.motorcycles.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-display font-bold">{item.brand} {item.model}</p><p className="text-xs text-muted-foreground">{item.year ?? "Ano não informado"} · {item.plate ?? "Sem placa"}</p></div><strong className="num-display text-sm">{km(item.current_km)}</strong></div>)}
         {section === "incomes" && data.incomes.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.category}</p><p className="truncate text-xs text-muted-foreground">{item.description ?? "Sem descrição"} · {dateBR(item.date)}</p></div><strong className="num-display text-sm text-positive">{brl(item.amount)}</strong></div>)}
         {section === "expenses" && data.expenses.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.category}</p><p className="truncate text-xs text-muted-foreground">{item.group_name} · {item.description ?? "Sem descrição"} · {dateBR(item.date)}</p></div><strong className="num-display text-sm text-negative">{brl(item.amount)}</strong></div>)}
