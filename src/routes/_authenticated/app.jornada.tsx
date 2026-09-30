@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createFileRoute } from "@tanstack/react-router";
@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useApp, useScopedData } from "@/lib/app-context";
 import { sumAmount } from "@/lib/calc";
-import { useUpsert } from "@/lib/data";
+import { currentUserId, useUpsert, useWorkSessionPauses, useWorkSessions } from "@/lib/data";
 import { brl, dateTimeBR, durationLabel, shortDuration } from "@/lib/format";
 import type { WorkSession } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { workedDuration } from "@/lib/work-duration";
+import { startOrResumeSession } from "@/lib/start-work-session";
 
 export const Route = createFileRoute("/_authenticated/app/jornada")({
   head: () => ({ meta: [
@@ -31,12 +32,50 @@ export const Route = createFileRoute("/_authenticated/app/jornada")({
 function JourneyPage() {
   const data = useScopedData();
   const { activeMoto } = useApp();
-  const active = data.sessions.find((session) => session.end_time == null) ?? null;
+  // A jornada aberta pertence ao usuário, não ao filtro de moto (ela pode até não ter moto).
+  const sessions = useWorkSessions();
+  const pauses = useWorkSessionPauses();
+  const active = sessions.data?.find((session) => session.end_time == null) ?? null;
+  const activePauses = pauses.data ?? [];
   const [now, setNow] = useState(Date.now());
   const [startKm, setStartKm] = useState("");
   const [endKm, setEndKm] = useState("");
-  const paused = active ? data.pauses.some((pause) => pause.work_session_id === active.id && pause.ended_at == null) : false;
+  const paused = active ? activePauses.some((pause) => pause.work_session_id === active.id && pause.ended_at == null) : false;
   const queryClient = useQueryClient();
+  const starting = useRef(false);
+  const startSession = useMutation({
+    mutationFn: async () => {
+      const uid = await currentUserId();
+      const getActive = async () => {
+        const { data, error } = await supabase.from("work_sessions").select("*").eq("user_id", uid).is("end_time", null).maybeSingle();
+        if (error) throw error;
+        return data;
+      };
+      return startOrResumeSession(getActive, async () => {
+        const { data, error } = await supabase.from("work_sessions").insert({
+          user_id: uid,
+          motorcycle_id: activeMoto?.id ?? null,
+          start_time: new Date().toISOString(),
+          start_km: startKm ? Number(startKm) : activeMoto?.current_km ?? null,
+        }).select().single();
+        if (error) throw error;
+        return data;
+      }, (error) => {
+        const dbError = error as { code?: string; message?: string } | null;
+        return dbError?.code === "23505" && dbError.message?.includes("work_sessions_one_active_per_user") === true;
+      });
+    },
+    onSuccess: async ({ session, existed }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["work_sessions"] }),
+        queryClient.invalidateQueries({ queryKey: ["work_session_pauses"] }),
+      ]);
+      const { data: openPause } = existed ? await supabase.from("work_session_pauses").select("id").eq("work_session_id", session.id).is("ended_at", null).maybeSingle() : { data: null };
+      toast[existed ? "info" : "success"](existed ? (openPause ? "Você tem uma jornada pausada. Retome para continuar." : "Você já tem uma jornada em andamento.") : "Jornada iniciada.");
+    },
+    onError: (error: Error) => toast.error(error.message || "Não foi possível iniciar a jornada."),
+    onSettled: () => { starting.current = false; },
+  });
   const changePause = useMutation({
     mutationFn: async ({ sessionId, pause }: { sessionId: string; pause: boolean }) => {
       const { error } = await supabase.rpc("set_work_session_pause", { _session_id: sessionId, _pause: pause });
@@ -65,20 +104,13 @@ function JourneyPage() {
   const sessionIncome = active ? sumAmount(data.incomes.filter((row) => row.work_session_id === active.id)) : 0;
   const sessionExpense = active ? sumAmount(data.expenses.filter((row) => row.work_session_id === active.id)) : 0;
   const sessionNet = sessionIncome - sessionExpense;
-  const elapsed = active ? workedDuration(active, data.pauses, now) : 0;
+  const elapsed = active ? workedDuration(active, activePauses, now) : 0;
   const hourly = elapsed > 0 ? sessionNet / (elapsed / 3600000) : 0;
 
   const start = () => {
-    save.mutate({
-      motorcycle_id: activeMoto?.id ?? null,
-      start_time: new Date().toISOString(),
-      start_km: startKm ? Number(startKm) : activeMoto?.current_km ?? null,
-      end_time: null,
-      end_km: null,
-      total_income: 0,
-      total_expense: 0,
-      net_profit: 0,
-    });
+    if (starting.current || startSession.isPending || sessions.isLoading || sessions.isError || active) return;
+    starting.current = true;
+    startSession.mutate();
   };
 
   const finish = () => {
@@ -116,7 +148,8 @@ function JourneyPage() {
       </GlassCard>
       <section><h2 className="mb-3 font-display text-lg font-bold">Registrar durante a jornada</h2><QuickActions sessionId={active.id} /></section>
     </> : <GlassCard>
-      <div className="mx-auto max-w-md text-center"><h2 className="font-display text-2xl font-bold">Pronto para rodar?</h2><p className="mt-2 text-sm text-muted-foreground">Inicie a jornada e associe ganhos e gastos ao seu turno.</p><div className="mt-5 space-y-1.5 text-left"><Label htmlFor="start-km">KM inicial</Label><Input id="start-km" type="number" inputMode="decimal" className="h-12 text-base" value={startKm} onChange={(e) => setStartKm(e.target.value)} placeholder={String(activeMoto?.current_km ?? "")} /></div><Button className="mt-5 h-12 w-full text-base" onClick={start} disabled={save.isPending}><Play className="mr-2 size-4" />Iniciar jornada</Button></div>
+      {sessions.isLoading ? <p className="text-center text-muted-foreground">Carregando jornada...</p> : sessions.isError ? <p className="text-center text-muted-foreground">Não foi possível consultar sua jornada. Atualize a página para tentar novamente.</p> :
+      <div className="mx-auto max-w-md text-center"><h2 className="font-display text-2xl font-bold">Pronto para rodar?</h2><p className="mt-2 text-sm text-muted-foreground">Inicie a jornada e associe ganhos e gastos ao seu turno.</p><div className="mt-5 space-y-1.5 text-left"><Label htmlFor="start-km">KM inicial</Label><Input id="start-km" type="number" inputMode="decimal" className="h-12 text-base" value={startKm} onChange={(e) => setStartKm(e.target.value)} placeholder={String(activeMoto?.current_km ?? "")} /></div><Button className="mt-5 h-12 w-full text-base" onClick={start} disabled={startSession.isPending || starting.current}><Play className="mr-2 size-4" />Iniciar jornada</Button></div>}
     </GlassCard>}
     <GlassCard><h2 className="font-display text-lg font-bold">Histórico</h2>{data.sessions.filter((s) => s.end_time).length ? <div className="mt-4 divide-y divide-border/60">{data.sessions.filter((s) => s.end_time).map((s: WorkSession) => { const duration = workedDuration(s, data.pauses); return <div key={s.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-3"><div><p className="text-sm font-semibold">{dateTimeBR(s.start_time)}</p><p className="text-xs text-muted-foreground">{shortDuration(duration)} · {brl(s.total_income)} ganhos</p></div><p className={`num-display text-sm ${s.net_profit >= 0 ? "text-positive" : "text-negative"}`}>{brl(s.net_profit)}</p></div> })}</div> : <EmptyState title="Nenhuma jornada encerrada" description="Seu histórico aparecerá aqui." />}</GlassCard>
   </div>;
