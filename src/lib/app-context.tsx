@@ -1,21 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext } from "react";
 import {
   useExpenses,
   useFuelRecords,
   useGoals,
   useIncomes,
   useMaintenance,
-  useMotorcycles,
   useProfile,
   useWorkSessions,
   useWorkSessionPauses,
 } from "./data";
 import type { Motorcycle } from "./types";
 
-const STORAGE_KEY = "motofinance-active-moto";
 export const ALL_MOTOS = "all";
 
-type AppState = {
+export type AppState = {
   motoId: string;
   setMotoId: (id: string) => void;
   motorcycles: Motorcycle[];
@@ -24,44 +22,7 @@ type AppState = {
   error: boolean;
 };
 
-const AppContext = createContext<AppState | null>(null);
-
-export function AppDataProvider({ children }: { children: ReactNode }) {
-  const motos = useMotorcycles();
-  const [motoId, setMotoIdState] = useState<string>(ALL_MOTOS);
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored) setMotoIdState(stored);
-  }, []);
-
-  useEffect(() => {
-    const list = motos.data ?? [];
-    if (motoId !== ALL_MOTOS && list.length > 0 && !list.some((m) => m.id === motoId)) {
-      setMotoIdState(list[0]!.id);
-    }
-    if (motoId === ALL_MOTOS && list.length === 1) setMotoIdState(list[0]!.id);
-  }, [motos.data, motoId]);
-
-  const setMotoId = (id: string) => {
-    setMotoIdState(id);
-    window.localStorage.setItem(STORAGE_KEY, id);
-  };
-
-  const value = useMemo<AppState>(() => {
-    const motorcycles = motos.data ?? [];
-    return {
-      motoId,
-      setMotoId,
-      motorcycles,
-      activeMoto: motorcycles.find((m) => m.id === motoId) ?? null,
-      loading: motos.isLoading,
-      error: motos.isError,
-    };
-  }, [motos.data, motos.isLoading, motos.isError, motoId]);
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-}
+export const AppContext = createContext<AppState | null>(null);
 
 export function useApp() {
   const ctx = useContext(AppContext);
