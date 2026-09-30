@@ -11,7 +11,7 @@ export async function startOrResumeSession<T>(
     return { session: await create(), existed: false };
   } catch (error) {
     if (isActiveConflict(error)) {
-      const concurrent = await getActive();
+      const concurrent = await getActive().catch(() => null);
       if (concurrent) return { session: concurrent, existed: true };
       throw new Error("Já existe uma jornada em andamento. Atualize a página para continuar.");
     }

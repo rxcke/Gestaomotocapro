@@ -114,5 +114,6 @@
 
 ## Jornada aberta não aparece
 - [x] Auditar a jornada existente, pausas, dados relacionados e tentativas de criação
-- [ ] Mostrar a jornada aberta independentemente da moto selecionada e evitar criação duplicada
-- [ ] Validar concorrência, pausa, histórico e telas móveis/desktop sem apagar dados existentes
+- [x] Mostrar a jornada aberta independentemente da moto selecionada e evitar criação duplicada
+- [x] Validar concorrência em teste, histórico e telas móveis/desktop sem apagar dados existentes
+- [ ] Testar ciclo real de pausa e encerramento em uma jornada descartável (bloqueado: preservar a jornada aberta do usuário)

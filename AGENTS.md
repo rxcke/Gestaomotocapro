@@ -13,3 +13,4 @@
 - Use the browser's local calendar for weekly DATE boundaries and session end dates; this matches existing client-side period calculations.
 - Keep pause intervals in RLS-scoped work_session_pauses and derive working time through workedDuration; this avoids invented pauses and keeps journey and weekly hours consistent.
 - Keep AppDataProvider in its own component module, separate from AppContext and hooks; this prevents Fast Refresh from replacing the context while mounted consumers still reference the old instance.
+- Keep session-start race recovery in `src/lib/start-work-session.ts` and read the user's open journey across all motorcycles; an open journey can have no motorcycle and the database's unique index remains the final guard.
