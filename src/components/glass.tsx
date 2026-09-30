@@ -39,6 +39,7 @@ export function Stat({
   hint,
   className,
   valueClassName,
+  hintClassName,
 }: {
   label: string;
   value: ReactNode;
@@ -46,6 +47,7 @@ export function Stat({
   hint?: string;
   className?: string;
   valueClassName?: string;
+  hintClassName?: string;
 }) {
   return (
     <div className={cn("glass-soft min-w-0 p-4", className)}>
@@ -60,7 +62,7 @@ export function Stat({
       >
         {value}
       </p>
-      {hint ? <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{hint}</p> : null}
+      {hint ? <p className={cn("mt-0.5 truncate text-[11px] text-muted-foreground", hintClassName)}>{hint}</p> : null}
     </div>
   );
 }
