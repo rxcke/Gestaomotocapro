@@ -204,6 +204,13 @@
       "when": 1790792138398,
       "tag": "0028_add_ambassador_role",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1790792157547,
+      "tag": "0029_centralize_ambassador_app_access",
+      "breakpoints": true
     }
   ]
 }
