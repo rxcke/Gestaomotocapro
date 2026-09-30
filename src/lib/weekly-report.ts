@@ -42,7 +42,8 @@ export function weeklyReport(rows: WeeklyRows, period: Period) {
     if (inside.length < 2 && !inside.some((record) => valid.some((other) => other.date < record.date && Number(other.km) < Number(record.km)))) return [];
     return [distanceInPeriod(valid, period)];
   });
-  const distance = sessionDistances.length ? sum(sessionDistances) : fuelDistances.length ? sum(fuelDistances) : null;
+  const distance = finished.length > 0 && sessionDistances.length === finished.length
+    ? sum(sessionDistances) : fuelDistances.length ? sum(fuelDistances) : null;
 
   return {
     income: finances.totalIncome,

@@ -63,6 +63,7 @@ function ReportsPage() {
         <Stat className="col-span-2 p-3 sm:col-span-1 sm:p-4" valueClassName={numberClasses} label="Combustível" value={brl(current.fuel)} />
       </div>
       <p className="text-sm text-foreground">Você trabalhou {num(current.hours, 1)} horas e teve {brl(current.profit)} de lucro nesta semana.</p>
+      {current.hours > 0 && <p className="text-xs text-muted-foreground">Pausas não registradas na jornada não estão descontadas das horas.</p>}
       {changes.some(([, value]) => value != null) && <div className="border-t border-border pt-4">
         <h3 className="text-sm font-semibold">Comparado à semana anterior</h3>
         <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">

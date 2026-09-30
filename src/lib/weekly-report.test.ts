@@ -33,6 +33,10 @@ describe("resumo semanal", () => {
     const result = weeklyReport({ ...empty(), incomes: [income(period.start, 200)], sessions: [session("2026-09-28T14:00:00Z", 1000, 1040), session(null, 1040, null)] }, period);
     assert.deepEqual([result.hours, result.profitPerHour, result.distance], [2, 100, 40]);
   });
+  test("KM de jornadas incompletas não é apresentado como total da semana", () => {
+    const result = weeklyReport({ ...empty(), sessions: [session("2026-09-28T14:00:00Z", 1000, 1040), session("2026-09-28T15:00:00Z")] }, period);
+    assert.equal(result.distance, null);
+  });
   test("jornadas encerradas fora da semana não entram", () => {
     const result = weeklyReport({ ...empty(), sessions: [session("2026-09-27T14:00:00Z")] }, period);
     assert.equal(result.hours, 0);
