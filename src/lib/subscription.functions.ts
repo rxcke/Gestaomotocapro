@@ -20,6 +20,8 @@ export type SubscriptionView = {
 export type SubscriptionAccess = {
   active: boolean;
   admin: boolean;
+  ambassador: boolean;
+  hasAppAccess: boolean;
   subscription: SubscriptionView | null;
 };
 
@@ -28,9 +30,11 @@ const CheckoutInput = z.object({ plan: z.enum(["monthly", "quarterly", "annual"]
 export const getSubscriptionAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SubscriptionAccess> => {
-    const [accessResult, roleResult, subscriptionResult] = await Promise.all([
+    const [accessResult, roleResult, ambassadorResult, appAccessResult, subscriptionResult] = await Promise.all([
       context.supabase.rpc("has_active_subscription", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
+      context.supabase.rpc("has_role", { _user_id: context.userId, _role: "ambassador" }),
+      context.supabase.rpc("has_app_access", { _user_id: context.userId }),
       context.supabase
         .from("subscriptions")
         .select("id,plan,status,provider_status,started_at,expires_at,canceled_at,cakto_subscription_id")
@@ -38,7 +42,7 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
         .maybeSingle(),
     ]);
 
-    if (accessResult.error || roleResult.error || subscriptionResult.error) {
+    if (accessResult.error || roleResult.error || ambassadorResult.error || appAccessResult.error || subscriptionResult.error) {
       throw new Error("Não foi possível consultar sua assinatura.");
     }
 
@@ -46,6 +50,8 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
     return {
       active: Boolean(accessResult.data),
       admin: Boolean(roleResult.data),
+      ambassador: Boolean(ambassadorResult.data),
+      hasAppAccess: Boolean(appAccessResult.data),
       subscription: row
         ? {
             id: row.id,
