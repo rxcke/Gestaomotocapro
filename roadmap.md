@@ -105,4 +105,4 @@
 ## Refinamento visual dos Relatórios
 - [x] Destacar lucro, manter ordem e indicar semanas sem movimento
 - [x] Clarificar indicadores da moto, resultado mensal e frase da semana sem mudar cálculos
-- [ ] Conferir valores completos, responsividade e testes
+- [x] Conferir valores completos, responsividade e testes
