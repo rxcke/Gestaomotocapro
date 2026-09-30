@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { createFileRoute } from "@tanstack/react-router";
 import { Pause, Play, Square } from "lucide-react";
 import { QuickActions } from "@/components/QuickActions";
@@ -11,6 +13,8 @@ import { sumAmount } from "@/lib/calc";
 import { useUpsert } from "@/lib/data";
 import { brl, dateTimeBR, durationLabel, shortDuration } from "@/lib/format";
 import type { WorkSession } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
+import { workedDuration } from "@/lib/work-duration";
 
 export const Route = createFileRoute("/_authenticated/app/jornada")({
   head: () => ({ meta: [
@@ -31,7 +35,23 @@ function JourneyPage() {
   const [now, setNow] = useState(Date.now());
   const [startKm, setStartKm] = useState("");
   const [endKm, setEndKm] = useState("");
-  const [paused, setPaused] = useState(false);
+  const paused = active ? data.pauses.some((pause) => pause.work_session_id === active.id && pause.ended_at == null) : false;
+  const queryClient = useQueryClient();
+  const changePause = useMutation({
+    mutationFn: async ({ sessionId, pause }: { sessionId: string; pause: boolean }) => {
+      const { error } = await supabase.rpc("set_work_session_pause", { _session_id: sessionId, _pause: pause });
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["work_session_pauses"] });
+      setNow(Date.now());
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Não foi possível alterar a pausa.");
+      void queryClient.invalidateQueries({ queryKey: ["work_session_pauses"] });
+      void queryClient.invalidateQueries({ queryKey: ["work_sessions"] });
+    },
+  });
   const save = useUpsert("work_sessions", "work_sessions", {
     successMessage: active ? "Jornada encerrada." : "Jornada iniciada.",
   });
@@ -45,7 +65,7 @@ function JourneyPage() {
   const sessionIncome = active ? sumAmount(data.incomes.filter((row) => row.work_session_id === active.id)) : 0;
   const sessionExpense = active ? sumAmount(data.expenses.filter((row) => row.work_session_id === active.id)) : 0;
   const sessionNet = sessionIncome - sessionExpense;
-  const elapsed = active ? Math.max(0, now - new Date(active.start_time).getTime()) : 0;
+  const elapsed = active ? workedDuration(active, data.pauses, now) : 0;
   const hourly = elapsed > 0 ? sessionNet / (elapsed / 3600000) : 0;
 
   const start = () => {
@@ -62,7 +82,7 @@ function JourneyPage() {
   };
 
   const finish = () => {
-    if (!active) return;
+    if (!active || changePause.isPending) return;
     save.mutate({
       id: active.id,
       motorcycle_id: active.motorcycle_id,
@@ -74,14 +94,13 @@ function JourneyPage() {
       total_expense: sessionExpense,
       net_profit: sessionNet,
     });
-    setPaused(false);
   };
 
   return <div className="space-y-6">
     <PageTitle title="Jornada" subtitle="Tempo, lucro e rendimento do seu trabalho." />
     {active ? <>
       <GlassCard className="text-center">
-        <p className="text-sm text-muted-foreground">Jornada em andamento</p>
+        <p className="text-sm text-muted-foreground">{paused ? "Jornada pausada" : "Jornada em andamento"}</p>
         <p className="num-display mt-3 text-5xl">{durationLabel(elapsed)}</p>
         <p className="mt-2 text-sm text-muted-foreground">Iniciada em {dateTimeBR(active.start_time)}</p>
         <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -91,14 +110,14 @@ function JourneyPage() {
         </div>
         <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
           <div className="space-y-1.5 text-left"><Label htmlFor="end-km">KM ao encerrar</Label><Input id="end-km" type="number" inputMode="decimal" className="h-12 text-base" value={endKm} onChange={(e) => setEndKm(e.target.value)} /></div>
-          <Button variant="outline" className="h-12" onClick={() => setPaused((value) => !value)}>{paused ? <Play className="mr-2 size-4" /> : <Pause className="mr-2 size-4" />}{paused ? "Retomar" : "Pausar"}</Button>
-          <Button className="h-12" onClick={finish} disabled={save.isPending}><Square className="mr-2 size-4" />Encerrar</Button>
+          <Button variant="outline" className="h-12" disabled={changePause.isPending || save.isPending} onClick={() => active && changePause.mutate({ sessionId: active.id, pause: !paused })}>{paused ? <Play className="mr-2 size-4" /> : <Pause className="mr-2 size-4" />}{paused ? "Retomar" : "Pausar"}</Button>
+          <Button className="h-12" onClick={finish} disabled={save.isPending || changePause.isPending}><Square className="mr-2 size-4" />Encerrar</Button>
         </div>
       </GlassCard>
       <section><h2 className="mb-3 font-display text-lg font-bold">Registrar durante a jornada</h2><QuickActions sessionId={active.id} /></section>
     </> : <GlassCard>
       <div className="mx-auto max-w-md text-center"><h2 className="font-display text-2xl font-bold">Pronto para rodar?</h2><p className="mt-2 text-sm text-muted-foreground">Inicie a jornada e associe ganhos e gastos ao seu turno.</p><div className="mt-5 space-y-1.5 text-left"><Label htmlFor="start-km">KM inicial</Label><Input id="start-km" type="number" inputMode="decimal" className="h-12 text-base" value={startKm} onChange={(e) => setStartKm(e.target.value)} placeholder={String(activeMoto?.current_km ?? "")} /></div><Button className="mt-5 h-12 w-full text-base" onClick={start} disabled={save.isPending}><Play className="mr-2 size-4" />Iniciar jornada</Button></div>
     </GlassCard>}
-    <GlassCard><h2 className="font-display text-lg font-bold">Histórico</h2>{data.sessions.filter((s) => s.end_time).length ? <div className="mt-4 divide-y divide-border/60">{data.sessions.filter((s) => s.end_time).map((s: WorkSession) => { const duration = new Date(s.end_time ?? s.start_time).getTime() - new Date(s.start_time).getTime(); return <div key={s.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-3"><div><p className="text-sm font-semibold">{dateTimeBR(s.start_time)}</p><p className="text-xs text-muted-foreground">{shortDuration(duration)} · {brl(s.total_income)} ganhos</p></div><p className={`num-display text-sm ${s.net_profit >= 0 ? "text-positive" : "text-negative"}`}>{brl(s.net_profit)}</p></div> })}</div> : <EmptyState title="Nenhuma jornada encerrada" description="Seu histórico aparecerá aqui." />}</GlassCard>
+    <GlassCard><h2 className="font-display text-lg font-bold">Histórico</h2>{data.sessions.filter((s) => s.end_time).length ? <div className="mt-4 divide-y divide-border/60">{data.sessions.filter((s) => s.end_time).map((s: WorkSession) => { const duration = workedDuration(s, data.pauses); return <div key={s.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-3"><div><p className="text-sm font-semibold">{dateTimeBR(s.start_time)}</p><p className="text-xs text-muted-foreground">{shortDuration(duration)} · {brl(s.total_income)} ganhos</p></div><p className={`num-display text-sm ${s.net_profit >= 0 ? "text-positive" : "text-negative"}`}>{brl(s.net_profit)}</p></div> })}</div> : <EmptyState title="Nenhuma jornada encerrada" description="Seu histórico aparecerá aqui." />}</GlassCard>
   </div>;
 }
