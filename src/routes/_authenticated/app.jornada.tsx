@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useApp, useScopedData } from "@/lib/app-context";
 import { sumAmount } from "@/lib/calc";
-import { currentUserId, useUpsert, useWorkSessionPauses, useWorkSessions } from "@/lib/data";
+import { currentUserId, useExpenses, useIncomes, useUpsert, useWorkSessionPauses, useWorkSessions } from "@/lib/data";
 import { brl, dateTimeBR, durationLabel, shortDuration } from "@/lib/format";
 import type { WorkSession } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +35,8 @@ function JourneyPage() {
   // A jornada aberta pertence ao usuário, não ao filtro de moto (ela pode até não ter moto).
   const sessions = useWorkSessions();
   const pauses = useWorkSessionPauses();
+  const incomes = useIncomes();
+  const expenses = useExpenses();
   const active = sessions.data?.find((session) => session.end_time == null) ?? null;
   const activePauses = pauses.data ?? [];
   const [now, setNow] = useState(Date.now());
@@ -101,8 +103,8 @@ function JourneyPage() {
     return () => window.clearInterval(timer);
   }, [active, paused]);
 
-  const sessionIncome = active ? sumAmount(data.incomes.filter((row) => row.work_session_id === active.id)) : 0;
-  const sessionExpense = active ? sumAmount(data.expenses.filter((row) => row.work_session_id === active.id)) : 0;
+  const sessionIncome = active ? sumAmount((incomes.data ?? []).filter((row) => row.work_session_id === active.id)) : 0;
+  const sessionExpense = active ? sumAmount((expenses.data ?? []).filter((row) => row.work_session_id === active.id)) : 0;
   const sessionNet = sessionIncome - sessionExpense;
   const elapsed = active ? workedDuration(active, activePauses, now) : 0;
   const hourly = elapsed > 0 ? sessionNet / (elapsed / 3600000) : 0;
@@ -114,7 +116,7 @@ function JourneyPage() {
   };
 
   const finish = () => {
-    if (!active || changePause.isPending) return;
+    if (!active || changePause.isPending || save.isPending || pauses.isLoading || pauses.isError) return;
     save.mutate({
       id: active.id,
       motorcycle_id: active.motorcycle_id,
@@ -131,8 +133,9 @@ function JourneyPage() {
   return <div className="space-y-6">
     <PageTitle title="Jornada" subtitle="Tempo, lucro e rendimento do seu trabalho." />
     {active ? <>
+      <h2 className="font-display text-lg font-bold">Jornada atual</h2>
       <GlassCard className="text-center">
-        <p className="text-sm text-muted-foreground">{paused ? "Jornada pausada" : "Jornada em andamento"}</p>
+        <p className="text-sm text-muted-foreground">{pauses.isLoading ? "Carregando estado da jornada..." : pauses.isError ? "Não foi possível consultar a pausa. Atualize a página." : paused ? "Jornada pausada" : "Jornada em andamento"}</p>
         <p className="num-display mt-3 text-5xl">{durationLabel(elapsed)}</p>
         <p className="mt-2 text-sm text-muted-foreground">Iniciada em {dateTimeBR(active.start_time)}</p>
         <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -142,8 +145,8 @@ function JourneyPage() {
         </div>
         <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
           <div className="space-y-1.5 text-left"><Label htmlFor="end-km">KM ao encerrar</Label><Input id="end-km" type="number" inputMode="decimal" className="h-12 text-base" value={endKm} onChange={(e) => setEndKm(e.target.value)} /></div>
-          <Button variant="outline" className="h-12" disabled={changePause.isPending || save.isPending} onClick={() => active && changePause.mutate({ sessionId: active.id, pause: !paused })}>{paused ? <Play className="mr-2 size-4" /> : <Pause className="mr-2 size-4" />}{paused ? "Retomar" : "Pausar"}</Button>
-          <Button className="h-12" onClick={finish} disabled={save.isPending || changePause.isPending}><Square className="mr-2 size-4" />Encerrar</Button>
+          <Button variant="outline" className="h-12" disabled={changePause.isPending || save.isPending || pauses.isLoading || pauses.isError} onClick={() => active && changePause.mutate({ sessionId: active.id, pause: !paused })}>{paused ? <Play className="mr-2 size-4" /> : <Pause className="mr-2 size-4" />}{paused ? "Retomar" : "Pausar"}</Button>
+          <Button className="h-12" onClick={finish} disabled={save.isPending || changePause.isPending || pauses.isLoading || pauses.isError}><Square className="mr-2 size-4" />Encerrar</Button>
         </div>
       </GlassCard>
       <section><h2 className="mb-3 font-display text-lg font-bold">Registrar durante a jornada</h2><QuickActions sessionId={active.id} /></section>
