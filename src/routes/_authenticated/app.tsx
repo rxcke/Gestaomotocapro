@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { AppDataProvider } from "@/lib/app-context";
+import { AppDataProvider } from "@/lib/app-data-provider";
 import { useProfile } from "@/lib/data";
 import { ErrorBlock, LoadingBlock } from "@/components/glass";
 import { PremiumGate } from "@/components/PremiumGate";
