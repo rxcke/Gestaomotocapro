@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 import { weekPeriod, weeklyComparison, weeklyReport } from "./weekly-report";
-import type { Expense, FuelRecord, Income, WorkSession } from "./types";
+import type { Expense, FuelRecord, Income, WorkSession, WorkSessionPause } from "./types";
 
 const income = (date: string, amount: number): Income => ({ id: crypto.randomUUID(), user_id: "owner", motorcycle_id: "m1", work_session_id: null, category: "Entrega", amount, date, time: null, description: null, created_at: date });
 const expense = (date: string, amount: number, link: "fuel" | "maintenance" | "manual" = "manual"): Expense => ({ id: crypto.randomUUID(), user_id: "owner", motorcycle_id: "m1", work_session_id: null, fuel_record_id: link === "fuel" ? "f1" : null, maintenance_record_id: link === "maintenance" ? "t1" : null, category: "Moto", group_name: "Moto", amount, date, description: null, created_at: date });
 const fuel = (date: string, total: number, km: number | null = null, motorcycle_id = "m1"): FuelRecord => ({ id: crypto.randomUUID(), user_id: "owner", motorcycle_id, work_session_id: null, date, total, km, liters: null, price_per_liter: null, station: null, description: null, created_at: date });
 const session = (end: string | null, startKm: number | null = null, endKm: number | null = null): WorkSession => ({ id: crypto.randomUUID(), user_id: "owner", motorcycle_id: "m1", start_time: "2026-09-28T12:00:00Z", end_time: end, start_km: startKm, end_km: endKm, total_income: 0, total_expense: 0, net_profit: 0, created_at: "2026-09-28T12:00:00Z" });
+const pause = (work_session_id: string, started_at: string, ended_at: string | null): WorkSessionPause => ({ id: crypto.randomUUID(), user_id: "owner", work_session_id, started_at, ended_at, created_at: started_at });
 const period = { start: "2026-09-28", end: "2026-10-04" };
 const empty = () => ({ incomes: [] as Income[], expenses: [] as Expense[], fuel: [] as FuelRecord[], sessions: [] as WorkSession[] });
 
@@ -65,5 +66,16 @@ describe("resumo semanal", () => {
   test("pausa não persistida não é subtraída como se fosse dado real", () => {
     const result = weeklyReport({ ...empty(), sessions: [session("2026-09-28T14:00:00Z")] }, period);
     assert.equal(result.hours, 2);
+  });
+  test("relatório usa duração oficial com uma pausa e lucro por hora", () => {
+    const s = session("2026-09-28T16:00:00Z");
+    const result = weeklyReport({ ...empty(), sessions: [s], pauses: [pause(s.id, "2026-09-28T14:00:00Z", "2026-09-28T14:30:00Z")], incomes: [income(period.start, 70)] }, period);
+    assert.deepEqual([result.hours, result.profitPerHour], [3.5, 20]);
+  });
+  test("duas pausas são subtraídas sem misturar outras jornadas", () => {
+    const s = session("2026-09-28T17:00:00Z");
+    const other = session(null);
+    const result = weeklyReport({ ...empty(), sessions: [s, other], pauses: [pause(s.id, "2026-09-28T13:30:00Z", "2026-09-28T14:00:00Z"), pause(s.id, "2026-09-28T15:30:00Z", "2026-09-28T16:00:00Z"), pause(other.id, "2026-09-28T12:00:00Z", null)] }, period);
+    assert.equal(result.hours, 4);
   });
 });
