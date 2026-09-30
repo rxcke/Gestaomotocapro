@@ -28,7 +28,7 @@ export function weeklyReport(rows: WeeklyRows, period: Period) {
 
   // Preferir distâncias medidas no começo e fim de jornadas encerradas. Sem elas, usar
   // pares de odômetros de abastecimento da mesma moto (nunca cruzar veículos distintos).
-  const sessionDistances = finished.flatMap((s) => s.start_km != null && s.end_km != null && Number(s.end_km) > Number(s.start_km)
+  const sessionDistances = finished.flatMap((s) => s.start_km != null && s.end_km != null && Number(s.end_km) >= Number(s.start_km)
     ? [Number(s.end_km) - Number(s.start_km)] : []);
   const fuelByMoto = new Map<string, FuelRecord[]>();
   for (const record of rows.fuel) {
@@ -43,7 +43,7 @@ export function weeklyReport(rows: WeeklyRows, period: Period) {
     return [distanceInPeriod(valid, period)];
   });
   const distance = finished.length > 0 && sessionDistances.length === finished.length
-    ? sum(sessionDistances) : fuelDistances.length ? sum(fuelDistances) : null;
+    ? sum(sessionDistances) : finished.length === 0 && fuelDistances.length ? sum(fuelDistances) : null;
 
   return {
     income: finances.totalIncome,
