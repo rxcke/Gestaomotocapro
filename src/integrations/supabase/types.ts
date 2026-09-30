@@ -579,6 +579,41 @@ export type Database = {
         }
         Relationships: []
       }
+      work_session_pauses: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          started_at: string
+          user_id: string
+          work_session_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          user_id: string
+          work_session_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          started_at?: string
+          user_id?: string
+          work_session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_session_pauses_owner_fkey"
+            columns: ["work_session_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "work_sessions"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       work_sessions: {
         Row: {
           created_at: string
@@ -673,6 +708,10 @@ export type Database = {
           _transaction_id: string
         }
         Returns: Json
+      }
+      set_work_session_pause: {
+        Args: { _pause: boolean; _session_id: string }
+        Returns: undefined
       }
     }
     Enums: {
