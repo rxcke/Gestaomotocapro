@@ -105,8 +105,8 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
       <Stat label="Reembolsadas" value={refundedSubscriptions} tone="negative" />
       <Stat label="Chargebacks" value={chargebackSubscriptions} tone="negative" />
     </div>
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-      {sections.map((item) => <Button key={item.id} variant={section === item.id ? "default" : "outline"} className="h-auto min-h-12 justify-start px-3 py-2" onClick={() => setSection(item.id)}><item.icon className="mr-2 size-4 shrink-0" /><span className="min-w-0 truncate">{item.label}</span><span className={cn("ml-auto text-xs", section === item.id ? "text-primary-foreground/75" : "text-muted-foreground")}>{item.count}</span></Button>)}
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
+      {sections.map((item) => <Button key={item.id} variant={section === item.id ? "default" : "outline"} className="h-auto min-h-12 justify-start px-2 py-2 sm:px-3" onClick={() => setSection(item.id)}><item.icon className="mr-2 size-4 shrink-0" /><span className="min-w-0 truncate text-xs sm:text-sm">{item.label}</span><span className={cn("ml-auto text-xs", section === item.id ? "text-primary-foreground/75" : "text-muted-foreground")}>{item.count}</span></Button>)}
     </div>
     <GlassCard padded={false} className="overflow-hidden">
       <div className="divide-y divide-border">
