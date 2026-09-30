@@ -8,7 +8,7 @@ type AdminOwner = {
 };
 
 export type AdminData = {
-  users: Array<{ id: string; name: string | null; email: string | null; ambassador: boolean; subscribed: boolean }>;
+  users: Array<{ id: string; name: string | null; email: string | null; phone: string | null; admin: boolean; ambassador: boolean; subscribed: boolean }>;
   subscriptions: Array<{
     id: string;
     user_id: string;
@@ -105,8 +105,8 @@ export const getAdminData = createServerFn({ method: "GET" })
           .select("id,user_id,motorcycle_id,date,km,liters,price_per_liter,total,station")
           .order("date", { ascending: false })
           .limit(500),
-        supabaseAdmin.from("profiles").select("id,name,email").limit(500),
-        supabaseAdmin.from("user_roles").select("user_id").eq("role", "ambassador").limit(500),
+        supabaseAdmin.from("profiles").select("id,name,email,phone").limit(500),
+        supabaseAdmin.from("user_roles").select("user_id,role").in("role", ["admin", "ambassador"]).limit(500),
         supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at").order("created_at", { ascending: false }).limit(500),
         supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
       ]);
@@ -129,10 +129,11 @@ export const getAdminData = createServerFn({ method: "GET" })
       ]),
     );
     const ambassadors = new Set((rolesResult.data ?? []).map((role) => role.user_id));
+    const admins = new Set((rolesResult.data ?? []).filter((role) => role.role === "admin").map((role) => role.user_id));
     const subscribers = new Set((subscriptionsResult.data ?? []).filter((row) => row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() > Date.now()).map((row) => row.user_id));
 
     return {
-      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id) })),
+      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, admin: admins.has(profile.id), ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id) })),
       motorcycles: motorcyclesResult.data ?? [],
       incomes: incomesResult.data ?? [],
       expenses: expensesResult.data ?? [],

@@ -128,3 +128,7 @@
 - [x] Acrescentar papel de embaixador e centralizar acesso próprio no banco
 - [x] Permitir concessão/remoção só pelo administrador com confirmação
 - [x] Validar concessão e remoção reais em conta de teste sem assinatura, isolamento, regressões e telas móveis/desktop
+
+## WhatsApp na administração
+- [ ] Exibir profiles.phone apenas na lista administrativa, formatado sem alterar o dado salvo
+- [ ] Validar ausência, formatos, acesso restrito e telas desktop/celular
