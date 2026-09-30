@@ -126,5 +126,5 @@
 ## Acesso especial para embaixadores
 - [x] Auditar roles, exceção administrativa, assinatura, onboarding e políticas RLS
 - [x] Acrescentar papel de embaixador e centralizar acesso próprio no banco
-- [ ] Permitir concessão/remoção só pelo administrador com confirmação
-- [ ] Validar acesso, isolamento, regressões e telas móveis/desktop
+- [x] Permitir concessão/remoção só pelo administrador com confirmação
+- [x] Validar concessão e remoção reais em conta de teste sem assinatura, isolamento, regressões e telas móveis/desktop
