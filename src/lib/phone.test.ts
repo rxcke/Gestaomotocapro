@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { formatBrazilianMobile, isValidBrazilianMobile, needsPhoneCompletion, normalizeBrazilianMobile } from "./phone";
+import { displayProfilePhone, formatBrazilianMobile, isValidBrazilianMobile, needsPhoneCompletion, normalizeBrazilianMobile } from "./phone";
 
 describe("celular brasileiro", () => {
   test("normaliza número mascarado para formato internacional", () => {
@@ -26,5 +26,19 @@ describe("celular brasileiro", () => {
     assert.equal(needsPhoneCompletion(null), true);
     assert.equal(needsPhoneCompletion(""), true);
     assert.equal(needsPhoneCompletion("+5531999999999"), false);
+  });
+});
+
+describe("exibição do telefone no painel", () => {
+  test("formata número internacional e local sem mudar os dígitos", () => {
+    assert.equal(displayProfilePhone("+5531999999999"), "(31) 99999-9999");
+    assert.equal(displayProfilePhone("31988887777"), "(31) 98888-7777");
+    assert.equal(displayProfilePhone("(31) 98888-7777"), "(31) 98888-7777");
+  });
+  test("ausência e formatos desconhecidos não inventam nem truncam número", () => {
+    assert.equal(displayProfilePhone(null), "Não informado");
+    assert.equal(displayProfilePhone("  "), "Não informado");
+    assert.equal(displayProfilePhone("+1 212 555 0000"), "+1 212 555 0000");
+    assert.equal(displayProfilePhone("319999999999"), "319999999999");
   });
 });

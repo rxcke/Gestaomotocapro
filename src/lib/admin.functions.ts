@@ -128,7 +128,7 @@ export const getAdminData = createServerFn({ method: "GET" })
         { name: profile.name, email: profile.email },
       ]),
     );
-    const ambassadors = new Set((rolesResult.data ?? []).map((role) => role.user_id));
+    const ambassadors = new Set((rolesResult.data ?? []).filter((role) => role.role === "ambassador").map((role) => role.user_id));
     const admins = new Set((rolesResult.data ?? []).filter((role) => role.role === "admin").map((role) => role.user_id));
     const subscribers = new Set((subscriptionsResult.data ?? []).filter((row) => row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() > Date.now()).map((row) => row.user_id));
 
