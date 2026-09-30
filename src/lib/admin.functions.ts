@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type AdminOwner = {
@@ -7,6 +8,7 @@ type AdminOwner = {
 };
 
 export type AdminData = {
+  users: Array<{ id: string; name: string | null; email: string | null; ambassador: boolean; subscribed: boolean }>;
   subscriptions: Array<{
     id: string;
     user_id: string;
@@ -81,7 +83,7 @@ export const getAdminData = createServerFn({ method: "GET" })
     if (roleError || !isAdmin) throw new Error("Acesso administrativo não autorizado.");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [motorcyclesResult, incomesResult, expensesResult, fuelResult, profilesResult, subscriptionsResult, eventsResult] =
+    const [motorcyclesResult, incomesResult, expensesResult, fuelResult, profilesResult, rolesResult, subscriptionsResult, eventsResult] =
       await Promise.all([
         supabaseAdmin
           .from("motorcycles")
@@ -104,6 +106,7 @@ export const getAdminData = createServerFn({ method: "GET" })
           .order("date", { ascending: false })
           .limit(500),
         supabaseAdmin.from("profiles").select("id,name,email").limit(500),
+        supabaseAdmin.from("user_roles").select("user_id").eq("role", "ambassador").limit(500),
         supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at").order("created_at", { ascending: false }).limit(500),
         supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
       ]);
@@ -114,6 +117,7 @@ export const getAdminData = createServerFn({ method: "GET" })
       expensesResult.error ??
       fuelResult.error ??
       profilesResult.error ??
+      rolesResult.error ??
       subscriptionsResult.error ??
       eventsResult.error;
     if (error) throw new Error("Não foi possível carregar os dados administrativos.");
@@ -124,8 +128,11 @@ export const getAdminData = createServerFn({ method: "GET" })
         { name: profile.name, email: profile.email },
       ]),
     );
+    const ambassadors = new Set((rolesResult.data ?? []).map((role) => role.user_id));
+    const subscribers = new Set((subscriptionsResult.data ?? []).filter((row) => row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() > Date.now()).map((row) => row.user_id));
 
     return {
+      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id) })),
       motorcycles: motorcyclesResult.data ?? [],
       incomes: incomesResult.data ?? [],
       expenses: expensesResult.data ?? [],
@@ -134,4 +141,29 @@ export const getAdminData = createServerFn({ method: "GET" })
       webhookEvents: eventsResult.data ?? [],
       owners,
     };
+  });
+
+const AmbassadorInput = z.object({ userId: z.string().uuid(), grant: z.boolean() });
+
+export const setAmbassadorAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => AmbassadorInput.parse(input))
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (roleError || !isAdmin) throw new Error("Acesso administrativo não autorizado.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile, error: profileError } = await supabaseAdmin.from("profiles").select("id").eq("id", data.userId).maybeSingle();
+    if (profileError || !profile) throw new Error("Usuário não encontrado.");
+    if (data.grant) {
+      const { error } = await supabaseAdmin.from("user_roles").upsert({ user_id: data.userId, role: "ambassador" }, { onConflict: "user_id,role", ignoreDuplicates: true });
+      if (error) throw new Error("Não foi possível conceder o acesso.");
+    } else {
+      const { error } = await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId).eq("role", "ambassador");
+      if (error) throw new Error("Não foi possível remover o acesso.");
+    }
+    return { ok: true };
   });
