@@ -49,6 +49,10 @@ describe("resumo semanal", () => {
     const result = weeklyReport({ ...empty(), fuel: [fuel("2026-09-27", 30, 1000), fuel(period.end, 40, 1100)] }, period);
     assert.equal(result.distance, 100);
   });
+  test("leituras de combustível não completam KM parcial de jornadas", () => {
+    const result = weeklyReport({ ...empty(), sessions: [session("2026-09-28T14:00:00Z")], fuel: [fuel("2026-09-27", 30, 1000), fuel(period.end, 40, 1100)] }, period);
+    assert.equal(result.distance, null);
+  });
   test("comparação exige atividade anterior e denominador válido", () => {
     const previous = weeklyReport({ ...empty(), incomes: [income(period.start, 100)], sessions: [session("2026-09-28T14:00:00Z")] }, period);
     const current = weeklyReport({ ...empty(), incomes: [income(period.start, 120)], sessions: [session("2026-09-28T14:00:00Z")] }, period);
