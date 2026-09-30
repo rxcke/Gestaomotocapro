@@ -111,3 +111,8 @@
 - [x] Auditar estado, cálculo, proteção de jornadas simultâneas e relatório
 - [x] Persistir múltiplas pausas com isolamento e concorrência seguros
 - [ ] Validar cálculo compartilhado, atualização, encerramento e telas em desktop/celular
+
+## Jornada aberta não aparece
+- [x] Auditar a jornada existente, pausas, dados relacionados e tentativas de criação
+- [ ] Mostrar a jornada aberta independentemente da moto selecionada e evitar criação duplicada
+- [ ] Validar concorrência, pausa, histórico e telas móveis/desktop sem apagar dados existentes
