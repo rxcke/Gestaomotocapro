@@ -60,7 +60,7 @@ function ReportsPage() {
         <Stat className="col-span-2 border-l-4 border-l-accent p-4 sm:p-5 lg:col-span-2" valueClassName="overflow-visible whitespace-normal break-words text-2xl leading-tight sm:text-3xl" label="LUCRO" value={brl(current.profit)} tone={current.profit >= 0 ? "positive" : "negative"} />
         <Stat className="p-3 sm:p-4" valueClassName={numberClasses} label="Horas trabalhadas" value={`${num(current.hours, 1)} h`} />
         <Stat className="p-3 sm:p-4" valueClassName={moneyClasses} label="Lucro/hora" value={current.profitPerHour == null ? "—" : brl(current.profitPerHour)} tone={current.profit >= 0 ? "positive" : "negative"} />
-        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} hintClassName="whitespace-normal break-words leading-snug" label="KM rodados" value={current.distance == null ? "Ainda não informado" : `${num(current.distance, 0)} km`} hint={current.distance == null ? "Registre os KM para acompanhar sua distância." : undefined} />
+        <Stat className="p-3 sm:p-4" valueClassName={numberClasses} hintClassName="whitespace-normal break-words leading-snug" label="KM rodados" value={current.distance == null ? "Ainda não informado" : `${num(current.distance, 0)} km`} hint={current.distance == null ? "Registre os KM para acompanhar sua distância." : ""} />
         <Stat className="p-3 sm:p-4" valueClassName={moneyClasses} label="Combustível" value={brl(current.fuel)} />
       </div>
       {!current.hasActivity && <div className="border-l-2 border-l-accent bg-muted px-4 py-3 text-sm">
@@ -84,8 +84,8 @@ function ReportsPage() {
       <section className="space-y-3" aria-labelledby="moto-indicators-heading">
         <h2 id="moto-indicators-heading" className="font-display text-lg font-bold">Indicadores da moto</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Stat valueClassName={numberClasses} hintClassName="whitespace-normal break-words leading-snug" label="KM rodados" value={distance > 0 ? `${Math.round(distance)} km` : "Ainda não informado"} hint={distance > 0 ? undefined : "Registre os KM para acompanhar sua distância."} />
-          <Stat valueClassName={moneyClasses} hintClassName="whitespace-normal break-words leading-snug" label="Custo por km" value={distance > 0 ? brl(costPerKm(f.expenses, distance)) : "Ainda não calculado"} hint={distance > 0 ? undefined : "Registre os KM e abastecimentos para calcular."} />
+          <Stat valueClassName={numberClasses} hintClassName="whitespace-normal break-words leading-snug" label="KM rodados" value={distance > 0 ? `${Math.round(distance)} km` : "Ainda não informado"} hint={distance > 0 ? "" : "Registre os KM para acompanhar sua distância."} />
+          <Stat valueClassName={moneyClasses} hintClassName="whitespace-normal break-words leading-snug" label="Custo por km" value={distance > 0 ? brl(costPerKm(f.expenses, distance)) : "Ainda não calculado"} hint={distance > 0 ? "" : "Registre os KM e abastecimentos para calcular."} />
         </div>
       </section>
     </div>
