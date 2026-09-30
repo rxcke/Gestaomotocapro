@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Bike, CreditCard, Fuel, ShieldCheck, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeft, Bike, CreditCard, Fuel, ShieldCheck, TrendingDown, TrendingUp, Users } from "lucide-react";
+import { toast } from "sonner";
 import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock, PageTitle, Stat } from "@/components/glass";
 import { Button } from "@/components/ui/button";
-import { getAdminData, type AdminData } from "@/lib/admin.functions";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { getAdminData, setAmbassadorAccess, type AdminData } from "@/lib/admin.functions";
 import { brl, dateBR, km } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Section = "motorcycles" | "incomes" | "expenses" | "fuel" | "subscriptions" | "webhooks";
+type Section = "users" | "motorcycles" | "incomes" | "expenses" | "fuel" | "subscriptions" | "webhooks";
 
 function Owner({ data, userId }: { data: AdminData; userId: string }) {
   const owner = data.owners[userId];
@@ -41,7 +43,7 @@ function Owner({ data, userId }: { data: AdminData; userId: string }) {
 function AdminPage() {
   const fetchAdminData = useServerFn(getAdminData);
   const query = useQuery({ queryKey: ["admin", "overview"], queryFn: () => fetchAdminData() });
-  const [section, setSection] = useState<Section>("motorcycles");
+  const [section, setSection] = useState<Section>("users");
 
   return <div className="relative min-h-dvh bg-canvas px-4 py-6 text-foreground sm:px-6 lg:px-10 lg:py-8">
     <AmbientBackground />
@@ -56,6 +58,18 @@ function AdminPage() {
 }
 
 function AdminContent({ data, section, setSection }: { data: AdminData; section: Section; setSection: (section: Section) => void }) {
+  const [pendingUser, setPendingUser] = useState<AdminData["users"][number] | null>(null);
+  const queryClient = useQueryClient();
+  const updateAccess = useServerFn(setAmbassadorAccess);
+  const update = useMutation({
+    mutationFn: (input: { userId: string; grant: boolean }) => updateAccess({ data: input }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin", "overview"] });
+      toast.success("Acesso de embaixador atualizado.");
+      setPendingUser(null);
+    },
+    onError: (error: Error) => toast.error(error.message || "Não foi possível atualizar o acesso."),
+  });
   const totalIncome = data.incomes.reduce((sum, item) => sum + Number(item.amount), 0);
   const totalExpense = data.expenses.reduce((sum, item) => sum + Number(item.amount), 0);
   const activeSubscriptions = data.subscriptions.filter((item) => item.status === "active").length;
@@ -67,6 +81,7 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
   const refundedSubscriptions = data.subscriptions.filter((item) => item.status === "refunded").length;
   const chargebackSubscriptions = data.subscriptions.filter((item) => item.status === "chargeback").length;
   const sections = [
+    { id: "users" as const, label: "Usuários", icon: Users, count: data.users.length },
     { id: "motorcycles" as const, label: "Motos", icon: Bike, count: data.motorcycles.length },
     { id: "incomes" as const, label: "Ganhos", icon: TrendingUp, count: data.incomes.length },
     { id: "expenses" as const, label: "Gastos", icon: TrendingDown, count: data.expenses.length },
@@ -95,15 +110,17 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
     </div>
     <GlassCard padded={false} className="overflow-hidden">
       <div className="divide-y divide-border">
+        {section === "users" && data.users.map((user) => <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div className="min-w-0"><p className="text-sm font-semibold">{user.name || "Usuário"}</p><p className="break-all text-xs text-muted-foreground">{user.email || "E-mail não informado"}</p><p className="mt-1 text-xs text-muted-foreground">{user.ambassador ? "Embaixador" : user.subscribed ? "Assinante" : "Sem acesso"}{user.ambassador && user.subscribed ? " · Assinante" : ""}</p></div><Button variant="outline" className="min-h-12" onClick={() => setPendingUser(user)}>{user.ambassador ? "Remover acesso" : "Tornar embaixador"}</Button></div>)}
         {section === "motorcycles" && data.motorcycles.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-display font-bold">{item.brand} {item.model}</p><p className="text-xs text-muted-foreground">{item.year ?? "Ano não informado"} · {item.plate ?? "Sem placa"}</p></div><strong className="num-display text-sm">{km(item.current_km)}</strong></div>)}
         {section === "incomes" && data.incomes.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.category}</p><p className="truncate text-xs text-muted-foreground">{item.description ?? "Sem descrição"} · {dateBR(item.date)}</p></div><strong className="num-display text-sm text-positive">{brl(item.amount)}</strong></div>)}
         {section === "expenses" && data.expenses.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.category}</p><p className="truncate text-xs text-muted-foreground">{item.group_name} · {item.description ?? "Sem descrição"} · {dateBR(item.date)}</p></div><strong className="num-display text-sm text-negative">{brl(item.amount)}</strong></div>)}
         {section === "fuel" && data.fuelRecords.map((item) => { const details = [item.liters != null ? `${item.liters.toLocaleString("pt-BR")} L` : null, item.km != null ? km(item.km) : null, dateBR(item.date)].filter(Boolean); return <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.station ?? "Posto não informado"}</p><p className="text-xs text-muted-foreground">{details.join(" · ")}</p></div><strong className="num-display text-sm">{brl(item.total)}</strong></div>})}
         {section === "subscriptions" && data.subscriptions.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.plan === "monthly" ? "Start · Mensal" : item.plan === "quarterly" ? "Pro · Trimestral" : "Elite · Anual"} · {subscriptionStatus(item.provider_status === "pending" && item.status !== "pending" ? item.status : item.provider_status)}</p><p className="truncate text-xs text-muted-foreground">{item.cakto_transaction_id ?? "Sem transação"} · {dateBR(item.started_at ?? item.created_at)}</p></div><strong className="text-sm">{item.expires_at ? dateBR(item.expires_at) : "—"}</strong></div>)}
         {section === "webhooks" && data.webhookEvents.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><div><p className="font-semibold">{item.event_type}</p><p className="truncate text-xs text-muted-foreground">{item.transaction_id ?? "Sem transação"}</p></div><div><p className="text-sm">{item.processed ? "Processado" : "Não processado"}</p><p className="truncate text-xs text-muted-foreground">{item.error_message ?? "Sem erro registrado"}</p></div><strong className="text-sm">{dateBR(item.created_at)}</strong></div>)}
-        {((section === "motorcycles" && !data.motorcycles.length) || (section === "incomes" && !data.incomes.length) || (section === "expenses" && !data.expenses.length) || (section === "fuel" && !data.fuelRecords.length) || (section === "subscriptions" && !data.subscriptions.length) || (section === "webhooks" && !data.webhookEvents.length)) ? <p className="p-8 text-center text-sm text-muted-foreground">Nenhum registro encontrado.</p> : null}
+        {((section === "users" && !data.users.length) || (section === "motorcycles" && !data.motorcycles.length) || (section === "incomes" && !data.incomes.length) || (section === "expenses" && !data.expenses.length) || (section === "fuel" && !data.fuelRecords.length) || (section === "subscriptions" && !data.subscriptions.length) || (section === "webhooks" && !data.webhookEvents.length)) ? <p className="p-8 text-center text-sm text-muted-foreground">Nenhum registro encontrado.</p> : null}
       </div>
     </GlassCard>
+    <AlertDialog open={pendingUser !== null} onOpenChange={(open) => { if (!open && !update.isPending) setPendingUser(null); }}><AlertDialogContent className="max-w-[calc(100vw-2rem)] rounded-md"><AlertDialogHeader><AlertDialogTitle>{pendingUser?.ambassador ? "Remover acesso de embaixador?" : "Conceder acesso de embaixador?"}</AlertDialogTitle><AlertDialogDescription>{pendingUser?.ambassador ? "Se o usuário não possuir uma assinatura ativa, ele perderá o acesso ao aplicativo." : "Este usuário terá acesso gratuito ao Gestão Motoca Pro sem precisar de assinatura."}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={update.isPending}>Cancelar</AlertDialogCancel><AlertDialogAction disabled={update.isPending} onClick={(event) => { event.preventDefault(); if (pendingUser) update.mutate({ userId: pendingUser.id, grant: !pendingUser.ambassador }); }}>{update.isPending ? "Salvando..." : pendingUser?.ambassador ? "Remover acesso" : "Conceder acesso"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </>;
 }
 
