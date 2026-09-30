@@ -197,6 +197,13 @@
       "when": 1790789961499,
       "tag": "0027_persist_work_session_pauses",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1790792138398,
+      "tag": "0028_add_ambassador_role",
+      "breakpoints": true
     }
   ]
 }
