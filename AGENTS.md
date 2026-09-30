@@ -11,4 +11,4 @@
 
 - Keep weekly reporting as a pure calculation over RLS-scoped existing rows in `src/lib/weekly-report.ts`; this avoids a second financial ledger or unnecessary stored summaries.
 - Use the browser's local calendar for weekly DATE boundaries and session end dates; this matches existing client-side period calculations.
-- Report recorded session elapsed time without inventing pause durations, since journey pauses are not persisted.
+- Keep pause intervals in RLS-scoped work_session_pauses and derive working time through workedDuration; this avoids invented pauses and keeps journey and weekly hours consistent.

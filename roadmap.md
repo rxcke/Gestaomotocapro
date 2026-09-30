@@ -106,3 +106,8 @@
 - [x] Destacar lucro, manter ordem e indicar semanas sem movimento
 - [x] Clarificar indicadores da moto, resultado mensal e frase da semana sem mudar cálculos
 - [x] Conferir valores completos, responsividade e testes
+
+## Persistência da pausa da jornada
+- [x] Auditar estado, cálculo, proteção de jornadas simultâneas e relatório
+- [x] Persistir múltiplas pausas com isolamento e concorrência seguros
+- [ ] Validar cálculo compartilhado, atualização, encerramento e telas em desktop/celular

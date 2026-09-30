@@ -12,6 +12,7 @@ import type {
   NotificationRow,
   Profile,
   WorkSession,
+  WorkSessionPause,
 } from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -57,6 +58,7 @@ export const useMaintenance = () =>
   useTable<MaintenanceRecord>("maintenance_records", "maintenance_records", { column: "date" });
 export const useGoals = () => useTable<Goal>("goals", "goals", { column: "created_at" });
 export const useWorkSessions = () => useTable<WorkSession>("work_sessions", "work_sessions", { column: "start_time" });
+export const useWorkSessionPauses = () => useTable<WorkSessionPause>("work_session_pauses", "work_session_pauses", { column: "started_at" });
 export const useDocuments = () => useTable<AppDocument>("documents", "documents", { column: "expiration_date", asc: true });
 export const useNotifications = () =>
   useTable<NotificationRow>("notifications", "notifications", { column: "created_at" });
@@ -70,6 +72,7 @@ const ALL_KEYS = [
   "maintenance_records",
   "goals",
   "work_sessions",
+  "work_session_pauses",
   "documents",
   "notifications",
 ];
