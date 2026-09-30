@@ -101,3 +101,8 @@
 - [x] Reutilizar o cálculo financeiro existente para a semana local, sem duplicar gastos automáticos
 - [x] Mostrar horas encerradas, KM comprovados, combustível e comparação válida em Relatórios
 - [x] Validar cenários de cálculo, acesso, telas móveis e regressões
+
+## Refinamento visual dos Relatórios
+- [x] Destacar lucro, manter ordem e indicar semanas sem movimento
+- [x] Clarificar indicadores da moto, resultado mensal e frase da semana sem mudar cálculos
+- [x] Conferir valores completos, responsividade e testes
