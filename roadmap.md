@@ -117,3 +117,8 @@
 - [x] Mostrar a jornada aberta independentemente da moto selecionada e evitar criação duplicada
 - [x] Validar concorrência em teste, histórico e telas móveis/desktop sem apagar dados existentes
 - [ ] Testar ciclo real de pausa e encerramento em uma jornada descartável (bloqueado: preservar a jornada aberta do usuário)
+
+## Lucro por hora no relatório semanal
+- [x] Identificar diferença entre horas exibidas e duração usada na divisão
+- [x] Ocultar lucro/hora quando horas efetivamente trabalhadas aparecem como 0,0 h
+- [x] Testar duração curta, pausas, zero, prejuízo e durações válidas

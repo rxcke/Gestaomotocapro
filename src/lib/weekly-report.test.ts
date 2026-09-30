@@ -78,4 +78,39 @@ describe("resumo semanal", () => {
     const result = weeklyReport({ ...empty(), sessions: [s, other], pauses: [pause(s.id, "2026-09-28T13:30:00Z", "2026-09-28T14:00:00Z"), pause(s.id, "2026-09-28T15:30:00Z", "2026-09-28T16:00:00Z"), pause(other.id, "2026-09-28T12:00:00Z", null)] }, period);
     assert.equal(result.hours, 4);
   });
+  test("não calcula lucro/hora quando a duração trabalhada aparece como 0,0 h", () => {
+    const s = session("2026-09-28T12:00:25.470Z");
+    const result = weeklyReport({ ...empty(), sessions: [s], incomes: [income(period.start, 50)], expenses: [expense(period.start, 20)] }, period);
+    assert.equal(result.profit, 30);
+    assert.equal(result.hours.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }), "0,0");
+    assert.equal(result.profitPerHour, null);
+  });
+  test("zero, menos de três minutos e pausas que deixam 0,0 h não geram lucro/hora", () => {
+    const zero = session("2026-09-28T12:00:00Z");
+    const short = session("2026-09-28T12:02:59Z");
+    const paused = session("2026-09-28T13:00:00Z");
+    for (const [s, pauses] of [
+      [zero, []],
+      [short, []],
+      [paused, [pause(paused.id, "2026-09-28T12:02:59Z", "2026-09-28T13:00:00Z")]],
+    ] as const) {
+      const result = weeklyReport({ ...empty(), sessions: [s], pauses: [...pauses], incomes: [income(period.start, 30)] }, period);
+      assert.equal(result.profitPerHour, null);
+    }
+  });
+  test("a partir de 0,1 h exibida calcula com a duração real, sem arredondar o divisor", () => {
+    const s = session("2026-09-28T12:03:00Z");
+    const result = weeklyReport({ ...empty(), sessions: [s], incomes: [income(period.start, 30)] }, period);
+    assert.equal(result.hours, 0.05);
+    assert.equal(result.profitPerHour, 600);
+    assert.equal(weeklyReport({ ...empty(), sessions: [session("2026-09-28T12:30:00Z")], incomes: [income(period.start, 30)] }, period).profitPerHour, 60);
+    assert.equal(weeklyReport({ ...empty(), sessions: [session("2026-09-28T13:00:00Z")], incomes: [income(period.start, 30)] }, period).profitPerHour, 30);
+    assert.equal(weeklyReport({ ...empty(), sessions: [session("2026-09-28T14:00:00Z")], incomes: [income(period.start, 30)] }, period).profitPerHour, 15);
+  });
+  test("lucro zero e prejuízo com horas válidas permanecem calculáveis; jornada aberta não entra", () => {
+    const s = session("2026-09-28T13:00:00Z");
+    assert.equal(weeklyReport({ ...empty(), sessions: [s, session(null)], incomes: [income(period.start, 20)], expenses: [expense(period.start, 20)] }, period).profitPerHour, 0);
+    assert.equal(weeklyReport({ ...empty(), sessions: [s], expenses: [expense(period.start, 20)] }, period).profitPerHour, -20);
+    assert.equal(weeklyReport({ ...empty(), sessions: [session(null)], incomes: [income(period.start, 30)] }, period).profitPerHour, null);
+  });
 });
