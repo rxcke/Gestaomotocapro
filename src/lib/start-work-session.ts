@@ -13,6 +13,7 @@ export async function startOrResumeSession<T>(
     if (isActiveConflict(error)) {
       const concurrent = await getActive();
       if (concurrent) return { session: concurrent, existed: true };
+      throw new Error("Já existe uma jornada em andamento. Atualize a página para continuar.");
     }
     throw error;
   }

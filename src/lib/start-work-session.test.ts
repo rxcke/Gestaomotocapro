@@ -37,4 +37,7 @@ describe("início seguro de jornada", () => {
   test("erros não relacionados ao índice continuam sendo erros", async () => {
     await assert.rejects(startOrResumeSession(async () => null, async () => { throw new Error("sem acesso"); }, isConflict), /sem acesso/);
   });
+  test("conflito sem leitura disponível nunca exibe erro técnico", async () => {
+    await assert.rejects(startOrResumeSession(async () => null, async () => { throw conflict; }, isConflict), /Já existe uma jornada/);
+  });
 });

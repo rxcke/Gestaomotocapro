@@ -75,7 +75,10 @@ function JourneyPage() {
       const { data: openPause } = existed ? await supabase.from("work_session_pauses").select("id").eq("work_session_id", session.id).is("ended_at", null).maybeSingle() : { data: null };
       toast[existed ? "info" : "success"](existed ? (openPause ? "Você tem uma jornada pausada. Retome para continuar." : "Você já tem uma jornada em andamento.") : "Jornada iniciada.");
     },
-    onError: (error: Error) => toast.error(error.message || "Não foi possível iniciar a jornada."),
+    onError: (error: Error) => {
+      toast.error(error.message || "Não foi possível iniciar a jornada.");
+      void queryClient.invalidateQueries({ queryKey: ["work_sessions"] });
+    },
     onSettled: () => { starting.current = false; },
   });
   const changePause = useMutation({
