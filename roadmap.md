@@ -96,3 +96,8 @@
 - [x] Identificar a falha exata entre formulário, banco, RLS, jornada e gasto automático
 - [x] Aplicar somente a menor correção necessária
 - [x] Validar os dez cenários solicitados sem alterar dados reais
+
+## Resumo semanal
+- [ ] Reutilizar o cálculo financeiro existente para a semana local, sem duplicar gastos automáticos
+- [ ] Mostrar horas encerradas, KM comprovados, combustível e comparação válida em Relatórios
+- [ ] Validar cenários de cálculo, acesso, telas móveis e regressões
