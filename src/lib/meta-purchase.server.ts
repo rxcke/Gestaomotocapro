@@ -22,11 +22,13 @@ export async function sendConfirmedPurchase(input: { transactionId: string; user
   }, { onConflict: "transaction_id", ignoreDuplicates: true }).select("transaction_id").maybeSingle();
   if (error || !claimed) return;
   try {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(consent.visitor_id));
+    const externalId = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
     const response = await fetch(`https://graph.facebook.com/v22.0/${encodeURIComponent(pixelId)}/events`, {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ access_token: token, data: [{
         event_name: "Purchase", event_time: Math.floor(Date.now() / 1000), event_id: eventId,
-        action_source: "website", user_data: { external_id: [consent.visitor_id] },
+        action_source: "website", user_data: { external_id: [externalId] },
         custom_data: { currency: "BRL", transaction_id: input.transactionId, plan: names[input.plan], content_name: names[input.plan], content_type: "product", ...(amount === null ? {} : { value: amount }) },
       }] }),
     });

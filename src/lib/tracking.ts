@@ -64,16 +64,20 @@ export function refreshTracking() {
 export function trackPage(path: string) {
   captureAttribution();
   refreshTracking();
-  const key = path;
-  if (key === lastPage) return;
-  lastPage = key;
   if (!active) return;
+  if (path === lastPage) return;
+  lastPage = path;
   (window as MetaWindow).fbq?.("track", "PageView");
   (window as MetaWindow).dataLayer?.push(["event", "page_view", { page_path: path }]);
   if (path === "/") {
     (window as MetaWindow).fbq?.("track", "ViewContent", { content_name: "Gestão Motoca Pro", content_type: "product" });
     (window as MetaWindow).dataLayer?.push(["event", "view_item", { item_name: "Gestão Motoca Pro" }]);
   }
+}
+
+export function trackCurrentPageAfterConsent() {
+  lastPage = "";
+  trackPage(window.location.pathname);
 }
 
 export function trackEvent(event: "Lead" | "InitiateCheckout", data: Record<string, string> = {}) {

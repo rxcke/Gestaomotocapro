@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { readConsent, requiresConsent, saveConsent, type ConsentChoice } from "@/lib/marketing-consent";
 import { recordMarketingChoice } from "@/lib/marketing-consent.functions";
-import { refreshTracking, setTrackingRegion, trackPage } from "@/lib/tracking";
+import { refreshTracking, setTrackingRegion, trackCurrentPageAfterConsent, trackPage } from "@/lib/tracking";
 import { supabase } from "@/integrations/supabase/client";
 
 export function MarketingConsent() {
@@ -25,8 +25,9 @@ export function MarketingConsent() {
     const onChange = () => { setChoice(readConsent()); refreshTracking(); };
     window.addEventListener("storage", onChange);
     window.addEventListener("marketing-consent-change", onChange);
-    window.addEventListener("open-cookie-settings", () => setSettings(true));
-    return () => { controller.abort(); window.clearTimeout(timeout); window.removeEventListener("storage", onChange); window.removeEventListener("marketing-consent-change", onChange); };
+    const openSettings = () => setSettings(true);
+    window.addEventListener("open-cookie-settings", openSettings);
+    return () => { controller.abort(); window.clearTimeout(timeout); window.removeEventListener("storage", onChange); window.removeEventListener("marketing-consent-change", onChange); window.removeEventListener("open-cookie-settings", openSettings); };
   }, []);
   useEffect(() => { trackPage(path); }, [path]);
   useEffect(() => {
@@ -40,6 +41,7 @@ export function MarketingConsent() {
     setChoice(next);
     setSettings(false);
     refreshTracking();
+    if (accepted) trackCurrentPageAfterConsent();
   };
   const visible = settings || (requiresConsent(region) && !choice);
   if (!visible) return null;
