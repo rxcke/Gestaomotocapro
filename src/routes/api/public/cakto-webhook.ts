@@ -292,11 +292,11 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
               continue;
             }
             const result = await processOrder(event, order, plan);
-            if (event === "purchase_approved" && result && typeof result === "object" && "result" in result && result.result === "processed" && "user_id" in result && typeof result.user_id === "string") {
+            if (event === "purchase_approved" && result && typeof result === "object" && "result" in result && result['result'] === "processed" && "user_id" in result && typeof result['user_id'] === "string") {
               // Advertising is best-effort; it never controls subscription status or webhook acknowledgement.
               try {
                 const { sendConfirmedPurchase } = await import("@/lib/meta-purchase.server");
-                await sendConfirmedPurchase({ transactionId: order.id, userId: result.user_id, plan, price: order.offer?.price });
+                await sendConfirmedPurchase({ transactionId: order.id, userId: result['user_id'], plan, price: order.offer?.price });
               } catch { /* Never disclose the provider token or reject a valid Cakto purchase. */ }
             }
             logWebhook("info", { event, eventId: order.id, plan, outcome: result });
