@@ -339,6 +339,89 @@ export type Database = {
           },
         ]
       }
+      marketing_consent_choices: {
+        Row: {
+          accepted: boolean
+          data_categories: string
+          decided_at: string
+          id: string
+          notice_version: string
+          previous_choice_id: string | null
+          purposes: string
+          recipients: string
+          region: string
+          user_id: string
+          visitor_id: string
+        }
+        Insert: {
+          accepted: boolean
+          data_categories?: string
+          decided_at?: string
+          id?: string
+          notice_version: string
+          previous_choice_id?: string | null
+          purposes?: string
+          recipients?: string
+          region: string
+          user_id: string
+          visitor_id: string
+        }
+        Update: {
+          accepted?: boolean
+          data_categories?: string
+          decided_at?: string
+          id?: string
+          notice_version?: string
+          previous_choice_id?: string | null
+          purposes?: string
+          recipients?: string
+          region?: string
+          user_id?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_consent_choices_previous_choice_id_fkey"
+            columns: ["previous_choice_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_consent_choices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_purchase_deliveries: {
+        Row: {
+          created_at: string
+          event_id: string
+          plan: string
+          sent_at: string | null
+          status: string
+          transaction_id: string
+          user_id: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          plan: string
+          sent_at?: string | null
+          status?: string
+          transaction_id: string
+          user_id: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          plan?: string
+          sent_at?: string | null
+          status?: string
+          transaction_id?: string
+          user_id?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
       motorcycles: {
         Row: {
           brand: string
