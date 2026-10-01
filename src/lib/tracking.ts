@@ -64,7 +64,7 @@ export function refreshTracking() {
 export function trackPage(path: string) {
   captureAttribution();
   refreshTracking();
-  const key = `${path}${window.location.search}`;
+  const key = path;
   if (key === lastPage) return;
   lastPage = key;
   if (!active) return;
