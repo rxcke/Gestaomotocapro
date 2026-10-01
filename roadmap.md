@@ -132,3 +132,10 @@
 ## WhatsApp na administração
 - [x] Exibir profiles.phone apenas na lista administrativa, formatado sem alterar o dado salvo
 - [x] Validar ausência, formatos, acesso restrito e telas desktop/celular
+
+## Rastreamento de campanhas
+- [x] Auditar Pixel, GA4, GTM, conversões, checkout, Cakto e privacidade
+- [ ] Implementar aviso regional e política de privacidade com registro da escolha
+- [ ] Centralizar eventos, preservar UTMs e configurar Pixel sem duplicação
+- [ ] Vincular checkout e compra confirmada à CAPI de forma idempotente
+- [ ] Validar funil, testes, tipos e publicação; pendente conexão GA4 e token Meta
