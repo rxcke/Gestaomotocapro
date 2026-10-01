@@ -26,6 +26,7 @@ import { Logo } from "@/components/Logo";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { trackClick } from "@/lib/tracking";
 
 const NAV_ITEMS = [
   { label: "Como funciona", href: "#como-funciona" },
@@ -181,7 +182,7 @@ function PlanCard({ name, price, period, plan, featured = false }: LandingPlan) 
         {PLAN_FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}
       </ul>
       <Button asChild variant={featured ? "default" : "outline"} className="mt-7 h-12 w-full">
-        <Link to="/planos" aria-label={`Escolher plano ${name} ${plan}`}>Escolher {name}<ArrowRight /></Link>
+        <Link to="/planos" onClick={() => trackClick(`Escolher ${name}`)} aria-label={`Escolher plano ${name} ${plan}`}>Escolher {name}<ArrowRight /></Link>
       </Button>
     </article>
   );
@@ -199,8 +200,8 @@ export function LandingPage() {
             {NAV_ITEMS.map((item) => <a key={item.href} href={item.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{item.label}</a>)}
           </nav>
           <div className="ml-4 hidden items-center gap-2 lg:flex">
-            <Button asChild variant="ghost" className="h-12"><Link to="/auth">Entrar</Link></Button>
-            <Button asChild className="h-12 px-5"><Link to="/auth" search={{ mode: "signup" }}>Começar agora</Link></Button>
+            <Button asChild variant="ghost" className="h-12"><Link to="/auth" onClick={() => trackClick("Entrar")}>Entrar</Link></Button>
+            <Button asChild className="h-12 px-5"><Link to="/auth" search={{ mode: "signup" }} onClick={() => trackClick("Começar agora")}>Começar agora</Link></Button>
           </div>
           <Button type="button" variant="ghost" size="icon" className="size-12 shrink-0 lg:hidden" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
             {menuOpen ? <X /> : <Menu />}
@@ -234,7 +235,7 @@ export function LandingPage() {
                 O Gestão Motoca Pro ajuda você a controlar seus ganhos, gastos, combustível e manutenção em poucos segundos. Sem planilhas e sem complicação.
               </p>
               <div className="mt-8 grid gap-3 sm:flex">
-                <Button asChild size="lg" className="h-14 w-full px-7 text-base sm:w-auto"><Link to="/auth" search={{ mode: "signup" }}>Quero assinar<ArrowRight /></Link></Button>
+                <Button asChild size="lg" className="h-14 w-full px-7 text-base sm:w-auto"><Link to="/auth" search={{ mode: "signup" }} onClick={() => trackClick("Quero assinar")}>Quero assinar<ArrowRight /></Link></Button>
                 <Button asChild size="lg" variant="outline" className="h-14 w-full px-7 text-base sm:w-auto"><a href="#como-funciona">Ver como funciona<ArrowDown /></a></Button>
               </div>
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-xs font-medium text-muted-foreground">
@@ -348,7 +349,7 @@ export function LandingPage() {
           <div className="flex flex-col gap-5 lg:items-end">
             <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground" aria-label="Links institucionais">
               <a href="#faq" className="min-h-12 content-center transition-colors hover:text-foreground">Termos de Uso</a>
-              <a href="#faq" className="min-h-12 content-center transition-colors hover:text-foreground">Política de Privacidade</a>
+              <Link to="/privacidade" className="min-h-12 content-center transition-colors hover:text-foreground">Política de Privacidade</Link>
               <a href="#contato" className="min-h-12 content-center transition-colors hover:text-foreground">Contato</a>
             </nav>
             <div className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-6" aria-label="Informações de contato">

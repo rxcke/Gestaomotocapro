@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getCheckoutUrl, getSubscriptionAccess, type SubscriptionPlan } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 import { cn } from "@/lib/utils";
+import { trackClick, trackEvent } from "@/lib/tracking";
 
 export const Route = createFileRoute("/_authenticated/planos")({
   head: () => ({ meta: [
@@ -40,6 +41,7 @@ function PlansPage() {
         toast.info("Este checkout ainda não foi configurado.");
         return;
       }
+      trackEvent("InitiateCheckout", { content_name: plan === "monthly" ? "Start" : plan === "quarterly" ? "Pro" : "Elite" });
       window.location.assign(result.url);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível abrir o checkout.");
@@ -76,6 +78,6 @@ function PlanCard({ name, price, period, plan, featured = false, loading, onSubs
     <h2 className="pr-28 font-display text-xl font-bold">{name}</h2>
     <p className="mt-5"><span className="num-display text-4xl">{price}</span><span className="text-sm text-muted-foreground">{period}</span></p>
     <ul className="my-7 flex-1 space-y-3">{FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}</ul>
-    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => onSubscribe(plan)}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : plan === "monthly" ? "Assinar plano mensal" : plan === "quarterly" ? "Assinar plano trimestral" : "Assinar plano anual"}</Button>
+    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => { trackClick(`Escolher ${name}`); onSubscribe(plan); }}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : plan === "monthly" ? "Assinar plano mensal" : plan === "quarterly" ? "Assinar plano trimestral" : "Assinar plano anual"}</Button>
   </GlassCard>;
 }

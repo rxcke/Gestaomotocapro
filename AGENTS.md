@@ -15,3 +15,4 @@
 - Keep AppDataProvider in its own component module, separate from AppContext and hooks; this prevents Fast Refresh from replacing the context while mounted consumers still reference the old instance.
 - Keep session-start race recovery in `src/lib/start-work-session.ts` and read the user's open journey across all motorcycles; an open journey can have no motorcycle and the database's unique index remains the final guard.
 - Keep app entitlement in `has_app_access(auth.uid())` while subscription remains a separate Cakto fact; this prevents special roles from masquerading as paid plans.
+- Keep marketing consent in append-only, owner-scoped choices and purchases in a transaction-keyed server-only delivery table; this preserves revocations and prevents webhook replays from double-sending conversions.
