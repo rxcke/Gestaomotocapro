@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "../lib/theme";
 import { Toaster } from "../components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { MarketingConsent } from "@/components/MarketingConsent";
 
 function NotFoundComponent() {
   return (
@@ -132,6 +133,7 @@ function RootComponent() {
         <QueryClientProvider client={queryClient}>
           <AuthStateSync queryClient={queryClient} />
           <Outlet />
+          <MarketingConsent />
           <Toaster richColors position="top-center" />
         </QueryClientProvider>
       </ThemeProvider>

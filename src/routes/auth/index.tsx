@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { authErrorMessage, clearSafeReturnPath, peekSafeReturnPath } from "@/lib/auth-errors";
 import { getEntryDestination } from "@/lib/entry-flow.functions";
 import { formatBrazilianMobile, normalizeBrazilianMobile } from "@/lib/phone";
+import { trackEvent, trackClick } from "@/lib/tracking";
 
 export const Route = createFileRoute("/auth/")({
   head: () => ({ meta: [
@@ -104,6 +105,7 @@ function AuthPage() {
           options: { emailRedirectTo: `${window.location.origin}/auth/callback`, data: { name, phone: normalizedPhone } },
         });
         if (error) throw error;
+        if (data.user) trackEvent("Lead");
         if (!data.session) {
           setConfirmationEmail(email);
           setSent("Conta criada! Confirme seu e-mail para entrar.");
@@ -168,7 +170,7 @@ function AuthPage() {
           <div className="space-y-1.5"><Label htmlFor="email">E-mail{mode === "signup" ? " *" : ""}</Label><Input id="email" name="email" type="email" required maxLength={320} autoComplete="email" className="h-12 text-base" /></div>
           {mode !== "forgot" ? <div className="space-y-1.5"><Label htmlFor="password">Senha{mode === "signup" ? " *" : ""}</Label><Input id="password" name="password" type="password" required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} className="h-12 text-base" /></div> : null}
           {mode === "signup" ? <div className="space-y-1.5"><Label htmlFor="confirmation">Confirmar senha *</Label><Input id="confirmation" name="confirmation" type="password" required minLength={8} autoComplete="new-password" className="h-12 text-base" /></div> : null}
-          <Button type="submit" className="h-12 w-full text-base" disabled={loading || googleLoading}>{loading ? "Aguarde..." : mode === "signin" ? "Entrar" : mode === "signup" ? "Começar agora" : "Enviar link"}</Button>
+          <Button type="submit" className="h-12 w-full text-base" disabled={loading || googleLoading} onClick={() => trackClick(mode === "signup" ? "Criar conta" : "Entrar")}>{loading ? "Aguarde..." : mode === "signin" ? "Entrar" : mode === "signup" ? "Começar agora" : "Enviar link"}</Button>
         </form>}
         {mode !== "forgot" ? <><div className="my-5 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" /></div><Button variant="outline" className="h-12 w-full text-base" onClick={google} disabled={googleLoading || loading}>{googleLoading ? "Abrindo Google..." : "Continuar com Google"}</Button></> : null}
         <div className="mt-6 space-y-2 text-center text-sm">{mode === "signin" ? <><button type="button" className="text-muted-foreground underline-offset-4 hover:underline" onClick={() => changeMode("forgot")}>Esqueci minha senha</button><p className="text-muted-foreground">Não tem conta? <button type="button" className="font-semibold text-foreground underline-offset-4 hover:underline" onClick={() => changeMode("signup")}>Criar agora</button></p></> : <button type="button" className="text-muted-foreground underline-offset-4 hover:underline" onClick={() => changeMode("signin")}>Voltar para o login</button>}</div>

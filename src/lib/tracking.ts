@@ -1,7 +1,8 @@
 import { readConsent, requiresConsent } from "@/lib/marketing-consent";
 
 const PIXEL_ID = "1409495857462088";
-const GA_ID = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_ANALYTICS_API_KEY as string | undefined;
+const GA_ID = import.meta.env['VITE_GA4_MEASUREMENT_ID'] as string | undefined;
+const ENABLED = import.meta.env['VITE_MARKETING_TRACKING_ENABLED'] === 'true';
 type MetaWindow = Window & { fbq?: (...args: unknown[]) => void; dataLayer?: unknown[] };
 let region = "XX";
 let initialized = false;
@@ -24,7 +25,7 @@ export function campaignParameters(): Record<string, string> {
 
 export function setTrackingRegion(value: string) { region = value; refreshTracking(); }
 
-function permitted() { return !requiresConsent(region) || readConsent()?.accepted === true; }
+function permitted() { const choice = readConsent(); return ENABLED && choice?.accepted !== false && (!requiresConsent(region) || choice?.accepted === true); }
 
 function install() {
   if (initialized) return;
