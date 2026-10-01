@@ -61,6 +61,10 @@ export function refreshTracking() {
   }
 }
 
+export function trackingDebugState() {
+  return import.meta.env.DEV ? { region, enabled: ENABLED, active, lastPage, campaign: campaignParameters() } : null;
+}
+
 export function trackPage(path: string) {
   captureAttribution();
   refreshTracking();

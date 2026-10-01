@@ -4,6 +4,7 @@ const names: Record<CaktoPlan, string> = { monthly: "Start", quarterly: "Pro", a
 
 /** Called only after the existing Cakto RPC confirms a newly processed approved purchase. */
 export async function sendConfirmedPurchase(input: { transactionId: string; userId: string; plan: CaktoPlan; price: number | string | null | undefined }) {
+  if (process.env['MARKETING_TRACKING_ENABLED'] !== 'true') return;
   const token = process.env['META_CAPI_ACCESS_TOKEN'];
   const pixelId = process.env['META_PIXEL_ID'];
   // No configured token means no delivery attempt and no claim: allow a later verified replay.
