@@ -556,8 +556,11 @@ export type Database = {
           plan: Database["public"]["Enums"]["subscription_plan"]
           provider: string
           provider_status: string
+          recurring_amount: number | null
           started_at: string | null
           status: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at: string | null
+          trial_started_at: string | null
           updated_at: string
           user_id: string
         }
@@ -577,8 +580,11 @@ export type Database = {
           plan: Database["public"]["Enums"]["subscription_plan"]
           provider?: string
           provider_status?: string
+          recurring_amount?: number | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -598,8 +604,11 @@ export type Database = {
           plan?: Database["public"]["Enums"]["subscription_plan"]
           provider?: string
           provider_status?: string
+          recurring_amount?: number | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -808,6 +817,7 @@ export type Database = {
         | "expired"
         | "refunded"
         | "chargeback"
+        | "trial"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -944,6 +954,7 @@ export const Constants = {
         "expired",
         "refunded",
         "chargeback",
+        "trial",
       ],
     },
   },

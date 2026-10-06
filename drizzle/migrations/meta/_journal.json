@@ -218,6 +218,13 @@
       "when": 1790882485914,
       "tag": "0030_marketing_consent_and_purchase_delivery",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1791291943814,
+      "tag": "0031_subscription_trial_status",
+      "breakpoints": true
     }
   ]
 }
