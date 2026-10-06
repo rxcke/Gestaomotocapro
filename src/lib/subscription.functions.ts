@@ -36,6 +36,7 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SubscriptionAccess> => {
     const [trialResult, accessResult, roleResult, ambassadorResult, appAccessResult, subscriptionResult] = await Promise.all([
+      context.supabase.rpc("has_valid_trial", { _user_id: context.userId }),
       context.supabase.rpc("has_active_subscription", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "ambassador" }),
