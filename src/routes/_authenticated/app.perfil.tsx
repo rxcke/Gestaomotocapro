@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useProfile, useUpdateProfile } from "@/lib/data";
 import { useTheme } from "@/lib/theme";
-import { dateBR } from "@/lib/format";
+import { brl, dateBR } from "@/lib/format";
 import { trialDaysLeft } from "@/lib/cakto-trial";
 import { getSubscriptionAccess, type SubscriptionAccess, type SubscriptionView } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
