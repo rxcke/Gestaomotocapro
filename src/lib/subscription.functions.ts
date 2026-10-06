@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type SubscriptionPlan = "monthly" | "quarterly" | "annual";
-export type SubscriptionStatus = "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
+export type SubscriptionStatus = "pending" | "trial" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
 export type ProviderSubscriptionStatus = SubscriptionStatus | "paused" | "late";
 
 export type SubscriptionView = {
@@ -15,10 +15,15 @@ export type SubscriptionView = {
   expiresAt: string | null;
   canceledAt: string | null;
   subscriptionId: string | null;
+  trialStartedAt: string | null;
+  trialEndsAt: string | null;
+  recurringAmount: number | null;
 };
 
 export type SubscriptionAccess = {
   active: boolean;
+  /** Cakto-confirmed free trial still before its first charge date; never a paid subscription. */
+  trial: boolean;
   admin: boolean;
   ambassador: boolean;
   hasAppAccess: boolean;
@@ -30,25 +35,26 @@ const CheckoutInput = z.object({ plan: z.enum(["monthly", "quarterly", "annual"]
 export const getSubscriptionAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SubscriptionAccess> => {
-    const [accessResult, roleResult, ambassadorResult, appAccessResult, subscriptionResult] = await Promise.all([
+    const [trialResult, accessResult, roleResult, ambassadorResult, appAccessResult, subscriptionResult] = await Promise.all([
       context.supabase.rpc("has_active_subscription", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "ambassador" }),
       context.supabase.rpc("has_app_access", { _user_id: context.userId }),
       context.supabase
         .from("subscriptions")
-        .select("id,plan,status,provider_status,started_at,expires_at,canceled_at,cakto_subscription_id")
+        .select("id,plan,status,provider_status,started_at,expires_at,canceled_at,cakto_subscription_id,trial_started_at,trial_ends_at,recurring_amount")
         .eq("user_id", context.userId)
         .maybeSingle(),
     ]);
 
-    if (accessResult.error || roleResult.error || ambassadorResult.error || appAccessResult.error || subscriptionResult.error) {
+    if (trialResult.error || accessResult.error || roleResult.error || ambassadorResult.error || appAccessResult.error || subscriptionResult.error) {
       throw new Error("Não foi possível consultar sua assinatura.");
     }
 
     const row = subscriptionResult.data;
     return {
       active: Boolean(accessResult.data),
+      trial: Boolean(trialResult.data),
       admin: Boolean(roleResult.data),
       ambassador: Boolean(ambassadorResult.data),
       hasAppAccess: Boolean(appAccessResult.data),
@@ -64,6 +70,9 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
             expiresAt: row.expires_at,
             canceledAt: row.canceled_at,
             subscriptionId: row.cakto_subscription_id,
+            trialStartedAt: row.trial_started_at,
+            trialEndsAt: row.trial_ends_at,
+            recurringAmount: row.recurring_amount === null ? null : Number(row.recurring_amount),
           }
         : null,
     };
