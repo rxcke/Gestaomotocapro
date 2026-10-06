@@ -6,6 +6,7 @@ import {
   resolveCaktoPlan,
   type CaktoPlan,
 } from "@/lib/cakto-offers";
+import { readCaktoSubscriptionFacts } from "@/lib/cakto-trial";
 
 const MAX_BODY_BYTES = 256_000;
 const MAX_TIMESTAMP_DRIFT_SECONDS = 300;
@@ -131,6 +132,7 @@ function sanitizedPayload(event: string, order: Order): Json {
       started_at: subscription.startedAt,
       expires_at: subscription.expiresAt,
       canceled_at: subscription.canceledAt,
+      subscription_status: readCaktoSubscriptionFacts(order.subscription).status,
     },
   };
 }
@@ -177,11 +179,15 @@ function logWebhook(
 
 async function processOrder(event: string, order: Order, plan: CaktoPlan) {
   const subscription = subscriptionFields(order);
-  const effectiveExpiration = fallbackExpiration(event, plan, subscription.startedAt, subscription.expiresAt);
+  const facts = readCaktoSubscriptionFacts(order.subscription);
+  // Trial access ends at the Cakto-reported first charge; never extend it by a paid period.
+  const effectiveExpiration = facts.isTrial
+    ? facts.trialEndsAt
+    : fallbackExpiration(event, plan, subscription.startedAt, subscription.expiresAt);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   // PostgREST accepts null for these nullable SQL parameters, while generated RPC types omit null.
   const nullableRpcString = (value: string | null) => value as unknown as string;
-  const { data, error } = await supabaseAdmin.rpc("process_cakto_subscription_event", {
+  const { data, error } = await supabaseAdmin.rpc("process_cakto_subscription_event_v2", {
     _event_id: `${event}:${order.id}`,
     _event_type: event,
     _transaction_id: order.id,
@@ -194,6 +200,9 @@ async function processOrder(event: string, order: Order, plan: CaktoPlan) {
     _expires_at: nullableRpcString(effectiveExpiration),
     _canceled_at: nullableRpcString(subscription.canceledAt),
     _payload: sanitizedPayload(event, order),
+    _subscription_status: nullableRpcString(facts.status),
+    _trial_ends_at: nullableRpcString(facts.trialEndsAt),
+    _amount: facts.amount as unknown as number,
   });
   if (error) throw new Error(error.message);
   return data;
@@ -292,7 +301,7 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
               continue;
             }
             const result = await processOrder(event, order, plan);
-            if (event === "purchase_approved" && result && typeof result === "object" && "result" in result && result['result'] === "processed" && "user_id" in result && typeof result['user_id'] === "string") {
+            if (event === "purchase_approved" && result && typeof result === "object" && "result" in result && result['result'] === "processed" && !("trial" in result && result['trial'] === true) && "user_id" in result && typeof result['user_id'] === "string") {
               // Advertising is best-effort; it never controls subscription status or webhook acknowledgement.
               try {
                 const { sendConfirmedPurchase } = await import("@/lib/meta-purchase.server");

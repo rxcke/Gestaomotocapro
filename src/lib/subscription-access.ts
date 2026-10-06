@@ -3,6 +3,7 @@ import type { SubscriptionAccess } from "@/lib/subscription.functions";
 
 const NO_ACCESS: SubscriptionAccess = {
   active: false,
+  trial: false,
   admin: false,
   ambassador: false,
   hasAppAccess: false,

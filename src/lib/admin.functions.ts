@@ -107,7 +107,7 @@ export const getAdminData = createServerFn({ method: "GET" })
           .limit(500),
         supabaseAdmin.from("profiles").select("id,name,email,phone").limit(500),
         supabaseAdmin.from("user_roles").select("user_id,role").in("role", ["admin", "ambassador"]).limit(500),
-        supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at").order("created_at", { ascending: false }).limit(500),
+        supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at,trial_started_at,trial_ends_at,recurring_amount").order("created_at", { ascending: false }).limit(500),
         supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
       ]);
 
