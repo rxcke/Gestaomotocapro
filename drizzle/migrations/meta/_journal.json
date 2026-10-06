@@ -225,6 +225,13 @@
       "when": 1791291943814,
       "tag": "0031_subscription_trial_status",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791292022304,
+      "tag": "0032_trial_access_and_processing",
+      "breakpoints": true
     }
   ]
 }

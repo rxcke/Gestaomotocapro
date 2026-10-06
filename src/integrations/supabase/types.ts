@@ -770,6 +770,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_valid_trial: { Args: { _user_id: string }; Returns: boolean }
       process_cakto_subscription_event: {
         Args: {
           _buyer_email: string
@@ -784,6 +785,26 @@ export type Database = {
           _started_at: string
           _subscription_id: string
           _transaction_id: string
+        }
+        Returns: Json
+      }
+      process_cakto_subscription_event_v2: {
+        Args: {
+          _amount?: number
+          _buyer_email: string
+          _canceled_at: string
+          _event_id: string
+          _event_type: string
+          _expires_at: string
+          _offer_id: string
+          _payload: Json
+          _plan: Database["public"]["Enums"]["subscription_plan"]
+          _product_id: string
+          _started_at: string
+          _subscription_id: string
+          _subscription_status?: string
+          _transaction_id: string
+          _trial_ends_at?: string
         }
         Returns: Json
       }
