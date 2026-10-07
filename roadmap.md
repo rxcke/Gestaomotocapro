@@ -1,5 +1,12 @@
 # Roadmap
 
+## Demonstração gratuita
+- [ ] Auditar acesso, RLS, gravações, pagamentos e indicação existente
+- [ ] Implementar estado separado e limites permanentes no banco
+- [ ] Liberar navegação, boas-vindas, resultado real e bloqueios com planos
+- [ ] Exibir uso e status na administração sem alterar Cakto
+- [ ] Validar segurança, limites, regressões e telas 360/390/430/desktop
+
 - [x] Auditar autenticação, Google, sessão e redirects
 - [x] Auditar assinatura, onboarding e estados de acesso
 - [x] Corrigir somente falhas comprovadas no fluxo de entrada
