@@ -32,7 +32,7 @@ type DialogProps = { open: boolean; onOpenChange: (v: boolean) => void };
 function useMotoOptions(allowEmpty = false) {
   const { motorcycles, motoId } = useApp();
   const options = motorcycles.map((m) => ({ value: m.id, label: `${m.brand} ${m.model}` }));
-  if (allowEmpty) options.push({ value: "none", label: "Sem moto" });
+  if (allowEmpty) options.push({ value: "none", label: "Sem moto específica" });
   const preselect = motoId !== ALL_MOTOS ? motoId : (options[0]?.value ?? "none");
   return { options, preselect };
 }
@@ -160,10 +160,10 @@ export function IncomeDialog({
       </div>
       {options.length > 1 ? (
         <SelectField
-          label="Moto"
+          label="Moto (opcional)"
           name="motorcycle_id"
           options={options}
-          defaultValue={record?.motorcycle_id ?? preselect}
+          defaultValue={record ? record.motorcycle_id ?? "none" : preselect}
         />
       ) : null}
       <Field label="Descrição (opcional)" name="description" defaultValue={record?.description ?? ""} />
@@ -228,10 +228,10 @@ export function ExpenseDialog({
       <Field label="Data" name="date" type="date" required defaultValue={record?.date ?? todayISO()} />
       {options.length > 1 ? (
         <SelectField
-          label="Moto"
+          label="Moto (opcional)"
           name="motorcycle_id"
           options={options}
-          defaultValue={record?.motorcycle_id ?? preselect}
+          defaultValue={record ? record.motorcycle_id ?? "none" : preselect}
         />
       ) : null}
       <Field label="Descrição (opcional)" name="description" defaultValue={record?.description ?? ""} />
@@ -336,10 +336,10 @@ export function FuelDialog({
       <Field label="Data (opcional)" name="date" type="date" defaultValue={record?.date ?? todayISO()} />
       {options.length > 1 ? (
         <SelectField
-          label="Moto"
+          label="Moto (opcional)"
           name="motorcycle_id"
           options={options}
-          defaultValue={record?.motorcycle_id ?? preselect}
+          defaultValue={record ? record.motorcycle_id ?? "none" : preselect}
         />
       ) : (
         <input type="hidden" name="motorcycle_id" value={record?.motorcycle_id ?? preselect} />
@@ -570,10 +570,10 @@ export function DocumentDialog({
       </div>
       {options.length > 1 ? (
         <SelectField
-          label="Moto"
+          label="Moto (opcional)"
           name="motorcycle_id"
           options={options}
-          defaultValue={record?.motorcycle_id ?? preselect}
+          defaultValue={record ? record.motorcycle_id ?? "none" : preselect}
         />
       ) : null}
       <Field label="Observação" name="description" defaultValue={record?.description ?? ""} />
