@@ -249,3 +249,16 @@
 @utility home-count { animation: home-rise .6s .1s ease-out both; }
 @utility home-bar { transform-origin: left; animation: home-bar .9s .2s cubic-bezier(.2,.8,.2,1) both; }
 @utility home-pulse { animation: home-pulse 1.6s ease-in-out infinite; }
+
+/* Relatórios — entrada narrativa */
+@utility report-reveal {
+  opacity: 0;
+  transform: translateY(14px) scale(0.99);
+  transition: opacity .6s ease-out, transform .6s cubic-bezier(.2,.8,.2,1);
+  &.is-in { opacity: 1; transform: none; }
+}
+@keyframes report-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@utility report-grow { transform-origin: left; animation: report-grow .9s cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .report-reveal { opacity: 1; transform: none; }
+}
