@@ -214,6 +214,7 @@ function Onboarding() {
           <EntryProgress step={step} total={3} />
 
           {step === 0 ? (
+            <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="name">Nome completo *</Label>
                 <Input
