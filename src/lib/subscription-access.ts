@@ -9,7 +9,9 @@ const NO_ACCESS: SubscriptionAccess = {
   hasAppAccess: false,
   demo: false,
   mode: "blocked",
-  demoUsage: { incomeUsed: false, expenseUsed: false, welcomed: false },
+  demoExpired: false,
+  demoStartedAt: null,
+  demoExpiresAt: null,
   subscription: null,
 };
 

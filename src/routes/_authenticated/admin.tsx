@@ -1,3 +1,4 @@
+import { demoRemainingLabel } from "@/lib/demo";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
@@ -118,14 +119,14 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
         {section === "users" && <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,.65fr)_minmax(0,.75fr)_minmax(0,1.4fr)] gap-3 px-4 py-3 text-xs font-semibold text-muted-foreground lg:grid"><span>Nome</span><span>E-mail</span><span>WhatsApp</span><span>Acesso</span><span>Plano</span><span>Status</span><span>Ações</span></div>}
         {section === "users" && data.users.map((user) => {
           const subscription = subscriptionsByUser.get(user.id);
-          const access = user.admin ? "Admin" : user.ambassador ? "Embaixador" : user.subscribed ? "Assinante" : user.demo ? "Demonstração" : "Sem assinatura ativa";
+          const access = user.admin ? "Admin" : user.ambassador ? "Embaixador" : user.subscribed ? "Assinante" : user.demo && user.demoExpiresAt ? (new Date(user.demoExpiresAt).getTime() > Date.now() ? "Demonstração" : "Demonstração expirada") : "Sem assinatura ativa";
           const plan = subscription ? ({ monthly: "Start", quarterly: "Pro", annual: "Elite" } as const)[subscription.plan] : "—";
           const status = subscription ? subscriptionStatus(subscription.provider_status === "pending" && subscription.status !== "pending" ? subscription.status : subscription.provider_status) : "—";
           return <div key={user.id} className="grid min-w-0 grid-cols-2 items-start gap-x-3 gap-y-3 p-4 text-sm lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,.65fr)_minmax(0,.75fr)_minmax(0,1.4fr)] lg:items-center">
             <div className="col-span-2 min-w-0 lg:col-span-1"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Nome</span><p className="break-words font-semibold">{user.name || "Usuário"}</p></div>
             <div className="col-span-2 min-w-0 lg:col-span-1"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">E-mail</span><p className="break-all">{user.email || "E-mail não informado"}</p></div>
             <div className="col-span-2 min-w-0 lg:col-span-1"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">WhatsApp</span><p className="break-all tabular-nums">{displayProfilePhone(user.phone)}</p></div>
-            <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Acesso</span><p className="break-words">{access}</p>{user.demo && <p className="mt-1 text-xs text-muted-foreground">Ganhos {user.incomeUsed ? 1 : 0}/1 · Gastos {user.expenseUsed ? 1 : 0}/1</p>}{user.referral && <p className="mt-1 break-all text-xs text-muted-foreground">Indicação: {user.referral}</p>}</div>
+            <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Acesso</span><p className="break-words">{access}</p>{user.demo && user.demoStartedAt && !user.subscribed && <p className="mt-1 text-xs text-muted-foreground">{new Date(user.demoStartedAt).toLocaleString("pt-BR")} → {new Date(user.demoExpiresAt ?? user.demoStartedAt).toLocaleString("pt-BR")}{demoRemainingLabel(user.demoExpiresAt, Date.now())?.expired === false ? ` · ${demoRemainingLabel(user.demoExpiresAt, Date.now())?.text}` : ""}</p>}{user.referral && <p className="mt-1 break-all text-xs text-muted-foreground">Indicação: {user.referral}</p>}</div>
             <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Plano</span><p>{plan}</p></div>
             <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground lg:hidden">Status</span><p className="break-words">{status}</p></div>
             <div className="col-span-2 min-w-0 lg:col-span-1"><Button variant="outline" className="h-auto min-h-12 w-full whitespace-normal text-center" onClick={() => setPendingUser(user)}>{user.ambassador ? "Remover acesso de embaixador" : "Tornar embaixador"}</Button></div>

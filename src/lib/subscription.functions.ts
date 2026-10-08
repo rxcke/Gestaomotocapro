@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { accessMode, type AccessMode, type DemoUsage } from "./demo";
+import { accessMode, type AccessMode } from "./demo";
 
 export type SubscriptionPlan = "monthly" | "quarterly" | "annual";
 export type SubscriptionStatus = "pending" | "trial" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
@@ -28,9 +28,12 @@ export type SubscriptionAccess = {
   admin: boolean;
   ambassador: boolean;
   hasAppAccess: boolean;
+  /** Unexpired 24h demo, timed by the database. */
   demo: boolean;
+  demoExpired: boolean;
+  demoStartedAt: string | null;
+  demoExpiresAt: string | null;
   mode: AccessMode;
-  demoUsage: DemoUsage;
   subscription: SubscriptionView | null;
 };
 
@@ -51,7 +54,7 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
         .eq("user_id", context.userId)
         .maybeSingle(),
       context.supabase.rpc("has_demo_access", { _user_id: context.userId }),
-      context.supabase.from("demo_usage").select("income_used,expense_used,welcomed_at").eq("user_id", context.userId).maybeSingle(),
+      context.supabase.from("demo_usage").select("demo_started_at,demo_expires_at").eq("user_id", context.userId).maybeSingle(),
     ]);
 
     if (trialResult.error || accessResult.error || roleResult.error || ambassadorResult.error || appAccessResult.error || subscriptionResult.error || demoResult.error || usageResult.error) {
@@ -66,8 +69,10 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
       ambassador: Boolean(ambassadorResult.data),
       hasAppAccess: Boolean(appAccessResult.data),
       demo: Boolean(demoResult.data),
-      mode: accessMode({ active: Boolean(accessResult.data), trial: Boolean(trialResult.data), admin: Boolean(roleResult.data), ambassador: Boolean(ambassadorResult.data), demo: Boolean(demoResult.data) }),
-      demoUsage: { incomeUsed: Boolean(usageResult.data?.income_used), expenseUsed: Boolean(usageResult.data?.expense_used), welcomed: Boolean(usageResult.data?.welcomed_at) },
+      demoExpired: !appAccessResult.data && !demoResult.data && Boolean(usageResult.data?.demo_expires_at),
+      demoStartedAt: usageResult.data?.demo_started_at ?? null,
+      demoExpiresAt: usageResult.data?.demo_expires_at ?? null,
+      mode: accessMode({ active: Boolean(accessResult.data), admin: Boolean(roleResult.data), ambassador: Boolean(ambassadorResult.data), demoActive: Boolean(demoResult.data), demoExpired: !appAccessResult.data && !demoResult.data && Boolean(usageResult.data?.demo_expires_at) }),
       subscription: row
         ? {
             id: row.id,
