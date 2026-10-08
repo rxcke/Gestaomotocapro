@@ -262,3 +262,23 @@
 @media (prefers-reduced-motion: reduce) {
   .report-reveal { opacity: 1; transform: none; }
 }
+
+/* Landing — apresentação */
+@keyframes lp-phone { from { opacity: 0; transform: translateY(40px) rotate(-4deg) scale(.96); } to { opacity: 1; transform: rotate(-4deg); } }
+@keyframes lp-pop { from { opacity: 0; transform: translateY(12px) scale(.94); } to { opacity: 1; transform: none; } }
+@utility lp-phone { animation: lp-phone .9s cubic-bezier(.2,.8,.2,1) both; }
+@utility lp-pop { animation: lp-pop .6s cubic-bezier(.2,.8,.2,1) both; }
+@utility lp-screen {
+  background:
+    radial-gradient(120% 70% at 0% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 60%),
+    var(--background);
+}
+@utility lp-glow {
+  background: radial-gradient(circle, color-mix(in oklab, var(--accent) 28%, transparent), transparent 65%);
+  filter: blur(30px);
+}
+@utility lp-grid {
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+}
