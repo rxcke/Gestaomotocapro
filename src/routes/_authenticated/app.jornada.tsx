@@ -139,22 +139,25 @@ function JourneyPage() {
   return <div className="space-y-6">
     <PageTitle title="Jornada" subtitle="Tempo, lucro e rendimento do seu trabalho." />
     {active ? <>
-      <h2 className="font-display text-lg font-bold">Jornada atual</h2>
-      <GlassCard className="text-center">
-        <p className="text-sm text-muted-foreground">{pauses.isLoading ? "Carregando estado da jornada..." : pauses.isError ? "Não foi possível consultar a pausa. Atualize a página." : paused ? "Jornada pausada" : "Jornada em andamento"}</p>
-        <p className="num-display mt-3 text-5xl">{durationLabel(elapsed)}</p>
-        <p className="mt-2 text-sm text-muted-foreground">Iniciada em {dateTimeBR(active.start_time)}</p>
-        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          <Stat className="p-3 sm:p-4" valueClassName="overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:truncate sm:text-xl" label="Ganhos" value={brl(sessionIncome)} tone="positive" />
-          <Stat className="p-3 sm:p-4" valueClassName="overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:truncate sm:text-xl" label="Gastos" value={brl(sessionExpense)} tone="negative" />
-          <Stat className="col-span-2 p-3 sm:col-span-1 sm:p-4" valueClassName="overflow-visible text-clip whitespace-normal break-words text-base leading-tight sm:truncate sm:text-xl" label="Lucro/hora" value={brl(hourly)} tone={hourly >= 0 ? "positive" : "negative"} />
+      <section className={`home-journey home-rise rounded-3xl p-5 sm:p-7 ${paused ? "is-paused" : ""}`} aria-label="Jornada atual">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]">
+          <span className={`size-2.5 rounded-full ${paused ? "bg-warning" : "bg-positive home-pulse"}`} />
+          <span className={paused ? "text-warning" : "text-positive"}>{pauses.isLoading ? "Carregando estado da jornada..." : pauses.isError ? "Não foi possível consultar a pausa. Atualize a página." : paused ? "Seu corre está pausado" : "Seu corre está rodando"}</span>
         </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-          <div className="space-y-1.5 text-left"><Label htmlFor="end-km">KM ao encerrar</Label><Input id="end-km" type="number" inputMode="decimal" className="h-12 text-base" value={endKm} onChange={(e) => setEndKm(e.target.value)} /></div>
-          <Button variant="outline" className="h-12" disabled={changePause.isPending || save.isPending || pauses.isLoading || pauses.isError} onClick={() => active && changePause.mutate({ sessionId: active.id, pause: !paused })}>{paused ? <Play className="mr-2 size-4" /> : <Pause className="mr-2 size-4" />}{paused ? "Retomar" : "Pausar"}</Button>
-          <Button className="h-12" onClick={finish} disabled={save.isPending || changePause.isPending || pauses.isLoading || pauses.isError}><Square className="mr-2 size-4" />Encerrar</Button>
+        <p className="num-display mt-4 text-5xl font-extrabold sm:text-6xl">{durationLabel(elapsed)}</p>
+        <p className="mt-1 text-sm text-muted-foreground">trabalhadas, sem contar pausas · início {dateTimeBR(active.start_time)}</p>
+        <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+          <div className="min-w-0"><p className="num-display break-words text-lg text-positive">{brl(sessionIncome)}</p><p className="text-xs text-muted-foreground">ganhos</p></div>
+          <div className="min-w-0"><p className="num-display break-words text-lg text-negative">{brl(sessionExpense)}</p><p className="text-xs text-muted-foreground">gastos</p></div>
+          <div className="min-w-0"><p className={`num-display break-words text-lg ${sessionIncome - sessionExpense >= 0 ? "" : "text-negative"}`}>{brl(sessionIncome - sessionExpense)}</p><p className="text-xs text-muted-foreground">lucro</p></div>
+          <div className="min-w-0"><p className={`num-display break-words text-lg ${hourly >= 0 ? "text-accent" : "text-negative"}`}>{brl(hourly)}/h</p><p className="text-xs text-muted-foreground">lucro por hora</p></div>
         </div>
-      </GlassCard>
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <Button size="lg" variant={paused ? "default" : "secondary"} className="h-14 rounded-2xl text-base font-bold" disabled={changePause.isPending || save.isPending || pauses.isLoading || pauses.isError} onClick={() => active && changePause.mutate({ sessionId: active.id, pause: !paused })}>{paused ? <Play className="mr-2 size-4" /> : <Pause className="mr-2 size-4" />}{changePause.isPending ? "Salvando..." : paused ? "Retomar" : "Pausar"}</Button>
+          <Button size="lg" variant="ghost" className="h-14 rounded-2xl text-base font-bold text-negative hover:text-negative" onClick={finish} disabled={save.isPending || changePause.isPending || pauses.isLoading || pauses.isError}><Square className="mr-2 size-4" />{save.isPending ? "Encerrando..." : "Encerrar"}</Button>
+        </div>
+        <div className="mt-4 space-y-1.5"><Label htmlFor="end-km" className="text-xs text-muted-foreground">KM ao encerrar (opcional)</Label><Input id="end-km" type="number" inputMode="decimal" className="h-12 rounded-2xl text-base" value={endKm} onChange={(e) => setEndKm(e.target.value)} /></div>
+      </section>
       <section><h2 className="mb-3 font-display text-lg font-bold">Registrar durante a jornada</h2><QuickActions sessionId={active.id} /></section>
     </> : <GlassCard>
       {sessions.isLoading ? <p className="text-center text-muted-foreground">Carregando jornada...</p> : sessions.isError ? <p className="text-center text-muted-foreground">Não foi possível consultar sua jornada. Atualize a página para tentar novamente.</p> :
