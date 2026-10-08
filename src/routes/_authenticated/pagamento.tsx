@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Clock3 } from "lucide-react";
-import { AmbientBackground, GlassCard } from "@/components/glass";
-import { Logo } from "@/components/Logo";
+import { EntryShell } from "@/components/EntryShell";
 import { Button } from "@/components/ui/button";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
@@ -31,5 +30,8 @@ function PaymentReturnPage() {
   }, []);
   const access = useQuery({ queryKey: ["subscription", "access"], queryFn: () => fetchSubscriptionAccessWhenAuthenticated(fetchAccess), refetchInterval: (query) => query.state.data?.active || pollExpired ? false : 5000 });
   const active = access.data?.active ?? false;
-  return <div className="relative flex min-h-dvh items-center justify-center bg-canvas px-5 py-10 text-foreground"><AmbientBackground /><div className="relative w-full max-w-lg"><div className="mb-7 flex justify-center"><Logo /></div><GlassCard className="text-center">{active ? <CheckCircle2 className="mx-auto size-11 text-positive" /> : <Clock3 className="mx-auto size-11 text-warning" />}<h1 className="mt-5 font-display text-2xl font-bold">{active ? "Pagamento confirmado! 🎉" : pollExpired ? "A confirmação ainda não chegou" : "Estamos confirmando seu pagamento"}</h1><p className="mt-3 text-sm text-muted-foreground">{active ? "Sua assinatura do Gestão Motoca Pro está ativa." : pollExpired ? "Você pode verificar novamente. Seu acesso será liberado assim que a Cakto confirmar." : "Assim que a Cakto confirmar, seu acesso será liberado automaticamente."}</p><div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">{active ? <Button asChild><Link to="/app">Continuar</Link></Button> : <Button disabled={access.isFetching} onClick={() => void access.refetch()}>{access.isFetching ? "Verificando..." : "Verificar pagamento novamente"}</Button>}<Button asChild variant="outline"><Link to="/planos">Ver planos</Link></Button></div></GlassCard></div></div>;
+  return <EntryShell eyebrow={active ? "Assinatura ativa" : "Pagamento"} title={active ? "Pagamento recebido. 🏍️" : pollExpired ? "A confirmação ainda não chegou." : "Estamos confirmando seu pagamento."} subtitle={active ? "Seu acesso ao Gestão Motoca Pro está liberado." : pollExpired ? "Você pode verificar novamente. Seu acesso é liberado assim que a confirmação chegar." : "Isso pode levar alguns instantes. Esta tela atualiza sozinha."} stepKey={active ? 1 : pollExpired ? 2 : 0}>
+    <div className={active ? "lp-pop flex size-16 items-center justify-center rounded-full bg-positive/15 text-positive" : "flex size-16 items-center justify-center rounded-full bg-secondary text-warning"}>{active ? <CheckCircle2 className="size-8" /> : <Clock3 className={pollExpired ? "size-8" : "size-8 animate-pulse"} />}</div>
+    <div className="mt-8 flex flex-col gap-3">{active ? <Button asChild className="h-14 rounded-full text-sm font-bold uppercase tracking-wider"><Link to="/app">Entrar no meu app</Link></Button> : <Button className="h-14 rounded-full text-sm font-bold uppercase tracking-wider" disabled={access.isFetching} onClick={() => void access.refetch()}>{access.isFetching ? "Verificando..." : "Atualizar status"}</Button>}{active ? null : <Button asChild variant="ghost" className="h-12 rounded-full"><Link to="/planos">Ver planos</Link></Button>}</div>
+  </EntryShell>;
 }
