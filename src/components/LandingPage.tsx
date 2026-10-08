@@ -201,7 +201,7 @@ export function LandingPage() {
           </nav>
           <div className="ml-4 hidden items-center gap-2 lg:flex">
             <Button asChild variant="ghost" className="h-12"><Link to="/auth" onClick={() => trackClick("Entrar")}>Entrar</Link></Button>
-            <Button asChild className="h-12 px-5"><Link to="/auth" search={{ mode: "signup" }} onClick={() => trackClick("Começar agora")}>Começar agora</Link></Button>
+            <Button asChild className="h-12 px-5"><Link to="/auth" search={{ mode: "signup" }} onClick={() => trackClick("Começar demonstração")}>Começar demonstração</Link></Button>
           </div>
           <Button type="button" variant="ghost" size="icon" className="size-12 shrink-0 lg:hidden" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
             {menuOpen ? <X /> : <Menu />}
@@ -213,7 +213,7 @@ export function LandingPage() {
               {NAV_ITEMS.map((item) => <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className="flex min-h-12 items-center border-b border-border text-sm font-semibold">{item.label}</a>)}
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <Button asChild variant="outline" className="h-12"><Link to="/auth">Entrar</Link></Button>
-                <Button asChild className="h-12"><Link to="/auth" search={{ mode: "signup" }}>Começar agora</Link></Button>
+                <Button asChild className="h-12"><Link to="/auth" search={{ mode: "signup" }}>Começar demonstração</Link></Button>
               </div>
             </nav>
           </div>
@@ -235,7 +235,7 @@ export function LandingPage() {
                 O Gestão Motoca Pro ajuda você a controlar seus ganhos, gastos, combustível e manutenção em poucos segundos. Sem planilhas e sem complicação.
               </p>
               <div className="mt-8 grid gap-3 sm:flex">
-                <Button asChild size="lg" className="h-14 w-full px-7 text-base sm:w-auto"><Link to="/auth" search={{ mode: "signup" }} onClick={() => trackClick("Quero assinar")}>Quero assinar<ArrowRight /></Link></Button>
+                <Button asChild size="lg" className="h-14 w-full px-7 text-base sm:w-auto"><Link to="/auth" search={{ mode: "signup" }} onClick={() => trackClick("Experimentar gratuitamente")}>Experimentar gratuitamente<ArrowRight /></Link></Button>
                 <Button asChild size="lg" variant="outline" className="h-14 w-full px-7 text-base sm:w-auto"><a href="#como-funciona">Ver como funciona<ArrowDown /></a></Button>
               </div>
               <div className="mt-7 flex flex-wrap gap-x-5 gap-y-3 text-xs font-medium text-muted-foreground">
@@ -338,7 +338,7 @@ export function LandingPage() {
             <Clock3 className="mx-auto size-9 text-accent" />
             <h2 className="mt-6 text-3xl leading-tight font-bold sm:text-5xl">Você já coloca a moto na rua todos os dias. Agora coloque seu dinheiro sob controle.</h2>
             <p className="mt-5 text-muted-foreground">Gestão Motoca Pro — Seu corre sob controle.</p>
-            <Button asChild size="lg" className="mt-8 h-14 w-full px-8 text-base sm:w-auto"><Link to="/auth" search={{ mode: "signup" }}>Começar agora<ArrowRight /></Link></Button>
+            <Button asChild size="lg" className="mt-8 h-14 w-full px-8 text-base sm:w-auto"><Link to="/auth" search={{ mode: "signup" }}>Começar demonstração<ArrowRight /></Link></Button>
           </div>
         </section>
       </main>

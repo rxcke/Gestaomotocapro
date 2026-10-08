@@ -15,6 +15,7 @@ import { brl, dateTimeBR, durationLabel, shortDuration } from "@/lib/format";
 import type { WorkSession } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { workedDuration } from "@/lib/work-duration";
+import { useAccess, openUpgrade } from "@/lib/use-access";
 import { startOrResumeSession } from "@/lib/start-work-session";
 
 export const Route = createFileRoute("/_authenticated/app/jornada")({
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/app/jornada")({
 
 function JourneyPage() {
   const data = useScopedData();
+  const access = useAccess();
   const { activeMoto } = useApp();
   // A jornada aberta pertence ao usuário, não ao filtro de moto (ela pode até não ter moto).
   const sessions = useWorkSessions();
@@ -113,6 +115,7 @@ function JourneyPage() {
   const hourly = elapsed > 0 ? sessionNet / (elapsed / 3600000) : 0;
 
   const start = () => {
+    if (!access.data?.hasAppAccess) { openUpgrade(); return; }
     if (starting.current || startSession.isPending || sessions.isLoading || sessions.isError || active) return;
     starting.current = true;
     startSession.mutate();

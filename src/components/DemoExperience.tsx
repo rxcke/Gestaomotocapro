@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Stat } from "./glass";
 import { useAccess, openUpgrade } from "@/lib/use-access";
 import { startDemo, recordSignupAttribution } from "@/lib/demo.functions";
-import { campaignParameters } from "@/lib/tracking";
+import { captureAttribution, campaignParameters } from "@/lib/tracking";
 import { useExpenses, useIncomes } from "@/lib/data";
 import { demoResult } from "@/lib/demo";
 import { brl } from "@/lib/format";
@@ -23,6 +23,7 @@ export function DemoExperience() {
   useEffect(() => {
     const open = () => setUpgrade(true);
     window.addEventListener("gmp:open-upgrade", open);
+    captureAttribution();
     void recordAttribution({ data: { campaign: campaignParameters() } }).catch(() => {});
     return () => window.removeEventListener("gmp:open-upgrade", open);
   }, [recordAttribution]);
@@ -34,7 +35,7 @@ export function DemoExperience() {
       <Button variant="outline" onClick={openUpgrade}>Desbloquear acesso completo</Button>
     </section>}
     <Dialog open={Boolean(demo && !usage?.welcomed)}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md" showCloseButton={false} onEscapeKeyDown={e => e.preventDefault()} onPointerDownOutside={e => e.preventDefault()}>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md [&>button:last-child]:hidden" onEscapeKeyDown={e => e.preventDefault()} onInteractOutside={e => e.preventDefault()} onPointerDownOutside={e => e.preventDefault()}>
         <DialogHeader><DialogTitle className="font-display text-2xl">Bem-vindo ao Gestão Motoca Pro.</DialogTitle><DialogDescription>Conheça como funciona o controle do seu corre antes de desbloquear a plataforma completa.</DialogDescription></DialogHeader>
         <p className="text-sm text-muted-foreground">Experimente com 1 ganho e 1 gasto reais. Sem cartão, sem assinatura e sem prazo.</p>
         <Button disabled={starting} className="h-auto min-h-12 whitespace-normal" onClick={async () => {

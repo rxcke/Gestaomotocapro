@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { Logo } from "./Logo";
 import { AmbientBackground } from "./glass";
 import { useApp, ALL_MOTOS } from "@/lib/app-context";
+import { useAccess } from "@/lib/use-access";
 import { useProfile } from "@/lib/data";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,8 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const profile = useProfile();
-  const isPro = profile.data?.is_professional ?? false;
+  const access = useAccess();
+  const isPro = (profile.data?.is_professional ?? false) || Boolean(access.data?.demo);
 
   const items = [...NAV];
   const extra = [
