@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useAccess, openUpgrade } from "@/lib/use-access";
+import { canDemoWrite } from "@/lib/demo";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,13 @@ export function FormDialog({
   actionClassName?: string;
   children: ReactNode;
 }) {
+  const access = useAccess();
+  const table = title === "Adicionar ganho" ? "incomes" : title === "Adicionar gasto" ? "expenses" : "blocked";
+  const blocked = Boolean(access.data && !access.data.hasAppAccess && (!access.data.demo || !canDemoWrite(table, "insert", access.data.demoUsage)));
+  useEffect(() => {
+    if (open && blocked) { onOpenChange(false); openUpgrade(); }
+  }, [open, blocked, onOpenChange]);
+  if (open && blocked) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">

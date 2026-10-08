@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      demo_usage: {
+        Row: {
+          created_at: string
+          expense_id: string | null
+          expense_used: boolean
+          income_id: string | null
+          income_used: boolean
+          updated_at: string
+          user_id: string
+          welcomed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          expense_id?: string | null
+          expense_used?: boolean
+          income_id?: string | null
+          income_used?: boolean
+          updated_at?: string
+          user_id: string
+          welcomed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          expense_id?: string | null
+          expense_used?: boolean
+          income_id?: string | null
+          income_used?: boolean
+          updated_at?: string
+          user_id?: string
+          welcomed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           amount: number | null
@@ -539,6 +580,35 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_attribution: {
+        Row: {
+          campaign: Json
+          created_at: string
+          referral_code: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign?: Json
+          created_at?: string
+          referral_code?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign?: Json
+          created_at?: string
+          referral_code?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signup_attribution_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           cakto_offer_id: string | null
@@ -763,6 +833,7 @@ export type Database = {
     Functions: {
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_app_access: { Args: { _user_id: string }; Returns: boolean }
+      has_demo_access: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -827,6 +898,7 @@ export type Database = {
         Args: { _pause: boolean; _session_id: string }
         Returns: undefined
       }
+      start_demo: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "ambassador"

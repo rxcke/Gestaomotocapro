@@ -8,7 +8,7 @@ let region = "XX";
 let initialized = false;
 let active = false;
 let lastPage = "";
-const UTMS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid"] as const;
+const UTMS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "ref", "ambassador"] as const;
 
 export function captureAttribution() {
   try {

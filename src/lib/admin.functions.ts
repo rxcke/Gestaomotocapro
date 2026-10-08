@@ -8,14 +8,17 @@ type AdminOwner = {
 };
 
 export type AdminData = {
-  users: Array<{ id: string; name: string | null; email: string | null; phone: string | null; admin: boolean; ambassador: boolean; subscribed: boolean }>;
+  users: Array<{ id: string; name: string | null; email: string | null; phone: string | null; admin: boolean; ambassador: boolean; subscribed: boolean; demo: boolean; incomeUsed: boolean; expenseUsed: boolean; referral: string | null }>;
   subscriptions: Array<{
     id: string;
     user_id: string;
     email: string;
     plan: "monthly" | "quarterly" | "annual";
-    status: "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
+    status: "trial" | "pending" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
     provider_status: string;
+    trial_started_at: string | null;
+    trial_ends_at: string | null;
+    recurring_amount: number | null;
     cakto_transaction_id: string | null;
     started_at: string | null;
     expires_at: string | null;
@@ -83,7 +86,7 @@ export const getAdminData = createServerFn({ method: "GET" })
     if (roleError || !isAdmin) throw new Error("Acesso administrativo não autorizado.");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [motorcyclesResult, incomesResult, expensesResult, fuelResult, profilesResult, rolesResult, subscriptionsResult, eventsResult] =
+    const [motorcyclesResult, incomesResult, expensesResult, fuelResult, profilesResult, rolesResult, subscriptionsResult, eventsResult, demoResult, attributionResult] =
       await Promise.all([
         supabaseAdmin
           .from("motorcycles")
@@ -109,6 +112,8 @@ export const getAdminData = createServerFn({ method: "GET" })
         supabaseAdmin.from("user_roles").select("user_id,role").in("role", ["admin", "ambassador"]).limit(500),
         supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at,trial_started_at,trial_ends_at,recurring_amount").order("created_at", { ascending: false }).limit(500),
         supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
+        supabaseAdmin.from("demo_usage").select("user_id,income_used,expense_used").limit(500),
+        supabaseAdmin.from("signup_attribution").select("user_id,referral_code").limit(500),
       ]);
 
     const error =
@@ -119,7 +124,7 @@ export const getAdminData = createServerFn({ method: "GET" })
       profilesResult.error ??
       rolesResult.error ??
       subscriptionsResult.error ??
-      eventsResult.error;
+      eventsResult.error ?? demoResult.error ?? attributionResult.error;
     if (error) throw new Error("Não foi possível carregar os dados administrativos.");
 
     const owners = Object.fromEntries(
@@ -132,8 +137,11 @@ export const getAdminData = createServerFn({ method: "GET" })
     const admins = new Set((rolesResult.data ?? []).filter((role) => role.role === "admin").map((role) => role.user_id));
     const subscribers = new Set((subscriptionsResult.data ?? []).filter((row) => row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() > Date.now()).map((row) => row.user_id));
 
+    const demoByUser = new Map((demoResult.data ?? []).map(row => [row.user_id,row]));
+    const referralByUser = new Map((attributionResult.data ?? []).map(row => [row.user_id,row.referral_code]));
+    const blocked = new Set((subscriptionsResult.data ?? []).filter(row => ["active","trial","canceled","expired","refunded","chargeback"].includes(row.status) || ["late","paused"].includes(row.provider_status)).map(row => row.user_id));
     return {
-      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, admin: admins.has(profile.id), ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id) })),
+      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, admin: admins.has(profile.id), ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id), demo: !admins.has(profile.id) && !ambassadors.has(profile.id) && !blocked.has(profile.id), incomeUsed: Boolean(demoByUser.get(profile.id)?.income_used), expenseUsed: Boolean(demoByUser.get(profile.id)?.expense_used), referral: referralByUser.get(profile.id) ?? null })),
       motorcycles: motorcyclesResult.data ?? [],
       incomes: incomesResult.data ?? [],
       expenses: expensesResult.data ?? [],

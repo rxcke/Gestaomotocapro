@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { accessMode, type AccessMode, type DemoUsage } from "./demo";
 
 export type SubscriptionPlan = "monthly" | "quarterly" | "annual";
 export type SubscriptionStatus = "pending" | "trial" | "active" | "canceled" | "expired" | "refunded" | "chargeback";
@@ -27,6 +28,9 @@ export type SubscriptionAccess = {
   admin: boolean;
   ambassador: boolean;
   hasAppAccess: boolean;
+  demo: boolean;
+  mode: AccessMode;
+  demoUsage: DemoUsage;
   subscription: SubscriptionView | null;
 };
 
@@ -35,7 +39,7 @@ const CheckoutInput = z.object({ plan: z.enum(["monthly", "quarterly", "annual"]
 export const getSubscriptionAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SubscriptionAccess> => {
-    const [trialResult, accessResult, roleResult, ambassadorResult, appAccessResult, subscriptionResult] = await Promise.all([
+    const [trialResult, accessResult, roleResult, ambassadorResult, appAccessResult, subscriptionResult, demoResult, usageResult] = await Promise.all([
       context.supabase.rpc("has_valid_trial", { _user_id: context.userId }),
       context.supabase.rpc("has_active_subscription", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
@@ -46,9 +50,11 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
         .select("id,plan,status,provider_status,started_at,expires_at,canceled_at,cakto_subscription_id,trial_started_at,trial_ends_at,recurring_amount")
         .eq("user_id", context.userId)
         .maybeSingle(),
+      context.supabase.rpc("has_demo_access", { _user_id: context.userId }),
+      context.supabase.from("demo_usage").select("income_used,expense_used,welcomed_at").eq("user_id", context.userId).maybeSingle(),
     ]);
 
-    if (trialResult.error || accessResult.error || roleResult.error || ambassadorResult.error || appAccessResult.error || subscriptionResult.error) {
+    if (trialResult.error || accessResult.error || roleResult.error || ambassadorResult.error || appAccessResult.error || subscriptionResult.error || demoResult.error || usageResult.error) {
       throw new Error("Não foi possível consultar sua assinatura.");
     }
 
@@ -59,6 +65,9 @@ export const getSubscriptionAccess = createServerFn({ method: "GET" })
       admin: Boolean(roleResult.data),
       ambassador: Boolean(ambassadorResult.data),
       hasAppAccess: Boolean(appAccessResult.data),
+      demo: Boolean(demoResult.data),
+      mode: accessMode({ active: Boolean(accessResult.data), trial: Boolean(trialResult.data), admin: Boolean(roleResult.data), ambassador: Boolean(ambassadorResult.data), demo: Boolean(demoResult.data) }),
+      demoUsage: { incomeUsed: Boolean(usageResult.data?.income_used), expenseUsed: Boolean(usageResult.data?.expense_used), welcomed: Boolean(usageResult.data?.welcomed_at) },
       subscription: row
         ? {
             id: row.id,

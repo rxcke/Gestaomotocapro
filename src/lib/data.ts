@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAccess, openUpgrade } from "./use-access";
+import { canDemoWrite } from "./demo";
 import type {
   AppDocument,
   Expense,
@@ -84,14 +86,24 @@ export function useInvalidateAll() {
 
 type MutationOptions = { successMessage?: string; onDone?: () => void };
 
+function reportWriteError(error: Error) {
+  if (error.message === "demo_blocked" || error.message.includes("demo_limit_reached") || error.message.includes("demo_input_forbidden")) {
+    openUpgrade();
+    return;
+  }
+  toast.error(error.message || "Não foi possível salvar.");
+}
+
 export function useUpsert<T extends Record<string, unknown>>(
   table: string,
   key: string,
   options: MutationOptions = {},
 ) {
   const qc = useQueryClient();
+  const access = useAccess();
   return useMutation({
     mutationFn: async (values: T & { id?: string }) => {
+      if (!access.data?.hasAppAccess && (!access.data?.demo || !canDemoWrite(table, values.id ? "update" : "insert", access.data.demoUsage))) throw new Error("demo_blocked");
       const uid = await currentUserId();
       const payload = { ...values, user_id: uid };
       const { data, error } = values.id
@@ -102,17 +114,20 @@ export function useUpsert<T extends Record<string, unknown>>(
     },
     onSuccess: () => {
       ALL_KEYS.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+      qc.invalidateQueries({ queryKey: ["subscription", "access"] });
       if (options.successMessage) toast.success(options.successMessage);
       options.onDone?.();
     },
-    onError: (error: Error) => toast.error(error.message || "Não foi possível salvar."),
+    onError: reportWriteError,
   });
 }
 
 export function useRemove(table: string, message = "Registro excluído.") {
   const qc = useQueryClient();
+  const access = useAccess();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!access.data?.hasAppAccess) throw new Error("demo_blocked");
       const { error } = await db.from(table).delete().eq("id", id);
       if (error) throw error;
       return id;
@@ -121,7 +136,7 @@ export function useRemove(table: string, message = "Registro excluído.") {
       ALL_KEYS.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
       toast.success(message);
     },
-    onError: (error: Error) => toast.error(error.message || "Não foi possível excluir."),
+    onError: reportWriteError,
   });
 }
 
