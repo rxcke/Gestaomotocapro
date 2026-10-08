@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Crown, LoaderCircle } from "lucide-react";
+import { Check, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
-import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock } from "@/components/glass";
+import { ErrorBlock, LoadingBlock } from "@/components/glass";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { getCheckoutUrl, getSubscriptionAccess, type SubscriptionPlan } from "@/lib/subscription.functions";
@@ -53,34 +53,42 @@ function PlansPage() {
   if (access.isLoading) return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><LoadingBlock label="Consultando sua assinatura..." /></div>;
   if (access.isError) return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><ErrorBlock message="Não foi possível consultar sua assinatura." /></div>;
 
-  return <div className="relative min-h-dvh bg-canvas px-4 py-7 text-foreground sm:px-6">
-    <AmbientBackground />
+  const hasPaidAccess = access.data?.hasAppAccess && !access.data.demo;
+  return <div className="dark relative min-h-dvh overflow-x-clip bg-background px-4 py-6 text-foreground sm:px-6">
+    <div className="lp-glow pointer-events-none absolute top-0 left-1/2 size-[560px] -translate-x-1/2" aria-hidden="true" />
     <main className="relative mx-auto max-w-5xl">
-      <div className="flex items-center justify-between gap-3"><Logo /><Button asChild variant="ghost"><Link to="/app/perfil">Perfil</Link></Button></div>
-      {(access.data?.demo || access.data?.demoExpired) && <div className="mt-6 text-center"><Button asChild variant="outline"><Link to="/app">Continuar explorando</Link></Button></div>}
-      <div className="mx-auto mt-10 max-w-2xl text-center">
-        <p className="text-sm font-semibold text-accent">GESTÃO MOTOCA PRO PREMIUM</p>
-        <h1 className="mt-3 font-display text-3xl font-bold sm:text-5xl">Controle total da sua moto e do seu dinheiro</h1>
-        <p className="mt-4 text-muted-foreground">Escolha o plano ideal. Tudo que você registrou na demonstração continua na sua conta após assinar.</p>
-      </div>
+      <div className="flex items-center justify-between gap-3"><Link to="/" aria-label="Gestão Motoca Pro — início"><Logo /></Link><div className="flex gap-1">{access.data?.demo || access.data?.demoExpired ? <Button asChild variant="ghost" className="rounded-full"><Link to="/app">Continuar explorando</Link></Button> : null}<Button asChild variant="ghost" className="rounded-full"><Link to="/app/perfil">Perfil</Link></Button></div></div>
 
-      {access.data?.hasAppAccess && !access.data.demo ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">{access.data.active ? "Sua assinatura está ativa" : "Seu acesso está liberado"}</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-3 md:items-stretch">
-         <PlanCard name="Start" price="R$ 29,90" period="/mês" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} />
-         <PlanCard name="Pro" price="R$ 69,90" period="/trimestre" plan="quarterly" featured loading={opening === "quarterly"} onSubscribe={subscribe} />
-         <PlanCard name="Elite" price="R$ 199,90" period="/ano" plan="annual" loading={opening === "annual"} onSubscribe={subscribe} />
-      </div>}
-      {access.data?.hasAppAccess && !access.data.demo ? null : <p className="mx-auto mt-6 max-w-2xl text-center text-sm leading-6 text-muted-foreground">Pagamento seguro pela Cakto. A demonstração é gratuita e não exige cartão.</p>}
+      {hasPaidAccess ? <section className="home-rise mx-auto mt-20 max-w-xl text-center">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">{access.data?.active ? "Assinatura ativa" : "Acesso liberado"}</p>
+        <h1 className="mt-3 font-display text-4xl font-extrabold sm:text-5xl">Seu acesso está ativo. <span className="text-accent">●</span></h1>
+        <p className="mt-4 text-muted-foreground">Você já tem todos os recursos do Gestão Motoca Pro.</p>
+        <Button className="mt-8 h-14 rounded-full px-8 text-sm font-bold uppercase tracking-wider" onClick={() => navigate({ to: "/app" })}>Entrar no app</Button>
+      </section> : <>
+        <section className="home-rise mx-auto mt-12 max-w-2xl text-center sm:mt-16">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">{access.data?.demoExpired ? "Demonstração encerrada" : access.data?.demo ? "Você está na demonstração" : "Planos"}</p>
+          <h1 className="mt-3 font-display text-[2.2rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">Escolha como você quer controlar seu corre.</h1>
+          <p className="mt-4 text-muted-foreground">{access.data?.demoExpired ? "Seus dados continuam aqui. Escolha um plano para continuar." : "Comece simples. Evolua quando quiser. Tudo que você já registrou continua na sua conta."}</p>
+        </section>
+        <div className="mt-12 grid gap-5 md:grid-cols-3 md:items-center">
+          <PlanCard name="Start" price="R$ 29,90" period="/mês" charge="Pagamento mensal" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} delay={0} />
+          <PlanCard name="Pro" price="R$ 69,90" period="/trimestre" charge="Pagamento trimestral" monthly="≈ R$ 23,30/mês" badge="🔥 Mais popular" plan="quarterly" featured loading={opening === "quarterly"} onSubscribe={subscribe} delay={100} />
+          <PlanCard name="Elite" price="R$ 199,90" period="/ano" charge="Pagamento anual" monthly="≈ R$ 16,66/mês" badge="🏆 Melhor custo-benefício" plan="annual" loading={opening === "annual"} onSubscribe={subscribe} delay={200} />
+        </div>
+        <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-6 text-muted-foreground">Todos os planos liberam o app completo. Pagamento seguro pela Cakto.</p>
+      </>}
     </main>
   </div>;
 }
 
-function PlanCard({ name, price, period, plan, featured = false, loading, onSubscribe }: { name: string; price: string; period: string; plan: SubscriptionPlan; featured?: boolean; loading: boolean; onSubscribe: (plan: SubscriptionPlan) => void }) {
-  return <GlassCard className={cn("relative flex h-full flex-col", featured && "border-accent/60 bg-glass-strong")}>
-    {featured ? <span className="absolute right-5 top-5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">ECONOMIZE</span> : null}
-    <h2 className="pr-28 font-display text-xl font-bold">{name}</h2>
-    <p className="mt-5 text-sm font-bold uppercase text-accent">Acesso completo</p>
-    <p><span className="num-display text-4xl">{price}</span><span className="text-sm text-muted-foreground">{period}</span></p>
-    <ul className="my-7 flex-1 space-y-3">{FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}</ul>
-    <Button className="h-12 w-full" variant={featured ? "default" : "outline"} disabled={loading} onClick={() => { trackClick(`Escolher ${name}`); onSubscribe(plan); }}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : `Escolher ${name}`}</Button>
-  </GlassCard>;
+function PlanCard({ name, price, period, charge, monthly, badge, plan, featured = false, loading, onSubscribe, delay }: { name: string; price: string; period: string; charge: string; monthly?: string; badge?: string; plan: SubscriptionPlan; featured?: boolean; loading: boolean; onSubscribe: (plan: SubscriptionPlan) => void; delay: number }) {
+  return <article style={{ animationDelay: `${delay}ms` }} className={cn("lp-pop relative flex flex-col rounded-[2rem] p-7", featured ? "bg-foreground text-background shadow-2xl md:py-10" : "border border-border bg-card")}>
+    {badge ? <span className={cn("absolute -top-3 left-7 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider", featured ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground")}>{badge}</span> : null}
+    <h2 className="text-sm font-bold uppercase tracking-[0.2em]">{name}</h2>
+    <p className="mt-5 flex items-end gap-1"><span className="num-display text-4xl">{price}</span><span className={cn("pb-1 text-sm", featured ? "text-background/60" : "text-muted-foreground")}>{period}</span></p>
+    <p className="mt-1 min-h-5 text-sm font-semibold text-accent">{monthly ?? ""}</p>
+    <p className={cn("mt-1 text-xs font-semibold uppercase tracking-wider", featured ? "text-background/60" : "text-muted-foreground")}>{charge}</p>
+    <ul className="my-7 flex-1 space-y-2.5">{FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}</ul>
+    <Button className={cn("h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider", featured ? "" : "")} variant={featured ? "default" : "outline"} disabled={loading} onClick={() => { trackClick(`Escolher ${name}`); onSubscribe(plan); }}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : `Assinar ${name}`}</Button>
+  </article>;
 }
