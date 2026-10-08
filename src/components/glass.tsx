@@ -20,7 +20,7 @@ export function GlassCard({
   className?: string;
   padded?: boolean;
 }) {
-  return <section className={cn("glass-panel", padded && "p-5 sm:p-6", className)}>{children}</section>;
+  return <section className={cn("glass-panel animate-in fade-in-0 slide-in-from-bottom-1 duration-300", padded && "p-5 sm:p-6", className)}>{children}</section>;
 }
 
 export function CardHeading({ title, action }: { title: ReactNode; action?: ReactNode }) {
@@ -54,7 +54,7 @@ export function Stat({
       <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
       <p
         className={cn(
-          "num-display mt-1 truncate text-xl",
+          "num-display mt-1 break-words text-lg leading-tight sm:text-xl",
           tone === "positive" && "text-positive",
           tone === "negative" && "text-negative",
           valueClassName,
@@ -87,9 +87,14 @@ export function EmptyState({
 
 export function LoadingBlock({ label = "Carregando..." }: { label?: string }) {
   return (
-    <div className="glass-soft flex items-center justify-center gap-3 px-6 py-10 text-sm text-muted-foreground">
-      <span className="size-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-      {label}
+    <div className="space-y-4" role="status" aria-live="polite">
+      <span className="sr-only">{label}</span>
+      <div className="h-36 animate-pulse rounded-lg bg-muted" />
+      <div className="grid grid-cols-2 gap-3">
+        <div className="h-20 animate-pulse rounded-md bg-muted" />
+        <div className="h-20 animate-pulse rounded-md bg-muted" />
+      </div>
+      <div className="h-28 animate-pulse rounded-lg bg-muted" />
     </div>
   );
 }

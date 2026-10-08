@@ -12,6 +12,8 @@ import {
   BarChart3,
   LogOut,
   ShieldCheck,
+  MoreHorizontal,
+  Target,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -32,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { authErrorMessage } from "@/lib/auth-errors";
 
 const NAV = [
@@ -57,6 +60,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(`${to}/`);
+
+  const mobileNav = [
+    NAV[0],
+    NAV[1],
+    isPro ? { to: "/app/jornada", label: "Jornada", icon: Timer, exact: false } : NAV[2],
+    { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false },
+  ];
+  const moreNav = [
+    ...(isPro ? [NAV[2]] : []),
+    NAV[3],
+    { to: "/app/metas", label: "Metas", icon: Target, exact: false },
+    NAV[4],
+  ];
+  const moreActive = moreNav.some((item) => isActive(item.to, false));
 
   return (
     <div className="relative min-h-dvh w-full bg-canvas text-foreground">
@@ -98,19 +115,53 @@ export function AppShell({ children }: { children: ReactNode }) {
           className="grid grid-cols-5 px-1 py-1.5"
           style={{ paddingBottom: "max(0.375rem, env(safe-area-inset-bottom))" }}
         >
-          {NAV.map((item) => (
+          {mobileNav.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               className={cn(
-                "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-medium",
+                "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-medium transition active:scale-95",
                 isActive(item.to, item.exact) ? "text-accent" : "text-muted-foreground",
+                isActive(item.to, item.exact) && "font-bold",
               )}
             >
               <item.icon className="size-5" />
               <span className="truncate">{item.label}</span>
             </Link>
           ))}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-medium transition active:scale-95",
+                  moreActive ? "text-accent" : "text-muted-foreground",
+                )}
+              >
+                <MoreHorizontal className="size-5" />
+                <span>Mais</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+              <SheetHeader><SheetTitle>Mais opções</SheetTitle></SheetHeader>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {moreNav.map((item) => (
+                  <SheetClose asChild key={item.to}>
+                    <Link
+                      to={item.to}
+                      className={cn(
+                        "flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition active:scale-[0.98]",
+                        isActive(item.to, false) ? "glass-soft text-accent" : "bg-muted/50 text-foreground",
+                      )}
+                    >
+                      <item.icon className="size-5 shrink-0" />
+                      {item.label}
+                    </Link>
+                  </SheetClose>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </nav>
     </div>
