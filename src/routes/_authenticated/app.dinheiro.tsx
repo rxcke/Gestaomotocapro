@@ -10,6 +10,7 @@ import { daysAgoPeriod, financeSummary, inPeriod, monthPeriod, type Period } fro
 import { useRemove } from "@/lib/data";
 import { brl, dateBR } from "@/lib/format";
 import type { Expense, Income } from "@/lib/types";
+import { useAccess } from "@/lib/use-access";
 
 export const Route = createFileRoute("/_authenticated/app/dinheiro")({
   head: () => ({ meta: [
@@ -27,6 +28,7 @@ type DialogState = { kind: "income"; record?: Income } | { kind: "expense"; reco
 
 function MoneyPage() {
   const data = useScopedData();
+  const full = Boolean(useAccess().data?.hasAppAccess);
   const [periodKey, setPeriodKey] = useState("month");
   const [dialog, setDialog] = useState<DialogState>(null);
   const removeIncome = useRemove("incomes", "Ganho excluído.");
@@ -72,9 +74,9 @@ function MoneyPage() {
             <TabsTrigger value="income">Ganhos</TabsTrigger>
             <TabsTrigger value="expense">Gastos</TabsTrigger>
           </TabsList>
-          <TabsContent value="all"><Ledger incomes={result.incomes} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} /></TabsContent>
-          <TabsContent value="income"><Ledger incomes={result.incomes} expenses={[]} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} /></TabsContent>
-          <TabsContent value="expense"><Ledger incomes={[]} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} /></TabsContent>
+          <TabsContent value="all"><Ledger incomes={result.incomes} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} /></TabsContent>
+          <TabsContent value="income"><Ledger incomes={result.incomes} expenses={[]} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} /></TabsContent>
+          <TabsContent value="expense"><Ledger incomes={[]} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} /></TabsContent>
         </Tabs>
       </GlassCard>
 
@@ -84,8 +86,8 @@ function MoneyPage() {
   );
 }
 
-function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense }: {
-  incomes: Income[]; expenses: Expense[]; onEdit: (v: DialogState) => void; onRemoveIncome: (id: string) => void; onRemoveExpense: (id: string) => void;
+function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense, full }: {
+  full: boolean; incomes: Income[]; expenses: Expense[]; onEdit: (v: DialogState) => void; onRemoveIncome: (id: string) => void; onRemoveExpense: (id: string) => void;
 }) {
   const rows = [
     ...incomes.map((r) => ({ ...r, kind: "income" as const })),
@@ -96,7 +98,7 @@ function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense }: 
     <div key={`${r.kind}-${r.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
       <div className="min-w-0"><p className="truncate text-sm font-semibold">{r.category}</p><p className="truncate text-xs text-muted-foreground">{dateBR(r.date)}{r.description ? ` · ${r.description}` : ""}</p></div>
       <div className="flex items-center gap-1"><span className={`mr-1 num-display text-sm ${r.kind === "income" ? "text-positive" : "text-negative"}`}>{r.kind === "income" ? "+" : "−"}{brl(r.amount)}</span>
-        {r.kind === "expense" && (r.fuel_record_id || r.maintenance_record_id) ? null : <>
+        {!full || (r.kind === "expense" && (r.fuel_record_id || r.maintenance_record_id)) ? null : <>
           <Button variant="ghost" size="icon" className="size-8" aria-label="Editar" onClick={() => onEdit(r.kind === "income" ? {kind:"income",record:r} : {kind:"expense",record:r})}><Pencil className="size-3.5" /></Button>
           <Button variant="ghost" size="icon" className="size-8 text-negative" aria-label="Excluir" onClick={() => { if (window.confirm("Excluir este lançamento?")) r.kind === "income" ? onRemoveIncome(r.id) : onRemoveExpense(r.id); }}><Trash2 className="size-3.5" /></Button>
         </>}

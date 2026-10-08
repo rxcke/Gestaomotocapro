@@ -20,7 +20,7 @@ export const recordSignupAttribution = createServerFn({ method: "POST" })
     const { data: existing, error: readError } = await context.supabase.from("signup_attribution").select("user_id").eq("user_id", context.userId).maybeSingle();
     if (readError) throw new Error("Não foi possível guardar sua indicação.");
     if (!existing) {
-      const { error } = await context.supabase.from("signup_attribution").insert({ user_id: context.userId, referral_code: campaign.ref ?? campaign.ambassador ?? null, campaign });
+      const { error } = await context.supabase.from("signup_attribution").insert({ user_id: context.userId, referral_code: campaign["ref"] ?? campaign["ambassador"] ?? null, campaign });
       if (error && error.code !== "23505") throw new Error("Não foi possível guardar sua indicação.");
     }
     return { ok: true };
