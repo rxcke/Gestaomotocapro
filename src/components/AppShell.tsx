@@ -52,28 +52,26 @@ export function AppShell({ children }: { children: ReactNode }) {
   const access = useAccess();
   const isPro = (profile.data?.is_professional ?? false) || Boolean(access.data?.demo || access.data?.demoExpired);
 
-  const items = [...NAV];
-  const extra = [
-    ...(isPro ? [{ to: "/app/jornada", label: "Jornada", icon: Timer, exact: false }] : []),
-    { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false },
+  const jornada = { to: "/app/jornada", label: "Jornada", icon: Timer, exact: false };
+  const relatorios = { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false };
+  const navGroups = [
+    { label: "", items: [NAV[0]] },
+    { label: "Seu corre", items: [...(isPro ? [jornada] : []), NAV[1]] },
+    { label: "Sua moto", items: [NAV[2], NAV[3]] },
+    { label: "Seu resultado", items: [relatorios] },
+    { label: "Conta", items: [NAV[4]] },
   ];
 
   const isActive = (to: string, exact?: boolean) =>
     exact ? pathname === to : pathname === to || pathname.startsWith(`${to}/`);
 
-  const mobileNav = [
-    NAV[0],
-    NAV[1],
-    isPro ? { to: "/app/jornada", label: "Jornada", icon: Timer, exact: false } : NAV[2],
-    { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false },
+  const mobileNav = [NAV[0], isPro ? jornada : NAV[1], isPro ? NAV[1] : NAV[2], relatorios];
+  const moreGroups = [
+    { label: "Sua moto", items: isPro ? [NAV[2], NAV[3]] : [NAV[3]] },
+    { label: "Seu resultado", items: [{ to: "/app/metas", label: "Metas", icon: Target, exact: false }] },
+    { label: "Conta", items: [NAV[4]] },
   ];
-  const moreNav = [
-    ...(isPro ? [NAV[2]] : []),
-    NAV[3],
-    { to: "/app/metas", label: "Metas", icon: Target, exact: false },
-    NAV[4],
-  ];
-  const moreActive = moreNav.some((item) => isActive(item.to, false));
+  const moreActive = moreGroups.some((g) => g.items.some((item) => isActive(item.to, false)));
 
   return (
     <div className="relative min-h-dvh w-full bg-canvas text-foreground">
@@ -84,21 +82,32 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Logo />
           </Link>
           <nav className="flex flex-col gap-1">
-            {[...items, ...extra].map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
-                  isActive(item.to, item.exact)
-                    ? "glass-soft font-semibold text-foreground"
-                    : "text-muted-foreground hover:bg-glass hover:text-foreground",
-                )}
-
-              >
-                <item.icon className="size-4 shrink-0" />
-                {item.label}
-              </Link>
+            {navGroups.map((group) => (
+              <div key={group.label || "home"} className="flex flex-col gap-1">
+                {group.label ? (
+                  <p className="px-4 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
+                    {group.label}
+                  </p>
+                ) : null}
+                {group.items.map((item) => {
+                  const active = isActive(item.to, item.exact);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
+                        active
+                          ? "bg-accent/10 font-semibold text-foreground"
+                          : "text-muted-foreground hover:bg-glass hover:text-foreground",
+                      )}
+                    >
+                      <item.icon className={cn("size-4 shrink-0", active && "text-accent")} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
             ))}
           </nav>
           <SidebarFooter />
