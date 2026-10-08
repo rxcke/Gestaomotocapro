@@ -15,23 +15,24 @@ export const getEntryDestination = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => EntryInput.parse(input))
   .handler(async ({ context, data }) => {
-    const [accessResult, roleResult, profileResult] = await Promise.all([
+    const [accessResult, roleResult, profileResult, demoResult] = await Promise.all([
       context.supabase.rpc("has_app_access", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
       context.supabase.from("profiles").select("onboarding_completed,phone").eq("id", context.userId).maybeSingle(),
+      context.supabase.rpc("has_demo_access", { _user_id: context.userId }),
     ]);
 
-    if (accessResult.error || roleResult.error || profileResult.error) {
+    if (accessResult.error || roleResult.error || profileResult.error || demoResult.error) {
       throw new Error("Não foi possível preparar sua entrada no aplicativo.");
     }
 
     const hasAccess = Boolean(accessResult.data);
     const intendedPath = safeIntendedPath(data.intendedPath);
     if (needsPhoneCompletion(profileResult.data?.phone)) return "/onboarding";
-    if (!hasAccess) {
+    if (!hasAccess && !demoResult.data) {
       return intendedPath === "/app/perfil" ? "/app/perfil" : "/planos";
     }
-    if (!profileResult.data?.onboarding_completed) return "/onboarding";
+    if (hasAccess && !profileResult.data?.onboarding_completed) return "/onboarding";
     if (intendedPath === "/admin" && !roleResult.data) return "/app";
     return intendedPath ?? "/app";
   });
