@@ -144,7 +144,7 @@ function ReportsPage() {
     const best = activeDays.reduce((a, b) => (b.profit > a.profit ? b : a));
     if (best.profit > 0) insights.push(`Seu melhor dia foi ${WEEKDAY[toDate(best.date).getDay()]}, ${toDate(best.date).toLocaleDateString("pt-BR")}: ${brl(best.profit)} de lucro.`);
   }
-  if (const top = categories[0]; if (top && fin.totalExpense > 0) insights.push(`Seu maior gasto foi ${top[0].toLowerCase()}: ${num((top[1] / fin.totalExpense) * 100, 0)}% do que saiu.`);
+  const top = categories[0]; if (top && fin.totalExpense > 0) insights.push(`Seu maior gasto foi ${top[0].toLowerCase()}: ${num((top[1] / fin.totalExpense) * 100, 0)}% do que saiu.`);
   if (current.hours > 0 && previous.hours > 0 && Math.abs(current.hours - previous.hours) >= 0.5) insights.push(current.hours > previous.hours ? "Você trabalhou mais horas do que no período anterior." : "Você trabalhou menos horas do que no período anterior.");
   if (current.profitPerHour != null && previous.profitPerHour != null && current.profitPerHour !== previous.profitPerHour) insights.push(current.profitPerHour > previous.profitPerHour ? "Seu lucro médio por hora aumentou." : "Seu lucro médio por hora caiu em relação ao período anterior.");
 
