@@ -99,7 +99,7 @@ function JourneyPage() {
     },
   });
   const save = useUpsert("work_sessions", "work_sessions", {
-    successMessage: active ? "Jornada encerrada." : "Jornada iniciada.",
+    successMessage: active ? "🏁 Corre encerrado" : "Jornada iniciada.",
   });
 
   useEffect(() => {
