@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Banknote, Fuel, Pause, Play, Receipt, ShoppingBag, Sparkles, Target, Trophy, Wrench } from "lucide-react";
 import { ErrorBlock, LoadingBlock } from "@/components/glass";
+import { MotoContext } from "@/components/AppShell";
 import { ExpenseDialog, FuelDialog, IncomeDialog, MaintenanceDialog } from "@/components/forms/dialogs";
 import { Button } from "@/components/ui/button";
 import { useApp, useScopedData } from "@/lib/app-context";
@@ -72,6 +73,7 @@ function Home() {
       <header className="home-rise min-w-0">
         <p className="text-sm font-medium text-muted-foreground">{greeting()}, {firstName} 👋</p>
         <h1 className="mt-1 font-display text-2xl font-bold leading-tight sm:text-3xl">Bora ver como está seu corre.</h1>
+        <div className="mt-3"><MotoContext subtle /></div>
       </header>
 
       {/* 2. Resultado */}
