@@ -102,7 +102,7 @@ function PhoneMock() {
   return (
     <div className="lp-phone relative mx-auto w-[260px] sm:w-[290px]">
       <div className="rounded-[2.6rem] border border-border bg-card p-2.5 shadow-2xl">
-        <div className="lp-screen relative overflow-hidden rounded-[2.1rem] px-4 pt-8 pb-5">
+        <div className="lp-screen relative overflow-hidden rounded-[2.1rem] px-4 pt-11 pb-5">
           <div className="absolute top-2.5 left-1/2 h-5 w-20 -translate-x-1/2 rounded-full bg-card" />
           <p className="text-xs text-muted-foreground">Boa tarde 👋</p>
           <p className="font-display text-sm font-bold">Bora ver como está seu corre.</p>
