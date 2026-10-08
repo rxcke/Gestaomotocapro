@@ -204,44 +204,52 @@ function SidebarFooter() {
   );
 }
 
-function TopBar() {
+/** Moto selecionada e km atual — mesma seleção usada em todo o app. */
+export function MotoContext({ subtle = false }: { subtle?: boolean }) {
   const { motorcycles, motoId, setMotoId, activeMoto } = useApp();
+  if (subtle && motorcycles.length === 0) return null;
+  return (
+    <div className="flex min-w-0 flex-wrap items-center gap-2">
+      {motorcycles.length > 1 ? (
+        <Select value={motoId} onValueChange={setMotoId}>
+          <SelectTrigger className={cn("glass-soft h-9 w-auto gap-2 border-0 font-display font-bold", subtle ? "text-xs" : "text-sm")}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_MOTOS}>Todas as motos</SelectItem>
+            {motorcycles.map((m) => (
+              <SelectItem key={m.id} value={m.id}>{m.brand} {m.model}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : subtle ? (
+        <span className="truncate text-sm font-semibold text-muted-foreground">🏍️ {activeMoto ? `${activeMoto.brand} ${activeMoto.model}` : "Sua moto"}</span>
+      ) : (
+        <h2 className="truncate font-display text-lg font-bold">{activeMoto ? `${activeMoto.brand} ${activeMoto.model}` : "Sua moto"}</h2>
+      )}
+      {activeMoto ? (
+        <span className={cn("rounded-full text-xs font-semibold text-muted-foreground", subtle ? "" : "glass-soft px-2.5 py-0.5")}>{subtle ? "· " : ""}{fmtKm(activeMoto.current_km)}</span>
+      ) : null}
+    </div>
+  );
+}
+
+function TopBar() {
   const profile = useProfile();
   const { theme, toggle } = useTheme();
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const isHome = pathname === "/app" || pathname === "/app/";
 
   return (
     <header className="mb-6 flex items-start justify-between gap-3">
+      {isHome ? <div className="min-w-0" /> : (
       <div className="min-w-0">
         <p className="truncate text-sm text-muted-foreground">
           Olá, {profile.data?.name?.split(" ")[0] ?? "piloto"} 👋
         </p>
-        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
-          {motorcycles.length > 1 ? (
-            <Select value={motoId} onValueChange={setMotoId}>
-              <SelectTrigger className="glass-soft h-9 w-auto gap-2 border-0 font-display text-sm font-bold">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ALL_MOTOS}>Todas as motos</SelectItem>
-                {motorcycles.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.brand} {m.model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <h2 className="truncate font-display text-lg font-bold">
-              {activeMoto ? `${activeMoto.brand} ${activeMoto.model}` : "Sua moto"}
-            </h2>
-          )}
-          {activeMoto ? (
-            <span className="glass-soft rounded-full px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
-              {fmtKm(activeMoto.current_km)}
-            </span>
-          ) : null}
-        </div>
+        <div className="mt-1"><MotoContext /></div>
       </div>
+      )}
       <div className="flex shrink-0 items-center gap-2">
         <Button
           variant="ghost"
