@@ -201,7 +201,7 @@ function Onboarding() {
   ];
   const head = done
     ? { eyebrow: "Tudo pronto", title: <>Pronto. Agora é só começar o corre. <span className="text-accent">🏍️</span></>, subtitle: "Seu controle começa aqui." }
-    : titles[step] ?? titles[0];
+    : (titles[step] ?? titles[0])!;
 
   return (
     <EntryShell eyebrow={head.eyebrow} title={head.title} subtitle={head.subtitle} stepKey={done ? "done" : step}>
