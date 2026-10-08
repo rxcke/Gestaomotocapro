@@ -246,6 +246,13 @@
       "when": 1791460723066,
       "tag": "0034_harden_demo_and_full_entitlements",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1791461474633,
+      "tag": "0035_demo_24h_unlimited",
+      "breakpoints": true
     }
   ]
 }

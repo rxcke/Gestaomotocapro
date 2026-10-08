@@ -17,6 +17,8 @@ export type Database = {
       demo_usage: {
         Row: {
           created_at: string
+          demo_expires_at: string | null
+          demo_started_at: string | null
           expense_id: string | null
           expense_used: boolean
           income_id: string | null
@@ -27,6 +29,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          demo_expires_at?: string | null
+          demo_started_at?: string | null
           expense_id?: string | null
           expense_used?: boolean
           income_id?: string | null
@@ -37,6 +41,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          demo_expires_at?: string | null
+          demo_started_at?: string | null
           expense_id?: string | null
           expense_used?: boolean
           income_id?: string | null
@@ -898,7 +904,6 @@ export type Database = {
         Args: { _pause: boolean; _session_id: string }
         Returns: undefined
       }
-      start_demo: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "ambassador"
