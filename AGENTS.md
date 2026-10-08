@@ -16,4 +16,4 @@
 - Keep session-start race recovery in `src/lib/start-work-session.ts` and read the user's open journey across all motorcycles; an open journey can have no motorcycle and the database's unique index remains the final guard.
 - Keep app entitlement in `has_app_access(auth.uid())` while subscription remains a separate Cakto fact; this prevents special roles from masquerading as paid plans.
 - Keep marketing consent in append-only, owner-scoped choices and purchases in a transaction-keyed server-only delivery table; this preserves revocations and prevents webhook replays from double-sending conversions.
-- Keep the free demo as a separate database-enforced state (`has_demo_access` plus permanent `demo_usage`), never a subscription, trial or role; this keeps quotas safe from deletion, races and direct API calls.
+- Keep the free demo as a database-timed window in `demo_usage` (created by a profile trigger, read-only to users) that `has_app_access` honors via `has_demo_access`, never a subscription, trial or role; this makes expiry tamper-proof without touching Cakto.

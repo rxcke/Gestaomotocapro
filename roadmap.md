@@ -5,7 +5,8 @@
 - [x] Implementar estado separado e limites permanentes no banco
 - [x] Liberar navegação, boas-vindas, resultado real e bloqueios com planos
 - [x] Exibir uso e status na administração sem alterar Cakto
-- [ ] Validar limites com conta demo real e telas 360/390/430/desktop (aguarda conta de teste aprovada)
+- [x] Trocar limite de 1 ganho/1 gasto por 24 horas de uso ilimitado
+- [ ] Validar com conta demo real e telas 360/390/430/desktop (aguarda conta de teste aprovada)
 
 - [x] Auditar autenticação, Google, sessão e redirects
 - [x] Auditar assinatura, onboarding e estados de acesso
