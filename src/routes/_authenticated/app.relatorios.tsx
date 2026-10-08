@@ -67,7 +67,7 @@ function CountUp({ value, format = brl, className }: { value: number; format?: (
   return <span className={className}><span aria-hidden="true">{format(shown)}</span><span className="sr-only">{format(value)}</span></span>;
 }
 
-function Delta({ value, label, invert = false }: { value: number | null; label: string; invert?: boolean }) {
+function Delta({ value, label, invert = false }: { value: number | null; label: string; invert?: boolean | undefined }) {
   if (value == null || !Number.isFinite(value)) return null;
   const good = invert ? value <= 0 : value >= 0;
   return <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold", good ? "bg-positive/15 text-positive" : "bg-negative/15 text-negative")}>
@@ -81,7 +81,7 @@ function Reveal({ children, className, delay = 0 }: { children: React.ReactNode;
   useEffect(() => {
     const el = ref.current; if (!el) return;
     if (!("IntersectionObserver" in window)) { setSeen(true); return; }
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setSeen(true); io.disconnect(); } }, { rootMargin: "0px 0px -8% 0px" });
+    const io = new IntersectionObserver(([e]) => { if (e?.isIntersecting) { setSeen(true); io.disconnect(); } }, { rootMargin: "0px 0px -8% 0px" });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -144,7 +144,7 @@ function ReportsPage() {
     const best = activeDays.reduce((a, b) => (b.profit > a.profit ? b : a));
     if (best.profit > 0) insights.push(`Seu melhor dia foi ${WEEKDAY[toDate(best.date).getDay()]}, ${toDate(best.date).toLocaleDateString("pt-BR")}: ${brl(best.profit)} de lucro.`);
   }
-  if (categories.length >= 1 && fin.totalExpense > 0) insights.push(`Seu maior gasto foi ${categories[0][0].toLowerCase()}: ${num((categories[0][1] / fin.totalExpense) * 100, 0)}% do que saiu.`);
+  if (const top = categories[0]; if (top && fin.totalExpense > 0) insights.push(`Seu maior gasto foi ${top[0].toLowerCase()}: ${num((top[1] / fin.totalExpense) * 100, 0)}% do que saiu.`);
   if (current.hours > 0 && previous.hours > 0 && Math.abs(current.hours - previous.hours) >= 0.5) insights.push(current.hours > previous.hours ? "Você trabalhou mais horas do que no período anterior." : "Você trabalhou menos horas do que no período anterior.");
   if (current.profitPerHour != null && previous.profitPerHour != null && current.profitPerHour !== previous.profitPerHour) insights.push(current.profitPerHour > previous.profitPerHour ? "Seu lucro médio por hora aumentou." : "Seu lucro médio por hora caiu em relação ao período anterior.");
 
