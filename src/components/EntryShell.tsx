@@ -39,8 +39,8 @@ export function EntryShell({
         </aside>
 
         <main className={cn("flex min-h-dvh flex-col px-5 py-6 sm:px-8 lg:justify-center lg:py-12", wide && "lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl")}>
-          <Link to="/" aria-label="Gestão Motoca Pro — início" className={cn("mb-10 w-fit", !wide && "lg:hidden")}><Logo /></Link>
-          <div key={stepKey} className="home-rise my-auto w-full lg:my-0">
+          <Link to="/" aria-label="Gestão Motoca Pro — início" className={cn("mb-12 w-fit", !wide && "lg:hidden")}><Logo /></Link>
+          <div key={stepKey} className="home-rise w-full">
             {eyebrow ? <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">{eyebrow}</p> : null}
             <h1 className="mt-3 font-display text-[2.1rem] leading-[1.05] font-extrabold tracking-tight sm:text-5xl">{title}</h1>
             {subtitle ? <p className="mt-3 text-base leading-7 text-muted-foreground">{subtitle}</p> : null}
