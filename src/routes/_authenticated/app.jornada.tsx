@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { createFileRoute } from "@tanstack/react-router";
 import { Pause, Play, Square } from "lucide-react";
 import { QuickActions } from "@/components/QuickActions";
-import { EmptyState, GlassCard, PageTitle, Stat } from "@/components/glass";
+import { EmptyState, GlassCard, PageTitle } from "@/components/glass";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -149,7 +149,7 @@ function JourneyPage() {
         <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
           <div className="min-w-0"><p className="num-display break-words text-lg text-positive">{brl(sessionIncome)}</p><p className="text-xs text-muted-foreground">ganhos</p></div>
           <div className="min-w-0"><p className="num-display break-words text-lg text-negative">{brl(sessionExpense)}</p><p className="text-xs text-muted-foreground">gastos</p></div>
-          <div className="min-w-0"><p className={`num-display break-words text-lg ${sessionIncome - sessionExpense >= 0 ? "" : "text-negative"}`}>{brl(sessionIncome - sessionExpense)}</p><p className="text-xs text-muted-foreground">lucro</p></div>
+          <div className="min-w-0"><p className={`num-display break-words text-lg ${sessionNet >= 0 ? "" : "text-negative"}`}>{brl(sessionNet)}</p><p className="text-xs text-muted-foreground">lucro</p></div>
           <div className="min-w-0"><p className={`num-display break-words text-lg ${hourly >= 0 ? "text-accent" : "text-negative"}`}>{brl(hourly)}/h</p><p className="text-xs text-muted-foreground">lucro por hora</p></div>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-3">
@@ -159,9 +159,9 @@ function JourneyPage() {
         <div className="mt-4 space-y-1.5"><Label htmlFor="end-km" className="text-xs text-muted-foreground">KM ao encerrar (opcional)</Label><Input id="end-km" type="number" inputMode="decimal" className="h-12 rounded-2xl text-base" value={endKm} onChange={(e) => setEndKm(e.target.value)} /></div>
       </section>
       <section><h2 className="mb-3 font-display text-lg font-bold">Registrar durante a jornada</h2><QuickActions sessionId={active.id} /></section>
-    </> : <GlassCard>
+    </> : <section className="home-start home-rise rounded-3xl p-5 sm:p-7">
       {sessions.isLoading ? <p className="text-center text-muted-foreground">Carregando jornada...</p> : sessions.isError ? <p className="text-center text-muted-foreground">Não foi possível consultar sua jornada. Atualize a página para tentar novamente.</p> :
-      <div className="mx-auto max-w-md text-center"><h2 className="font-display text-2xl font-bold">Pronto para rodar?</h2><p className="mt-2 text-sm text-muted-foreground">Inicie a jornada e associe ganhos e gastos ao seu turno.</p><div className="mt-5 space-y-1.5 text-left"><Label htmlFor="start-km">KM inicial</Label><Input id="start-km" type="number" inputMode="decimal" className="h-12 text-base" value={startKm} onChange={(e) => setStartKm(e.target.value)} placeholder={String(activeMoto?.current_km ?? "")} /></div><Button className="mt-5 h-12 w-full text-base" onClick={start} disabled={startSession.isPending || starting.current}><Play className="mr-2 size-4" />Iniciar jornada</Button></div>}
+      <div className="mx-auto max-w-md text-center"><h2 className="font-display text-3xl font-extrabold">Vai começar o corre?</h2><p className="mt-2 text-sm text-muted-foreground">Inicie a jornada e associe ganhos e gastos ao seu turno.</p><div className="mt-5 space-y-1.5 text-left"><Label htmlFor="start-km" className="text-xs text-muted-foreground">KM inicial (opcional)</Label><Input id="start-km" type="number" inputMode="decimal" className="h-12 rounded-2xl text-base" value={startKm} onChange={(e) => setStartKm(e.target.value)} placeholder={String(activeMoto?.current_km ?? "")} /></div><Button className="mt-5 h-14 w-full rounded-2xl text-base font-bold" onClick={start} disabled={startSession.isPending || starting.current}><Play className="mr-2 size-4" />Iniciar jornada</Button></div>}
     </GlassCard>}
     <GlassCard><h2 className="font-display text-lg font-bold">Histórico</h2>{data.sessions.filter((s) => s.end_time).length ? <div className="mt-4 divide-y divide-border/60">{data.sessions.filter((s) => s.end_time).map((s: WorkSession) => { const duration = workedDuration(s, data.pauses); return <div key={s.id} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-3"><div><p className="text-sm font-semibold">{dateTimeBR(s.start_time)}</p><p className="text-xs text-muted-foreground">{shortDuration(duration)} · {brl(s.total_income)} ganhos</p></div><p className={`num-display text-sm ${s.net_profit >= 0 ? "text-positive" : "text-negative"}`}>{brl(s.net_profit)}</p></div> })}</div> : <EmptyState title="Nenhuma jornada encerrada" description="Seu histórico aparecerá aqui." />}</GlassCard>
   </div>;
