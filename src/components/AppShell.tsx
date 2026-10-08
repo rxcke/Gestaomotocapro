@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Logo } from "./Logo";
+import { QuickRegister } from "./QuickRegister";
 import { AmbientBackground } from "./glass";
 import { useApp, ALL_MOTOS } from "@/lib/app-context";
 import { useAccess } from "@/lib/use-access";
@@ -54,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const items = [...NAV];
   const extra = [
-    ...(isPro ? [{ to: "/app/jornada", label: "Jornada", icon: Timer, exact: false }] : []),
+    ...(isPro ? [{ to: "/app/jornada", label: "Corre", icon: Timer, exact: false }] : []),
     { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false },
   ];
 
@@ -64,7 +65,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const mobileNav = [
     NAV[0],
     NAV[1],
-    isPro ? { to: "/app/jornada", label: "Jornada", icon: Timer, exact: false } : NAV[2],
+    isPro ? { to: "/app/jornada", label: "Corre", icon: Timer, exact: false } : NAV[2],
     { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false },
   ];
   const moreNav = [
@@ -83,6 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Link to="/app">
             <Logo />
           </Link>
+          <QuickRegister variant="sidebar" />
           <nav className="flex flex-col gap-1">
             {[...items, ...extra].map((item) => (
               <Link
@@ -104,12 +106,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SidebarFooter />
         </aside>
 
-        <main className="min-w-0 flex-1 px-4 py-6 pb-28 sm:px-6 lg:px-10 lg:py-8 lg:pb-10">
+        <main className="min-w-0 flex-1 px-4 py-6 pb-40 sm:px-6 lg:px-10 lg:py-8 lg:pb-10">
           <TopBar />
           {children}
         </main>
       </div>
 
+      <QuickRegister />
       <nav className="glass-soft fixed inset-x-0 bottom-0 z-20 rounded-none border-x-0 border-b-0 lg:hidden">
         <div
           className="grid grid-cols-5 px-1 py-1.5"
