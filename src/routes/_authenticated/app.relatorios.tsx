@@ -5,9 +5,6 @@ import { useScopedData } from "@/lib/app-context";
 import { costPerKm, distanceInPeriod, financeSummary, monthPeriod } from "@/lib/calc";
 import { brl, brlCompact, num } from "@/lib/format";
 import { weekPeriod, weeklyComparison, weeklyReport } from "@/lib/weekly-report";
-import { useAccess, openUpgrade } from "@/lib/use-access";
-import { Button } from "@/components/ui/button";
-import { DemoFinancialResult } from "@/components/DemoExperience";
 
 export const Route = createFileRoute("/_authenticated/app/relatorios")({
   head: () => ({ meta: [
@@ -26,10 +23,8 @@ const moneyClasses = "overflow-visible whitespace-normal break-words text-base l
 
 function ReportsPage() {
   const d = useScopedData();
-  const access = useAccess();
   if (d.isLoading) return <LoadingBlock label="Preparando relatórios..." />;
   if (d.isError) return <ErrorBlock />;
-  if (access.data?.demo) return <div className="space-y-6"><PageTitle title="Relatórios" subtitle="Seu resultado e a visão completa do seu corre." /><DemoFinancialResult /><div className="border-t border-border pt-5"><h2 className="font-display text-lg font-bold">Relatórios completos</h2><p className="my-3 text-sm text-muted-foreground">Resumo semanal, lucro por hora, custo por km, histórico e análises estão disponíveis no acesso completo.</p><Button onClick={openUpgrade}>Desbloquear relatórios</Button></div></div>;
 
   const period = monthPeriod();
   const f = financeSummary(d.incomes, d.expenses, period);

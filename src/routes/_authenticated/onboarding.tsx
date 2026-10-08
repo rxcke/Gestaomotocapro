@@ -52,8 +52,8 @@ function Onboarding() {
   const displayPhone = phone || formatBrazilianMobile(profile.data?.phone);
 
   const phoneMissing = needsPhoneCompletion(profile.data?.phone);
-  const blocked = access.isSuccess && !access.data.hasAppAccess && !access.data.demo && !phoneMissing;
-  const completed = profile.isSuccess && access.isSuccess && (Boolean(profile.data?.onboarding_completed) || access.data.demo) && !phoneMissing;
+  const blocked = access.isSuccess && !access.data.hasAppAccess && !access.data.demoExpired && !phoneMissing;
+  const completed = profile.isSuccess && access.isSuccess && (Boolean(profile.data?.onboarding_completed) || access.data.demoExpired) && !phoneMissing;
 
   useEffect(() => {
     if (!profile.isSuccess || typeof window === "undefined") return;
@@ -122,7 +122,7 @@ function Onboarding() {
       setPhone(formatBrazilianMobile(normalizedPhone));
       if (!access.data?.hasAppAccess) {
         window.localStorage.removeItem(draftKey);
-        navigate({ to: access.data?.demo ? "/app" : "/planos", replace: true });
+        navigate({ to: access.data?.demoExpired ? "/app" : "/planos", replace: true });
         return;
       }
       setStep(1);

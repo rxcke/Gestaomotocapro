@@ -8,7 +8,7 @@ type AdminOwner = {
 };
 
 export type AdminData = {
-  users: Array<{ id: string; name: string | null; email: string | null; phone: string | null; admin: boolean; ambassador: boolean; subscribed: boolean; demo: boolean; incomeUsed: boolean; expenseUsed: boolean; referral: string | null }>;
+  users: Array<{ id: string; name: string | null; email: string | null; phone: string | null; admin: boolean; ambassador: boolean; subscribed: boolean; demo: boolean; demoStartedAt: string | null; demoExpiresAt: string | null; referral: string | null }>;
   subscriptions: Array<{
     id: string;
     user_id: string;
@@ -112,7 +112,7 @@ export const getAdminData = createServerFn({ method: "GET" })
         supabaseAdmin.from("user_roles").select("user_id,role").in("role", ["admin", "ambassador"]).limit(500),
         supabaseAdmin.from("subscriptions").select("id,user_id,email,plan,status,provider_status,cakto_transaction_id,started_at,expires_at,created_at,trial_started_at,trial_ends_at,recurring_amount").order("created_at", { ascending: false }).limit(500),
         supabaseAdmin.from("webhook_events").select("id,event_type,transaction_id,processed,error_message,created_at").order("created_at", { ascending: false }).limit(100),
-        supabaseAdmin.from("demo_usage").select("user_id,income_used,expense_used").limit(500),
+        supabaseAdmin.from("demo_usage").select("user_id,demo_started_at,demo_expires_at").limit(500),
         supabaseAdmin.from("signup_attribution").select("user_id,referral_code").limit(500),
       ]);
 
@@ -141,7 +141,7 @@ export const getAdminData = createServerFn({ method: "GET" })
     const referralByUser = new Map((attributionResult.data ?? []).map(row => [row.user_id,row.referral_code]));
     const blocked = new Set((subscriptionsResult.data ?? []).filter(row => ["active","trial","canceled","expired","refunded","chargeback"].includes(row.status) || ["late","paused"].includes(row.provider_status)).map(row => row.user_id));
     return {
-      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, admin: admins.has(profile.id), ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id), demo: !admins.has(profile.id) && !ambassadors.has(profile.id) && !blocked.has(profile.id), incomeUsed: Boolean(demoByUser.get(profile.id)?.income_used), expenseUsed: Boolean(demoByUser.get(profile.id)?.expense_used), referral: referralByUser.get(profile.id) ?? null })),
+      users: (profilesResult.data ?? []).map((profile) => ({ ...profile, admin: admins.has(profile.id), ambassador: ambassadors.has(profile.id), subscribed: subscribers.has(profile.id), demo: !admins.has(profile.id) && !ambassadors.has(profile.id) && !blocked.has(profile.id), demoStartedAt: demoByUser.get(profile.id)?.demo_started_at ?? null, demoExpiresAt: demoByUser.get(profile.id)?.demo_expires_at ?? null, referral: referralByUser.get(profile.id) ?? null })),
       motorcycles: motorcyclesResult.data ?? [],
       incomes: incomesResult.data ?? [],
       expenses: expensesResult.data ?? [],

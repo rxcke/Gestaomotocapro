@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const profile = useProfile();
   const access = useAccess();
-  const isPro = (profile.data?.is_professional ?? false) || Boolean(access.data?.demo);
+  const isPro = (profile.data?.is_professional ?? false) || Boolean(access.data?.demo || access.data?.demoExpired);
 
   const items = [...NAV];
   const extra = [

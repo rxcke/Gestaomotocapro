@@ -7,8 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { useApp, ALL_MOTOS, useScopedData } from "@/lib/app-context";
 import { activeMotoKm, financeSummary, fuelStats, monthPeriod, percent, upcomingMaintenance, variation } from "@/lib/calc";
 import { brl, brlCompact, greeting, num } from "@/lib/format";
-import { useAccess } from "@/lib/use-access";
-import { DemoFinancialResult } from "@/components/DemoExperience";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
@@ -26,11 +24,9 @@ export const Route = createFileRoute("/_authenticated/app/")({
 
 function Dashboard() {
   const data = useScopedData();
-  const access = useAccess();
   const { activeMoto, motorcycles, motoId } = useApp();
   if (data.isLoading) return <LoadingBlock label="Calculando seu resultado..." />;
   if (data.isError) return <ErrorBlock />;
-  if (access.data?.demo) return <div className="space-y-6"><PageTitle title={`${greeting()}, ${data.profile?.name?.split(" ")[0] ?? "piloto"}`} subtitle="Seu corre. Seus números. Seu controle." /><DemoFinancialResult /><QuickActions /><div className="grid grid-cols-2 gap-3">{[{ to: "/app/dinheiro", name: "Ganhos e gastos" }, { to: "/app/moto/abastecimentos", name: "Combustível" }, { to: "/app/manutencao", name: "Manutenção" }, { to: "/app/jornada", name: "Jornadas" }, { to: "/app/metas", name: "Metas" }, { to: "/app/relatorios", name: "Relatórios" }].map(item => <Button key={item.to} variant="outline" asChild className="min-h-12"><Link to={item.to}>{item.name}</Link></Button>)}</div></div>;
   if (motorcycles.length === 0) return <EmptyState title="Cadastre sua primeira moto" description="Ela será a base para calcular consumo, manutenção e custo por km." />;
 
   const current = financeSummary(data.incomes, data.expenses, monthPeriod());

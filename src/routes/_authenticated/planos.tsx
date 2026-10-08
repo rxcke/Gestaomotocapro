@@ -57,19 +57,19 @@ function PlansPage() {
     <AmbientBackground />
     <main className="relative mx-auto max-w-5xl">
       <div className="flex items-center justify-between gap-3"><Logo /><Button asChild variant="ghost"><Link to="/app/perfil">Perfil</Link></Button></div>
-      {access.data?.demo && <div className="mt-6 text-center"><Button asChild variant="outline"><Link to="/app">Continuar explorando a demonstração</Link></Button></div>}
+      {(access.data?.demo || access.data?.demoExpired) && <div className="mt-6 text-center"><Button asChild variant="outline"><Link to="/app">Continuar explorando</Link></Button></div>}
       <div className="mx-auto mt-10 max-w-2xl text-center">
         <p className="text-sm font-semibold text-accent">GESTÃO MOTOCA PRO PREMIUM</p>
         <h1 className="mt-3 font-display text-3xl font-bold sm:text-5xl">Controle total da sua moto e do seu dinheiro</h1>
-        <p className="mt-4 text-muted-foreground">Escolha o plano ideal. Os registros da demonstração continuam na sua conta após assinar.</p>
+        <p className="mt-4 text-muted-foreground">Escolha o plano ideal. Tudo que você registrou na demonstração continua na sua conta após assinar.</p>
       </div>
 
-      {access.data?.hasAppAccess ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">{access.data.active ? "Sua assinatura está ativa" : "Seu acesso está liberado"}</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-3 md:items-stretch">
+      {access.data?.hasAppAccess && !access.data.demo ? <GlassCard className="mx-auto mt-8 max-w-xl text-center"><Crown className="mx-auto size-7 text-accent" /><h2 className="mt-3 font-display text-xl font-bold">{access.data.active ? "Sua assinatura está ativa" : "Seu acesso está liberado"}</h2><p className="mt-2 text-sm text-muted-foreground">Você já tem acesso a todos os recursos.</p><Button className="mt-5" onClick={() => navigate({ to: "/app" })}>Abrir painel</Button></GlassCard> : <div className="mt-10 grid gap-5 md:grid-cols-3 md:items-stretch">
          <PlanCard name="Start" price="R$ 29,90" period="/mês" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} />
          <PlanCard name="Pro" price="R$ 69,90" period="/trimestre" plan="quarterly" featured loading={opening === "quarterly"} onSubscribe={subscribe} />
          <PlanCard name="Elite" price="R$ 199,90" period="/ano" plan="annual" loading={opening === "annual"} onSubscribe={subscribe} />
       </div>}
-      {access.data?.hasAppAccess ? null : <p className="mx-auto mt-6 max-w-2xl text-center text-sm leading-6 text-muted-foreground">Pagamento seguro pela Cakto. A demonstração é gratuita e não exige cartão.</p>}
+      {access.data?.hasAppAccess && !access.data.demo ? null : <p className="mx-auto mt-6 max-w-2xl text-center text-sm leading-6 text-muted-foreground">Pagamento seguro pela Cakto. A demonstração é gratuita e não exige cartão.</p>}
     </main>
   </div>;
 }

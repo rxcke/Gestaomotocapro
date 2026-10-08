@@ -2,14 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export const startDemo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { error } = await context.supabase.rpc("start_demo");
-    if (error) throw new Error("Não foi possível começar a demonstração.");
-    return { ok: true };
-  });
-
 export const recordSignupAttribution = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ campaign: z.record(z.string().max(200)).refine(value => Object.keys(value).length <= 10) }).parse(input))

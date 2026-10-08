@@ -19,7 +19,7 @@ export const getEntryDestination = createServerFn({ method: "POST" })
       context.supabase.rpc("has_app_access", { _user_id: context.userId }),
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
       context.supabase.from("profiles").select("onboarding_completed,phone").eq("id", context.userId).maybeSingle(),
-      context.supabase.rpc("has_demo_access", { _user_id: context.userId }),
+      context.supabase.from("demo_usage").select("demo_expires_at").eq("user_id", context.userId).maybeSingle(),
     ]);
 
     if (accessResult.error || roleResult.error || profileResult.error || demoResult.error) {
@@ -29,7 +29,7 @@ export const getEntryDestination = createServerFn({ method: "POST" })
     const hasAccess = Boolean(accessResult.data);
     const intendedPath = safeIntendedPath(data.intendedPath);
     if (needsPhoneCompletion(profileResult.data?.phone)) return "/onboarding";
-    if (!hasAccess && !demoResult.data) {
+    if (!hasAccess && !demoResult.data?.demo_expires_at) {
       return intendedPath === "/app/perfil" ? "/app/perfil" : "/planos";
     }
     if (hasAccess && !profileResult.data?.onboarding_completed) return "/onboarding";
