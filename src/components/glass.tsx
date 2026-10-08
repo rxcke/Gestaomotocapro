@@ -20,13 +20,13 @@ export function GlassCard({
   className?: string;
   padded?: boolean;
 }) {
-  return <section className={cn("glass-panel animate-in fade-in-0 slide-in-from-bottom-1 duration-300", padded && "p-5 sm:p-6", className)}>{children}</section>;
+  return <section className={cn("glass-panel home-rise", padded && "p-5 sm:p-6", className)}>{children}</section>;
 }
 
 export function CardHeading({ title, action }: { title: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <p className="text-sm font-semibold text-muted-foreground">{title}</p>
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{title}</p>
       {action}
     </div>
   );
@@ -51,7 +51,7 @@ export function Stat({
 }) {
   return (
     <div className={cn("glass-soft min-w-0 p-4", className)}>
-      <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="truncate text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
       <p
         className={cn(
           "num-display mt-1 break-words text-lg leading-tight sm:text-xl",
@@ -77,8 +77,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="glass-soft flex flex-col items-center gap-3 px-6 py-10 text-center">
-      <p className="font-display text-base font-bold">{title}</p>
+    <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-border px-6 py-10 text-center">
+      <p className="font-display text-lg font-bold">{title}</p>
       {description ? <p className="max-w-sm text-sm text-muted-foreground">{description}</p> : null}
       {action}
     </div>
@@ -110,7 +110,7 @@ export function ErrorBlock({ message }: { message?: string }) {
 export function PageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="min-w-0">
-      <h1 className="font-display text-2xl font-bold">{title}</h1>
+      <h1 className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">{title}</h1>
       {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
     </div>
   );

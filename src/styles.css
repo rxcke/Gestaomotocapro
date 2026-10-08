@@ -188,17 +188,17 @@
 
 /* Painel de vidro — base de toda a interface */
 @utility glass-panel {
-  background-color: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  background-color: var(--glass-strong);
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius) + 12px);
   backdrop-filter: blur(18px) saturate(115%);
   box-shadow: var(--glass-shadow);
 }
 
 @utility glass-soft {
-  background-color: var(--glass-strong);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  background-color: color-mix(in oklab, var(--muted) 70%, transparent);
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius) + 8px);
   backdrop-filter: blur(14px) saturate(110%);
 }
 
