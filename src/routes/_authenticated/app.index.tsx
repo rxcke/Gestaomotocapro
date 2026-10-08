@@ -50,7 +50,7 @@ function Dashboard() {
       <GlassCard className="overflow-hidden">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1.5fr)_minmax(220px,0.8fr)] md:items-end">
           <div className="min-w-0">
-            <CardHeading title="Resultado deste mês" />
+            <CardHeading title="Lucro deste mês" />
             <p className={`num-display mt-3 text-4xl sm:text-5xl ${current.net >= 0 ? "text-positive" : "text-negative"}`}>
               {brl(current.net)}
             </p>
@@ -59,8 +59,8 @@ function Dashboard() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Stat label="Entrou" value={brlCompact(current.totalIncome)} tone="positive" />
-            <Stat label="Saiu" value={brlCompact(current.totalExpense)} tone="negative" />
+            <Stat label="Entrou" value={brl(current.totalIncome)} tone="positive" />
+            <Stat label="Saiu" value={brl(current.totalExpense)} tone="negative" />
           </div>
         </div>
       </GlassCard>
@@ -100,11 +100,11 @@ function Dashboard() {
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div>
               <p className="text-xs text-muted-foreground">Consumo médio</p>
-              <p className="num-display mt-1 text-2xl">{fuels.avgKmL == null ? "Dados insuficientes" : `${num(fuels.avgKmL)} km/L`}</p>
+              <p className="num-display mt-1 text-2xl">{fuels.avgKmL == null ? "—" : `${num(fuels.avgKmL)} km/L`}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Custo por km</p>
-              <p className="num-display mt-1 text-2xl">{fuels.fuelCostPerKm == null ? "Dados insuficientes" : brl(fuels.fuelCostPerKm)}</p>
+              <p className="num-display mt-1 text-2xl">{fuels.fuelCostPerKm == null ? "—" : brl(fuels.fuelCostPerKm)}</p>
             </div>
           </div>
           <Button asChild variant="ghost" size="sm" className="mt-4 px-0 text-accent">
@@ -135,8 +135,8 @@ function Dashboard() {
         <GlassCard>
           <CardHeading title="Modo trabalho" />
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <Stat label="Ganhos no mês" value={brlCompact(current.totalIncome)} tone="positive" />
-            <Stat label="Lucro do mês" value={brlCompact(current.net)} tone={current.net >= 0 ? "positive" : "negative"} />
+            <Stat label="Ganhos no mês" value={brl(current.totalIncome)} tone="positive" />
+            <Stat label="Lucro do mês" value={brl(current.net)} tone={current.net >= 0 ? "positive" : "negative"} />
             <div className="glass-soft flex items-center justify-center p-4">
               <Button asChild className="w-full"><Link to="/app/jornada">Abrir jornada</Link></Button>
             </div>
