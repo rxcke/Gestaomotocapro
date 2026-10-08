@@ -5,7 +5,9 @@ import { ExpenseDialog, IncomeDialog } from "@/components/forms/dialogs";
 import { ErrorBlock, GlassCard, LoadingBlock, PageTitle, Stat } from "@/components/glass";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useScopedData } from "@/lib/app-context";
+import { useApp, useScopedData } from "@/lib/app-context";
+import { useExpenses, useIncomes } from "@/lib/data";
+import { filterByMotorcycle, NO_MOTO, ALL_ENTRIES } from "@/lib/money-filter";
 import { daysAgoPeriod, financeSummary, inPeriod, monthPeriod, type Period } from "@/lib/calc";
 import { useRemove } from "@/lib/data";
 import { brl, dateBR } from "@/lib/format";
@@ -30,6 +32,11 @@ function MoneyPage() {
   const data = useScopedData();
   const full = Boolean(useAccess().data?.hasAppAccess);
   const [periodKey, setPeriodKey] = useState("month");
+  const { motorcycles } = useApp();
+  const allIncomes = useIncomes();
+  const allExpenses = useExpenses();
+  const [motoFilter, setMotoFilter] = useState(ALL_ENTRIES);
+  const motoNames = Object.fromEntries(motorcycles.map((m) => [m.id, `${m.brand} ${m.model}`]));
   const [dialog, setDialog] = useState<DialogState>(null);
   const removeIncome = useRemove("incomes", "Ganho excluído.");
   const removeExpense = useRemove("expenses", "Gasto excluído.");
@@ -41,9 +48,9 @@ function MoneyPage() {
     return monthPeriod();
   }, [periodKey]);
 
-  if (data.isLoading) return <LoadingBlock />;
-  if (data.isError) return <ErrorBlock />;
-  const result = financeSummary(data.incomes, data.expenses, period);
+  if (data.isLoading || allIncomes.isLoading || allExpenses.isLoading) return <LoadingBlock />;
+  if (data.isError || allIncomes.isError || allExpenses.isError) return <ErrorBlock />;
+  const result = financeSummary(filterByMotorcycle(allIncomes.data ?? [], motoFilter), filterByMotorcycle(allExpenses.data ?? [], motoFilter), period);
 
   return (
     <div className="space-y-6">
@@ -61,6 +68,12 @@ function MoneyPage() {
         ))}
       </div>
 
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-1" aria-label="Filtrar por moto">
+        {[{ k: ALL_ENTRIES, l: "Todas as motos" }, ...motorcycles.map((m) => ({ k: m.id, l: `${m.brand} ${m.model}` })), { k: NO_MOTO, l: "Sem moto" }].map((o) => (
+          <Button key={o.k} size="sm" variant={motoFilter === o.k ? "default" : "outline"} className="shrink-0" onClick={() => setMotoFilter(o.k)}>{o.l}</Button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Stat label="Entradas" value={brl(result.totalIncome)} tone="positive" />
         <Stat label="Despesas" value={brl(result.totalExpense)} tone="negative" />
@@ -74,9 +87,9 @@ function MoneyPage() {
             <TabsTrigger value="income">Ganhos</TabsTrigger>
             <TabsTrigger value="expense">Gastos</TabsTrigger>
           </TabsList>
-          <TabsContent value="all"><Ledger incomes={result.incomes} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} /></TabsContent>
-          <TabsContent value="income"><Ledger incomes={result.incomes} expenses={[]} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} /></TabsContent>
-          <TabsContent value="expense"><Ledger incomes={[]} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} /></TabsContent>
+          <TabsContent value="all"><Ledger incomes={result.incomes} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} motoNames={motoNames} /></TabsContent>
+          <TabsContent value="income"><Ledger incomes={result.incomes} expenses={[]} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} motoNames={motoNames} /></TabsContent>
+          <TabsContent value="expense"><Ledger incomes={[]} expenses={result.expenses} onEdit={setDialog} onRemoveIncome={removeIncome.mutate} onRemoveExpense={removeExpense.mutate} full={full} motoNames={motoNames} /></TabsContent>
         </Tabs>
       </GlassCard>
 
@@ -86,8 +99,8 @@ function MoneyPage() {
   );
 }
 
-function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense, full }: {
-  full: boolean; incomes: Income[]; expenses: Expense[]; onEdit: (v: DialogState) => void; onRemoveIncome: (id: string) => void; onRemoveExpense: (id: string) => void;
+function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense, full, motoNames }: {
+  full: boolean; motoNames: Record<string, string>; incomes: Income[]; expenses: Expense[]; onEdit: (v: DialogState) => void; onRemoveIncome: (id: string) => void; onRemoveExpense: (id: string) => void;
 }) {
   const rows = [
     ...incomes.map((r) => ({ ...r, kind: "income" as const })),
@@ -96,7 +109,7 @@ function Ledger({ incomes, expenses, onEdit, onRemoveIncome, onRemoveExpense, fu
   if (!rows.length) return <p className="py-10 text-center text-sm text-muted-foreground">Nenhum lançamento neste período.</p>;
   return <div className="mt-4 divide-y divide-border/60">{rows.map((r) => (
     <div key={`${r.kind}-${r.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
-      <div className="min-w-0"><p className="truncate text-sm font-semibold">{r.category}</p><p className="truncate text-xs text-muted-foreground">{dateBR(r.date)}{r.description ? ` · ${r.description}` : ""}</p></div>
+      <div className="min-w-0"><p className="truncate text-sm font-semibold">{r.category}</p><p className="truncate text-xs text-muted-foreground">{dateBR(r.date)} · {r.motorcycle_id ? motoNames[r.motorcycle_id] ?? "Moto" : "Sem moto específica"}{r.description ? ` · ${r.description}` : ""}</p></div>
       <div className="flex items-center gap-1"><span className={`mr-1 num-display text-sm ${r.kind === "income" ? "text-positive" : "text-negative"}`}>{r.kind === "income" ? "+" : "−"}{brl(r.amount)}</span>
         {!full || (r.kind === "expense" && (r.fuel_record_id || r.maintenance_record_id)) ? null : <>
           <Button variant="ghost" size="icon" className="size-8" aria-label="Editar" onClick={() => onEdit(r.kind === "income" ? {kind:"income",record:r} : {kind:"expense",record:r})}><Pencil className="size-3.5" /></Button>

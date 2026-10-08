@@ -18,7 +18,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     if (motoId !== ALL_MOTOS && list.length > 0 && !list.some((m) => m.id === motoId)) {
       setMotoIdState(list[0]?.id ?? ALL_MOTOS);
     }
-    if (motoId === ALL_MOTOS && list.length === 1) setMotoIdState(list[0]?.id ?? ALL_MOTOS);
   }, [motos.data, motoId]);
 
   const setMotoId = (id: string) => {
@@ -32,7 +31,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       motoId,
       setMotoId,
       motorcycles,
-      activeMoto: motorcycles.find((m) => m.id === motoId) ?? null,
+      // With a single motorcycle the view stays general (entries without a motorcycle remain visible); that motorcycle still drives km context.
+      activeMoto: motorcycles.find((m) => m.id === motoId) ?? (motorcycles.length === 1 ? motorcycles[0] ?? null : null),
       loading: motos.isLoading,
       error: motos.isError,
     };
