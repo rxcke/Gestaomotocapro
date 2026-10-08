@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, CheckCircle2, Clock3, LoaderCircle, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock3, LoaderCircle, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Logo } from "@/components/Logo";
+import { EntryShell } from "@/components/EntryShell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
@@ -72,109 +72,42 @@ function ThankYouPage() {
     if (hasSession) await access.refetch();
   };
 
+  const copy = state === "active"
+    ? { eyebrow: "Assinatura confirmada", title: <>Pagamento recebido. <span className="text-accent">🏍️</span></>, text: "Seu acesso ao Gestão Motoca Pro está liberado. Agora é só começar o corre." }
+    : state === "checking"
+      ? { eyebrow: "Confirmando", title: "Estamos confirmando seu pagamento.", text: "Isso pode levar alguns instantes. Esta página atualiza sozinha." }
+      : { eyebrow: "Aguardando confirmação", title: "Não conseguimos identificar seu pagamento ainda.", text: hasSession ? "Se você acabou de realizar a compra, aguarde alguns instantes e atualize o status." : "Se você acabou de realizar a compra, entre com o mesmo e-mail usado no pagamento para acompanhar a liberação." };
+
   return (
-    <main className="dark min-h-dvh overflow-x-hidden bg-canvas text-foreground">
-      <div className="mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-12 lg:py-8">
-        <header className="flex items-center justify-between border-b border-border pb-5">
-          <Link to="/" aria-label="Gestão Motoca Pro — início">
-            <Logo />
-          </Link>
-          <span className="hidden text-xs font-semibold uppercase text-muted-foreground sm:block">
-            Compra concluída
-          </span>
-        </header>
-
-        <div className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)] lg:gap-16 lg:py-14">
-          <section className="min-w-0">
-            <div className="mb-7 flex size-16 items-center justify-center rounded-full border border-accent/40 bg-accent/10 text-accent sm:size-20">
-              <Check className="size-8 sm:size-10" strokeWidth={3} aria-hidden="true" />
-            </div>
-            <p className="text-sm font-bold uppercase text-accent">Pagamento recebido</p>
-            <h1 className="mt-4 max-w-3xl font-display text-4xl leading-[1.08] font-bold sm:text-5xl lg:text-6xl">
-              AGORA É OFICIAL.
-              <span className="mt-2 block text-accent">SEU CORRE ESTÁ SOB CONTROLE.</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-              Seu pagamento foi recebido. Agora falta só um passo para começar a usar o Gestão Motoca Pro.
-            </p>
-
-            <div className="mt-10 border-l-2 border-accent pl-5 sm:pl-6">
-              <p className="font-display text-lg font-bold">Seu próximo passo</p>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-                Use o mesmo e-mail utilizado na compra para acessar sua conta.
-              </p>
-            </div>
-          </section>
-
-          <section className="min-w-0 border-t border-border pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12" aria-live="polite">
-            <StatusIndicator state={state} />
-            <h2 className="mt-6 font-display text-2xl font-bold sm:text-3xl">
-              {state === "active"
-                ? "ACESSO LIBERADO!"
-                : state === "checking"
-                  ? "Estamos confirmando seu acesso..."
-                  : "Pagamento em processamento"}
-            </h2>
-            <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground sm:text-base">
-              {state === "active"
-                ? "Tudo certo. Sua assinatura foi confirmada e seu Gestão Motoca Pro está pronto."
-                : state === "checking"
-                  ? "Seu pagamento foi recebido. Estamos liberando sua conta."
-                  : "Se você acabou de realizar o pagamento, aguarde alguns instantes. Assim que a confirmação chegar, seu acesso será liberado."}
-            </p>
-
-            {state === "processing" ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-7 h-14 w-full text-sm sm:w-auto"
-                disabled={access.isFetching}
-                onClick={() => void tryAgain()}
-              >
-                <RotateCcw className={access.isFetching ? "animate-spin" : ""} />
-                {access.isFetching ? "VERIFICANDO..." : "TENTAR NOVAMENTE"}
-              </Button>
-            ) : null}
-
-            <Button asChild className="mt-4 h-14 w-full px-6 text-sm sm:w-auto">
-              <Link to="/auth">
-                ACESSAR MEU GESTÃO MOTOCA
-                <ArrowRight />
-              </Link>
+    <EntryShell eyebrow={copy.eyebrow} title={copy.title} subtitle={copy.text} stepKey={state}>
+      <div aria-live="polite">
+        <StatusIndicator state={state} />
+        <div className="mt-8 flex flex-col gap-3">
+          {state === "active" ? (
+            <Button asChild className="h-14 rounded-full text-sm font-bold uppercase tracking-wider"><Link to="/app">Entrar no meu app<ArrowRight /></Link></Button>
+          ) : hasSession ? (
+            <Button type="button" className="h-14 rounded-full text-sm font-bold uppercase tracking-wider" disabled={access.isFetching} onClick={() => void tryAgain()}>
+              <RotateCcw className={access.isFetching ? "animate-spin" : ""} />{access.isFetching ? "Verificando..." : "Atualizar status"}
             </Button>
-
-            <p className="mt-5 max-w-md text-xs leading-5 text-muted-foreground">
-              Seu acesso será liberado automaticamente assim que sua assinatura for identificada.
-            </p>
-          </section>
+          ) : (
+            <Button asChild className="h-14 rounded-full text-sm font-bold uppercase tracking-wider"><Link to="/auth">Ir para login<ArrowRight /></Link></Button>
+          )}
         </div>
-
-        <footer className="border-t border-border pt-5 text-xs text-muted-foreground">
-          Gestão Motoca Pro · Seu corre sob controle.
-        </footer>
+        <p className="mt-6 text-xs leading-5 text-muted-foreground">Use o mesmo e-mail da compra. O acesso é liberado automaticamente quando a assinatura é identificada.</p>
       </div>
-    </main>
+    </EntryShell>
   );
 }
 
 function StatusIndicator({ state }: { state: ConfirmationState }) {
-  const sharedClass = "size-8";
   return (
-    <div className="flex items-center gap-3">
-      <span className="flex size-14 shrink-0 items-center justify-center rounded-full border border-border bg-secondary">
-        {state === "active" ? (
-          <CheckCircle2 className={`${sharedClass} text-positive`} aria-hidden="true" />
-        ) : state === "checking" ? (
-          <LoaderCircle className={`${sharedClass} animate-spin text-accent`} aria-hidden="true" />
-        ) : (
-          <Clock3 className={`${sharedClass} text-warning`} aria-hidden="true" />
-        )}
+    <div className="flex items-center gap-4">
+      <span className={state === "active" ? "lp-pop flex size-16 shrink-0 items-center justify-center rounded-full bg-positive/15" : "flex size-16 shrink-0 items-center justify-center rounded-full bg-secondary"}>
+        {state === "active" ? <CheckCircle2 className="size-8 text-positive" aria-hidden="true" /> : state === "checking" ? <LoaderCircle className="size-8 animate-spin text-accent" aria-hidden="true" /> : <Clock3 className="size-8 text-warning" aria-hidden="true" />}
       </span>
       <div>
-        <p className="text-xs font-semibold uppercase text-muted-foreground">Status do acesso</p>
-        <p className="mt-1 text-sm font-semibold">
-          {state === "active" ? "Assinatura identificada" : state === "checking" ? "Confirmação em andamento" : "Aguardando confirmação"}
-        </p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Status do acesso</p>
+        <p className="mt-1 text-sm font-semibold">{state === "active" ? "Assinatura identificada" : state === "checking" ? "Confirmação em andamento" : "Aguardando confirmação"}</p>
       </div>
     </div>
   );

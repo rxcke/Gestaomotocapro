@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { AmbientBackground, GlassCard } from "@/components/glass";
-import { Logo } from "@/components/Logo";
+import { EntryShell } from "@/components/EntryShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,31 +75,23 @@ function ResetPassword() {
       toast.error(authErrorMessage(error, "Não foi possível atualizar a senha."));
       return;
     }
-    toast.success("Senha atualizada!");
+    toast.success("Senha alterada. Bora voltar pro corre! 🏍️");
     navigate({ to: "/app", replace: true });
   };
 
+  const field = "h-14 rounded-2xl border-transparent bg-secondary px-4 text-base focus-visible:border-accent";
   return (
-    <div className="relative flex min-h-dvh items-center justify-center bg-canvas px-5 text-foreground">
-      <AmbientBackground />
-      <div className="relative w-full max-w-md">
-        <div className="mb-6 flex justify-center">
-          <Logo />
-        </div>
-        <GlassCard>
-          <h1 className="font-display text-2xl font-bold">{checking ? "Verificando link" : validRecovery ? "Nova senha" : "Link inválido ou expirado"}</h1>
-          {checking ? <p className="mt-3 text-sm text-muted-foreground">Aguarde só um instante.</p> : validRecovery ? <form className="mt-5 space-y-4" onSubmit={submit}>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Senha</Label>
-              <Input id="password" name="password" type="password" minLength={8} required autoComplete="new-password" className="h-12 text-base" />
-            </div>
-            <div className="space-y-1.5"><Label htmlFor="confirmation">Confirmar senha</Label><Input id="confirmation" name="confirmation" type="password" minLength={8} required autoComplete="new-password" className="h-12 text-base" /></div>
-            <Button type="submit" className="h-12 w-full text-base" disabled={loading}>
-              {loading ? "Salvando..." : "Salvar nova senha"}
-            </Button>
-          </form> : <div className="mt-5"><p className="text-sm text-muted-foreground">Solicite um novo link para redefinir sua senha.</p><Button className="mt-5 w-full" onClick={() => navigate({ to: "/auth", replace: true })}>Voltar para entrar</Button></div>}
-        </GlassCard>
-      </div>
-    </div>
+    <EntryShell
+      eyebrow="Nova senha"
+      title={checking ? "Verificando seu link..." : validRecovery ? "Crie uma nova senha." : "Esse link expirou."}
+      subtitle={checking ? "Aguarde só um instante." : validRecovery ? "Mínimo de 8 caracteres, com letra e número." : "Peça um novo link para redefinir sua senha."}
+      stepKey={checking ? 0 : validRecovery ? 1 : 2}
+    >
+      {checking ? <div className="h-14 animate-pulse rounded-2xl bg-secondary" /> : validRecovery ? <form className="space-y-4" onSubmit={submit}>
+        <div className="space-y-1.5"><Label htmlFor="password">Nova senha</Label><Input id="password" name="password" type="password" minLength={8} required autoComplete="new-password" className={field} /></div>
+        <div className="space-y-1.5"><Label htmlFor="confirmation">Confirmar nova senha</Label><Input id="confirmation" name="confirmation" type="password" minLength={8} required autoComplete="new-password" className={field} /></div>
+        <Button type="submit" className="mt-2 h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider" disabled={loading}>{loading ? "Salvando..." : "Alterar senha"}</Button>
+      </form> : <Button className="h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider" onClick={() => navigate({ to: "/auth", replace: true })}>Voltar para entrar</Button>}
+    </EntryShell>
   );
 }
