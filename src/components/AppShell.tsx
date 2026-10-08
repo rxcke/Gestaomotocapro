@@ -153,20 +153,27 @@ export function AppShell({ children }: { children: ReactNode }) {
             </SheetTrigger>
             <SheetContent side="bottom" className="rounded-t-2xl pb-[max(1.5rem,env(safe-area-inset-bottom))]">
               <SheetHeader><SheetTitle>Mais opções</SheetTitle></SheetHeader>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {moreNav.map((item) => (
-                  <SheetClose asChild key={item.to}>
-                    <Link
-                      to={item.to}
-                      className={cn(
-                        "flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition active:scale-[0.98]",
-                        isActive(item.to, false) ? "glass-soft text-accent" : "bg-muted/50 text-foreground",
-                      )}
-                    >
-                      <item.icon className="size-5 shrink-0" />
-                      {item.label}
-                    </Link>
-                  </SheetClose>
+              <div className="mt-2 space-y-3">
+                {moreGroups.map((group) => (
+                  <div key={group.label}>
+                    <p className="px-1 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">{group.label}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.items.map((item) => (
+                        <SheetClose asChild key={item.to}>
+                          <Link
+                            to={item.to}
+                            className={cn(
+                              "flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition active:scale-[0.98]",
+                              isActive(item.to, false) ? "bg-accent/10 font-semibold text-foreground" : "bg-muted/50 text-foreground",
+                            )}
+                          >
+                            <item.icon className={cn("size-5 shrink-0", isActive(item.to, false) && "text-accent")} />
+                            {item.label}
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </SheetContent>
