@@ -1,4 +1,5 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import { useAccess, openUpgrade } from "@/lib/use-access";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -150,3 +151,55 @@ export const textOrNull = (v: FormDataEntryValue | null) => {
   const s = v == null ? "" : String(v).trim();
   return s === "" ? null : s;
 };
+
+/** Valor em destaque: primeiro passo do fluxo "registrar primeiro → detalhar depois". */
+export function AmountField({
+  question,
+  name = "amount",
+  defaultValue,
+}: {
+  question: string;
+  name?: string;
+  defaultValue?: string | number;
+}) {
+  return (
+    <div className="rounded-2xl bg-muted/40 px-4 py-5 text-center">
+      <Label htmlFor={name} className="block text-sm font-semibold text-muted-foreground">{question}</Label>
+      <div className="mt-2 flex items-baseline justify-center gap-2">
+        <span className="font-display text-2xl font-bold text-muted-foreground">R$</span>
+        <input
+          id={name}
+          name={name}
+          type="number"
+          step="0.01"
+          min="0.01"
+          inputMode="decimal"
+          required
+          autoFocus
+          placeholder="0,00"
+          defaultValue={defaultValue ?? ""}
+          className="num-display w-full min-w-0 max-w-[12ch] bg-transparent text-center text-4xl text-foreground outline-none placeholder:text-muted-foreground/50 focus-visible:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+/** Detalhes opcionais recolhidos. Os campos ficam sempre montados para irem no formulário. */
+export function OptionalDetails({ children, defaultOpen = false }: { children: ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex min-h-11 w-full items-center justify-between rounded-xl px-1 text-sm font-semibold text-muted-foreground transition hover:text-foreground"
+      >
+        <span>Detalhes (opcional)</span>
+        <ChevronDown className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      <div className={open ? "mt-2 space-y-4 animate-in fade-in-0 slide-in-from-top-1 duration-200" : "hidden"}>{children}</div>
+    </div>
+  );
+}
