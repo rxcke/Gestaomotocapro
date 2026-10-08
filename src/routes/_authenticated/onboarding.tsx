@@ -351,7 +351,6 @@ function Onboarding() {
                 </Button>
               </div>
             </div>
-          ) : null}
           ) : null}</>)}
     </EntryShell>
   );
