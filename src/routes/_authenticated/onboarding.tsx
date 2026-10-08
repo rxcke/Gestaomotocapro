@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock } from "@/components/glass";
-import { Logo } from "@/components/Logo";
+import { ErrorBlock, LoadingBlock } from "@/components/glass";
+import { EntryProgress, EntryShell } from "@/components/EntryShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +46,7 @@ function Onboarding() {
   const [pro, setPro] = useState(false);
   const [moto, setMoto] = useState({ brand: "", model: "", year: "", plate: "", km: "" });
   const [saving, setSaving] = useState(false);
+  const [done, setDone] = useState(false);
   const draftKey = `onboarding:draft:${user.id}`;
 
   const displayName = name || profile.data?.name || "";
@@ -88,10 +89,10 @@ function Onboarding() {
   }, [blocked, navigate]);
 
   useEffect(() => {
-    if (completed) navigate({ to: "/app", replace: true });
-  }, [completed, navigate]);
+    if (completed && !done) navigate({ to: "/app", replace: true });
+  }, [completed, done, navigate]);
 
-  if (access.isLoading || profile.isLoading || motorcycles.isLoading || blocked || completed) {
+  if (access.isLoading || profile.isLoading || motorcycles.isLoading || blocked || (completed && !done)) {
     return <div className="flex min-h-dvh items-center justify-center bg-canvas p-6"><LoadingBlock label="Verificando sua assinatura..." /></div>;
   }
 
@@ -183,8 +184,8 @@ function Onboarding() {
         onboarding_completed: true,
       });
       window.localStorage.removeItem(draftKey);
+      setDone(true);
       await profile.refetch();
-      await navigate({ to: "/app", replace: true });
     } catch {
       toast.error("Não foi possível concluir seu cadastro. Seus passos anteriores foram salvos.");
     } finally {
@@ -192,34 +193,32 @@ function Onboarding() {
     }
   };
 
+  const firstName = displayName.trim().split(/\s+/)[0] ?? "";
+  const titles = [
+    { eyebrow: "Começando", title: <>Bem-vindo ao corre{firstName ? `, ${firstName}` : ""}. 🏍️</>, subtitle: "Vamos deixar tudo pronto para você começar." },
+    { eyebrow: "Seu uso", title: "Como você usa a moto?", subtitle: "Escolha uma ou mais opções." },
+    { eyebrow: "Sua moto", title: "Qual é a sua máquina?", subtitle: "Você pode cadastrar outras depois." },
+  ];
+  const head = done
+    ? { eyebrow: "Tudo pronto", title: <>Pronto. Agora é só começar o corre. <span className="text-accent">🏍️</span></>, subtitle: "Seu controle começa aqui." }
+    : titles[step] ?? titles[0];
+
   return (
-    <div className="relative flex min-h-dvh items-center justify-center bg-canvas px-5 py-10 text-foreground">
-      <AmbientBackground />
-      <div className="relative w-full max-w-md">
-        <div className="mb-6 flex justify-center">
-          <Logo />
+    <EntryShell eyebrow={head.eyebrow} title={head.title} subtitle={head.subtitle} stepKey={done ? "done" : step}>
+      {done ? (
+        <div>
+          <div className="lp-pop flex size-20 items-center justify-center rounded-full bg-accent text-4xl text-accent-foreground" aria-hidden="true">✓</div>
+          <Button className="mt-10 h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider" onClick={() => void navigate({ to: "/app", replace: true })}>Ir para meu app</Button>
         </div>
-        <GlassCard>
-          <div className="mb-5 flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className={cn("h-1.5 flex-1 rounded-full", i <= step ? "bg-accent" : "bg-border")}
-              />
-            ))}
-          </div>
+      ) : (<>
+          <EntryProgress step={step} total={3} />
 
           {step === 0 ? (
-            <div className="space-y-4">
-              <div>
-                <h1 className="font-display text-2xl font-bold">Bem-vindo!</h1>
-                <p className="mt-1 text-sm text-muted-foreground">Complete seus dados de contato.</p>
-              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="name">Nome completo *</Label>
                 <Input
                   id="name"
-                  className="h-12 text-base"
+                  className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base"
                   value={displayName}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Seu nome completo"
@@ -229,9 +228,9 @@ function Onboarding() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="onboarding-phone">WhatsApp / Celular *</Label>
-                <Input id="onboarding-phone" type="tel" inputMode="tel" autoComplete="tel-national" className="h-12 text-base" value={displayPhone} onChange={(event) => setPhone(formatBrazilianMobile(event.target.value))} placeholder="(31) 99999-9999" maxLength={15} required />
+                <Input id="onboarding-phone" type="tel" inputMode="tel" autoComplete="tel-national" className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base" value={displayPhone} onChange={(event) => setPhone(formatBrazilianMobile(event.target.value))} placeholder="(31) 99999-9999" maxLength={15} required />
               </div>
-              <Button className="h-12 w-full text-base" disabled={saving} onClick={saveIdentityStep}>
+              <Button className="h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider" disabled={saving} onClick={saveIdentityStep}>
                 {saving ? "Salvando..." : "Continuar"}
               </Button>
             </div>
@@ -239,10 +238,6 @@ function Onboarding() {
 
           {step === 1 ? (
             <div className="space-y-4">
-              <div>
-                <h1 className="font-display text-2xl font-bold">Como você usa a moto?</h1>
-                <p className="mt-1 text-sm text-muted-foreground">Escolha uma ou mais opções.</p>
-              </div>
               <div className="flex flex-wrap gap-2">
                 {USAGE_TYPES.map((u) => (
                   <button
@@ -266,10 +261,10 @@ function Onboarding() {
                 <Switch checked={pro} onCheckedChange={setPro} />
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" className="h-12 flex-1" onClick={() => setStep(0)}>
+                <Button variant="ghost" className="h-14 flex-1 rounded-full" onClick={() => setStep(0)}>
                   Voltar
                 </Button>
-                <Button className="h-12 flex-1 text-base" disabled={saving} onClick={saveUsageStep}>
+                <Button className="h-14 flex-1 rounded-full text-sm font-bold uppercase tracking-wider" disabled={saving} onClick={saveUsageStep}>
                   {saving ? "Salvando..." : "Continuar"}
                 </Button>
               </div>
@@ -278,15 +273,11 @@ function Onboarding() {
 
           {step === 2 ? (
             <div className="space-y-4">
-              <div>
-                <h1 className="font-display text-2xl font-bold">Sua moto</h1>
-                <p className="mt-1 text-sm text-muted-foreground">Você pode cadastrar outras depois.</p>
-              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="brand">Marca</Label>
                 <Input
                   id="brand"
-                  className="h-12 text-base"
+                  className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base"
                   value={moto.brand}
                   onChange={(e) => setMoto({ ...moto, brand: e.target.value })}
                   placeholder="Honda"
@@ -298,7 +289,7 @@ function Onboarding() {
                 <Label htmlFor="model">Modelo</Label>
                 <Input
                   id="model"
-                  className="h-12 text-base"
+                  className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base"
                   value={moto.model}
                   onChange={(e) => setMoto({ ...moto, model: e.target.value })}
                   placeholder="CG 160"
@@ -313,7 +304,7 @@ function Onboarding() {
                     id="year"
                     type="number"
                     inputMode="numeric"
-                    className="h-12 text-base"
+                    className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base"
                     value={moto.year}
                     onChange={(e) => setMoto({ ...moto, year: e.target.value })}
                     min={1900}
@@ -324,7 +315,7 @@ function Onboarding() {
                   <Label htmlFor="plate">Placa</Label>
                   <Input
                     id="plate"
-                    className="h-12 text-base"
+                    className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base"
                     value={moto.plate}
                     onChange={(e) => setMoto({ ...moto, plate: e.target.value })}
                     maxLength={8}
@@ -338,7 +329,7 @@ function Onboarding() {
                   id="km"
                   type="number"
                   inputMode="decimal"
-                  className="h-12 text-base"
+                  className="h-14 rounded-2xl border-transparent bg-secondary px-4 text-base"
                   value={moto.km}
                   onChange={(e) => setMoto({ ...moto, km: e.target.value })}
                   placeholder="32500"
@@ -347,11 +338,11 @@ function Onboarding() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" className="h-12 flex-1" onClick={() => setStep(1)}>
+                <Button variant="ghost" className="h-14 flex-1 rounded-full" onClick={() => setStep(1)}>
                   Voltar
                 </Button>
                 <Button
-                  className="h-12 flex-1 text-base"
+                  className="h-14 flex-1 rounded-full text-sm font-bold uppercase tracking-wider"
                   disabled={saving}
                   onClick={finish}
                 >
@@ -360,8 +351,7 @@ function Onboarding() {
               </div>
             </div>
           ) : null}
-        </GlassCard>
-      </div>
-    </div>
+          ) : null}</>)}
+    </EntryShell>
   );
 }
