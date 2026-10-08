@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import { AmountField, Field, FormDialog, OptionalDetails, SelectField, numberOrNull, textOrNull } from "./fields";
+import { Field, FormDialog, SelectField, numberOrNull, textOrNull } from "./fields";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,7 +115,7 @@ export function IncomeDialog({
 }: DialogProps & { record?: Income | null; sessionId?: string | null }) {
   const { options, preselect } = useMotoOptions(true);
   const save = useUpsert("incomes", "incomes", {
-    successMessage: record ? "✓ Ganho atualizado" : "✓ Ganho registrado",
+    successMessage: "Ganho salvo com sucesso.",
     onDone: () => onOpenChange(false),
   });
 
@@ -123,7 +123,7 @@ export function IncomeDialog({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={record ? "Editar ganho" : "Registrar ganho"}
+      title={record ? "Editar ganho" : "Adicionar ganho"}
       onSubmit={(f) =>
         save.mutate({
           ...(record ? { id: record.id } : {}),
@@ -137,10 +137,17 @@ export function IncomeDialog({
         })
       }
       submitting={save.isPending}
-      submitLabel={record ? "Salvar ganho" : "Registrar ganho"}
+      submitLabel="Salvar ganho"
     >
-      <AmountField question="Quanto você ganhou?" defaultValue={record?.amount ?? ""} />
-      <OptionalDetails>
+      <Field
+        label="Valor (R$)"
+        name="amount"
+        type="number"
+        step="0.01"
+        inputMode="decimal"
+        required
+        defaultValue={record?.amount ?? ""}
+      />
       <SelectField
         label="Categoria"
         name="category"
@@ -159,8 +166,7 @@ export function IncomeDialog({
           defaultValue={record ? record.motorcycle_id ?? "none" : preselect}
         />
       ) : null}
-      <Field label="Observação (opcional)" name="description" defaultValue={record?.description ?? ""} />
-      </OptionalDetails>
+      <Field label="Descrição (opcional)" name="description" defaultValue={record?.description ?? ""} />
     </FormDialog>
   );
 }
@@ -179,7 +185,7 @@ export function ExpenseDialog({
 }: DialogProps & { record?: Expense | null; sessionId?: string | null }) {
   const { options, preselect } = useMotoOptions(true);
   const save = useUpsert("expenses", "expenses", {
-    successMessage: record ? "✓ Gasto atualizado" : "✓ Gasto registrado",
+    successMessage: "Gasto salvo com sucesso.",
     onDone: () => onOpenChange(false),
   });
 
@@ -187,7 +193,7 @@ export function ExpenseDialog({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={record ? "Editar gasto" : "Registrar gasto"}
+      title={record ? "Editar gasto" : "Adicionar gasto"}
       onSubmit={(f) => {
         const [group, category] = String(f.get("category")).split("|");
         save.mutate({
@@ -202,10 +208,17 @@ export function ExpenseDialog({
         });
       }}
       submitting={save.isPending}
-      submitLabel={record ? "Salvar gasto" : "Registrar gasto"}
+      submitLabel="Salvar gasto"
     >
-      <AmountField question="Quanto você gastou?" defaultValue={record?.amount ?? ""} />
-      <OptionalDetails>
+      <Field
+        label="Valor (R$)"
+        name="amount"
+        type="number"
+        step="0.01"
+        inputMode="decimal"
+        required
+        defaultValue={record?.amount ?? ""}
+      />
       <SelectField
         label="Categoria"
         name="category"
@@ -221,8 +234,7 @@ export function ExpenseDialog({
           defaultValue={record ? record.motorcycle_id ?? "none" : preselect}
         />
       ) : null}
-      <Field label="Observação (opcional)" name="description" defaultValue={record?.description ?? ""} />
-      </OptionalDetails>
+      <Field label="Descrição (opcional)" name="description" defaultValue={record?.description ?? ""} />
     </FormDialog>
   );
 }

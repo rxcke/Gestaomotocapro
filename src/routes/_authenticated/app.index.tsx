@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useApp, ALL_MOTOS, useScopedData } from "@/lib/app-context";
 import { activeMotoKm, financeSummary, fuelStats, monthPeriod, percent, upcomingMaintenance, variation } from "@/lib/calc";
-import { brl, brlCompact, greeting, num, todayISO } from "@/lib/format";
+import { brl, brlCompact, greeting, num } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
@@ -30,7 +30,6 @@ function Dashboard() {
   if (motorcycles.length === 0) return <EmptyState title="Cadastre sua primeira moto" description="Ela será a base para calcular consumo, manutenção e custo por km." />;
 
   const current = financeSummary(data.incomes, data.expenses, monthPeriod());
-  const today = financeSummary(data.incomes, data.expenses, { start: todayISO(), end: todayISO() });
   const previous = financeSummary(data.incomes, data.expenses, monthPeriod(-1));
   const change = variation(current.net, previous.net);
   const fuels = fuelStats(data.fuel);
@@ -47,15 +46,6 @@ function Dashboard() {
         title={`${greeting()}, ${data.profile?.name?.split(" ")[0] ?? "piloto"}`}
         subtitle={motoId === ALL_MOTOS ? "Resultado consolidado de todas as motos" : "Veja como sua moto está trabalhando por você."}
       />
-
-      <section aria-labelledby="today-title">
-        <h2 id="today-title" className="mb-3 font-display text-lg font-bold">Seu corre de hoje</h2>
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <Stat label="Faturamento" value={brl(today.totalIncome)} tone="positive" className="p-3 sm:p-4" valueClassName="text-base sm:text-xl" />
-          <Stat label="Gastos" value={brl(today.totalExpense)} tone="negative" className="p-3 sm:p-4" valueClassName="text-base sm:text-xl" />
-          <Stat label="Lucro" value={brl(today.net)} tone={today.net >= 0 ? "positive" : "negative"} className="p-3 sm:p-4" valueClassName="text-base sm:text-xl" />
-        </div>
-      </section>
 
       <GlassCard className="overflow-hidden">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1.5fr)_minmax(220px,0.8fr)] md:items-end">
@@ -92,7 +82,7 @@ function Dashboard() {
               </div>
               <Progress value={Math.min(100, goalProgress)} className="mt-2 [&>div]:bg-accent" />
               <p className="mt-2 text-xs text-muted-foreground">
-                {goalProgress >= 100 ? "🏆 Meta batida!" : `Faltam ${brl(Math.max(0, Number(activeGoal.target_amount) - goalCurrent))}`}
+                {goalProgress >= 100 ? "Meta alcançada! 🔥" : `Faltam ${brl(Math.max(0, Number(activeGoal.target_amount) - goalCurrent))}`}
               </p>
             </>
           ) : (
