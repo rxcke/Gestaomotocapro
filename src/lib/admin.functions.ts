@@ -176,3 +176,82 @@ export const setAmbassadorAccess = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+const ExportInput = z.object({
+  period: z.enum(["all", "today", "7d", "30d", "custom"]),
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  subscription: z.enum(["all", "active", "none"]),
+  demo: z.enum(["all", "active", "expired", "none"]),
+  countOnly: z.boolean(),
+});
+
+export const exportUsersCsv = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ExportInput.parse(input))
+  .handler(async ({ context, data }): Promise<{ count: number; csv: string | null }> => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (roleError || !isAdmin) throw new Error("Acesso administrativo não autorizado.");
+    const { periodRange, crmWhatsapp, brDateTime, demoStatus, buildCsv } = await import("./user-export");
+    const now = new Date();
+    const range = periodRange(data.period, now, data.from, data.to);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    type P = { id: string; name: string | null; email: string | null; phone: string | null; created_at: string; auth_provider: string };
+    const profiles: P[] = [];
+    for (let offset = 0; ; offset += 1000) {
+      let q = supabaseAdmin.from("profiles").select("id,name,email,phone,created_at,auth_provider").order("created_at", { ascending: false }).range(offset, offset + 999);
+      if (range) q = q.gte("created_at", range.start).lt("created_at", range.end);
+      const { data: page, error } = await q;
+      if (error) throw new Error("Não foi possível ler os usuários.");
+      profiles.push(...(page ?? []));
+      if (!page || page.length < 1000) break;
+    }
+
+    const ids = profiles.map((p) => p.id);
+    const subs: Array<{ user_id: string; plan: string; status: string; provider_status: string; expires_at: string | null; created_at: string }> = [];
+    const demos = new Map<string, { demo_started_at: string | null; demo_expires_at: string | null }>();
+    const referrals = new Map<string, string | null>();
+    for (let i = 0; i < ids.length; i += 200) {
+      const chunk = ids.slice(i, i + 200);
+      const [s, d, a] = await Promise.all([
+        supabaseAdmin.from("subscriptions").select("user_id,plan,status,provider_status,expires_at,created_at").in("user_id", chunk),
+        supabaseAdmin.from("demo_usage").select("user_id,demo_started_at,demo_expires_at").in("user_id", chunk),
+        supabaseAdmin.from("signup_attribution").select("user_id,referral_code").in("user_id", chunk),
+      ]);
+      if (s.error || d.error || a.error) throw new Error("Não foi possível ler os dados de acesso.");
+      subs.push(...(s.data ?? []));
+      (d.data ?? []).forEach((r) => demos.set(r.user_id, r));
+      (a.data ?? []).forEach((r) => referrals.set(r.user_id, r.referral_code));
+    }
+    const latestSub = new Map<string, (typeof subs)[number]>();
+    for (const s of subs) { const cur = latestSub.get(s.user_id); if (!cur || s.created_at > cur.created_at) latestSub.set(s.user_id, s); }
+    const isActive = (s?: (typeof subs)[number]) => !!s && s.status === "active" && !!s.expires_at && new Date(s.expires_at) > now;
+    const planName: Record<string, string> = { monthly: "Start", quarterly: "Pro", annual: "Elite" };
+    const statusName: Record<string, string> = { pending: "Pendente", trial: "Trial", active: "Ativa", canceled: "Cancelada", expired: "Expirada", refunded: "Reembolsada", chargeback: "Chargeback", paused: "Pausada", late: "Inadimplente" };
+
+    const rows = profiles.filter((p) => {
+      const active = isActive(latestSub.get(p.id)) || subs.some((s) => s.user_id === p.id && isActive(s));
+      if (data.subscription === "active" && !active) return false;
+      if (data.subscription === "none" && active) return false;
+      const ds = demoStatus(demos.get(p.id)?.demo_expires_at, now);
+      if (data.demo === "active" && ds !== "Ativa") return false;
+      if (data.demo === "expired" && ds !== "Expirada") return false;
+      if (data.demo === "none" && ds !== "Sem demonstração") return false;
+      return true;
+    });
+    if (data.countOnly || rows.length === 0) return { count: rows.length, csv: null };
+
+    const csv = buildCsv(rows.map((p) => {
+      const s = latestSub.get(p.id);
+      const demo = demos.get(p.id);
+      const st = s ? (s.provider_status === "pending" && s.status !== "pending" ? s.status : s.provider_status) : null;
+      return [
+        p.email ?? "", p.name ?? "", crmWhatsapp(p.phone), brDateTime(p.created_at),
+        p.auth_provider === "google" ? "Google" : p.auth_provider === "email" ? "E-mail" : p.auth_provider ?? "",
+        referrals.get(p.id) ?? "",
+        s ? planName[s.plan] ?? "" : "", st ? statusName[st] ?? st : "Sem assinatura",
+        demoStatus(demo?.demo_expires_at, now), brDateTime(demo?.demo_started_at), brDateTime(demo?.demo_expires_at),
+      ];
+    }));
+    return { count: rows.length, csv };
+  });

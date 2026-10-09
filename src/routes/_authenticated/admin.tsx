@@ -12,6 +12,7 @@ import { getAdminData, setAmbassadorAccess, type AdminData } from "@/lib/admin.f
 import { brl, dateBR, km } from "@/lib/format";
 import { displayProfilePhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
+import { ExportUsersDialog } from "@/components/ExportUsersDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -114,6 +115,7 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
       {sections.map((item) => <Button key={item.id} variant={section === item.id ? "default" : "outline"} className="h-auto min-h-12 justify-start px-2 py-2 sm:px-3" onClick={() => setSection(item.id)}><item.icon className="mr-2 size-4 shrink-0" /><span className="min-w-0 truncate text-xs sm:text-sm">{item.label}</span><span className={cn("ml-auto text-xs", section === item.id ? "text-primary-foreground/75" : "text-muted-foreground")}>{item.count}</span></Button>)}
     </div>
+    {section === "users" && <div className="flex justify-end"><ExportUsersDialog /></div>}
     <GlassCard padded={false} className="overflow-hidden">
       <div className="divide-y divide-border">
         {section === "users" && <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,.65fr)_minmax(0,.75fr)_minmax(0,1.4fr)] gap-3 px-4 py-3 text-xs font-semibold text-muted-foreground lg:grid"><span>Nome</span><span>E-mail</span><span>WhatsApp</span><span>Acesso</span><span>Plano</span><span>Status</span><span>Ações</span></div>}
