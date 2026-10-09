@@ -116,7 +116,7 @@ function Home() {
         <div className="mt-4 grid grid-cols-2 gap-3">
           <ActionButton primary icon={Banknote} label="Ganho" onClick={() => setOpen("income")} />
           <ActionButton icon={Receipt} label="Gasto" onClick={() => setOpen("expense")} />
-          <ActionButton icon={Fuel} label="Abasteci" onClick={() => setOpen("fuel")} subtle />
+          <ActionButton icon={Fuel} label="Abastecimento" onClick={() => setOpen("fuel")} subtle />
           <ActionButton icon={Wrench} label="Manutenção" onClick={() => setOpen("maintenance")} subtle />
         </div>
       </section>
