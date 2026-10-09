@@ -1,4 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "node:test";
+import { strict as assert } from "node:assert";
+const expect = (a: unknown) => ({ toBe: (b: unknown) => assert.equal(a, b), toEqual: (b: unknown) => assert.deepEqual(a, b) });
 import { buildCsv, crmWhatsapp, demoStatus, periodRange } from "./user-export";
 
 describe("user export", () => {
@@ -24,7 +26,7 @@ describe("user export", () => {
   });
   test("csv starts with BOM and keeps accents", () => {
     const csv = buildCsv([["joão@x.com", "João Ação", "", "", "", "", "", "", "", "", ""]]);
-    expect(csv.startsWith("\uFEFF")).toBe(true);
-    expect(csv).toContain('"João Ação"');
+    assert.ok(csv.startsWith("\uFEFF"));
+    assert.ok(csv.includes('"João Ação"'));
   });
 });
