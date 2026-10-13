@@ -17,6 +17,7 @@ import {
 import { todayISO } from "@/lib/format";
 import { normalizeFuelMeasurements } from "@/lib/fuel";
 import { normalizeMaintenanceInput } from "@/lib/maintenance";
+import { isPositiveAmount, NON_POSITIVE_AMOUNT_MESSAGE } from "@/lib/money-input";
 import type {
   AppDocument,
   Expense,
@@ -124,18 +125,20 @@ export function IncomeDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={record ? "Editar ganho" : "Adicionar ganho"}
-      onSubmit={(f) =>
+      onSubmit={(f) => {
+        const amount = numberOrNull(f.get("amount"));
+        if (!isPositiveAmount(amount)) { toast.error(NON_POSITIVE_AMOUNT_MESSAGE); return; }
         save.mutate({
           ...(record ? { id: record.id } : {}),
-          amount: numberOrNull(f.get("amount")) ?? 0,
+          amount,
           category: String(f.get("category")),
           date: String(f.get("date")),
           time: textOrNull(f.get("time")),
           description: textOrNull(f.get("description")),
           motorcycle_id: motoValue(f.get("motorcycle_id")),
           work_session_id: record?.work_session_id ?? sessionId ?? null,
-        })
-      }
+        });
+      }}
       submitting={save.isPending}
       submitLabel="Salvar ganho"
     >
@@ -144,6 +147,7 @@ export function IncomeDialog({
         name="amount"
         type="number"
         step="0.01"
+        min="0.01"
         inputMode="decimal"
         required
         defaultValue={record?.amount ?? ""}
@@ -196,9 +200,11 @@ export function ExpenseDialog({
       title={record ? "Editar gasto" : "Adicionar gasto"}
       onSubmit={(f) => {
         const [group, category] = String(f.get("category")).split("|");
+        const amount = numberOrNull(f.get("amount"));
+        if (!isPositiveAmount(amount)) { toast.error(NON_POSITIVE_AMOUNT_MESSAGE); return; }
         save.mutate({
           ...(record ? { id: record.id } : {}),
-          amount: numberOrNull(f.get("amount")) ?? 0,
+          amount,
           group_name: group ?? "Moto",
           category: category ?? "Outros",
           date: String(f.get("date")),
@@ -215,6 +221,7 @@ export function ExpenseDialog({
         name="amount"
         type="number"
         step="0.01"
+        min="0.01"
         inputMode="decimal"
         required
         defaultValue={record?.amount ?? ""}

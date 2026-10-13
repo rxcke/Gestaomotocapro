@@ -953,6 +953,10 @@ export type Database = {
         Args: { _pause: boolean; _session_id: string }
         Returns: undefined
       }
+      work_session_entry_totals: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: Record<string, unknown>
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "ambassador"

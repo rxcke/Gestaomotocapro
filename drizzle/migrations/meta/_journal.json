@@ -267,6 +267,13 @@
       "when": 1791922840623,
       "tag": "0037_cakto_event_ordering_and_pending_link_apply",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1791923510049,
+      "tag": "0038_financial_integrity_phase2",
+      "breakpoints": true
     }
   ]
 }
