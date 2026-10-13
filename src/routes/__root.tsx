@@ -86,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Gestão Motoca Pro" },
       { name: "description", content: "Ganhos, gastos, combustível, manutenção e lucro para quem trabalha com moto." },
       { name: "author", content: "Gestão Motoca Pro" },
+      { name: "google-site-verification", content: "LrEmYHlxKvkJUsVqKJ2c-GAyWhVR3ons1QrNUMCqiJY" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
