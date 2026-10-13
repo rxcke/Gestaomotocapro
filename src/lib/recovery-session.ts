@@ -19,7 +19,8 @@ function decodeClaims(accessToken: string): Record<string, unknown> | null {
 export function isRecoverySession(accessToken: string | null | undefined, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
   if (!accessToken) return false;
   const claims = decodeClaims(accessToken);
-  const amr = Array.isArray(claims?.amr) ? (claims!.amr as AmrEntry[]) : [];
+  const rawAmr = claims?.["amr"];
+  const amr = Array.isArray(rawAmr) ? (rawAmr as AmrEntry[]) : [];
   return amr.some((entry) =>
     entry?.method === "recovery" &&
     typeof entry.timestamp === "number" &&
