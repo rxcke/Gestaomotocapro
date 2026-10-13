@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAccess, openUpgrade } from "./use-access";
+import { financialWriteErrorMessage } from "./money-input";
 import type {
   AppDocument,
   Expense,
