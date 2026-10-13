@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authErrorMessage } from "@/lib/auth-errors";
 import { isRecoverySession, recoveryLinkError } from "@/lib/recovery-session";
+import { clearRecoveryMarker, readRecoveryMarker } from "@/lib/recovery-watch";
 
 export const Route = createFileRoute("/reset-password")({
   staticData: { sitemap: false },
@@ -36,17 +37,19 @@ function ResetPassword() {
     let active = true;
     // Captured before the auth client clears the URL; a link error always wins.
     const linkError = recoveryLinkError(window.location.hash, window.location.search);
-    const decide = (accessToken: string | null | undefined) => {
+    type S = Parameters<typeof isRecoverySession>[0];
+    const decide = (session: S) => {
       if (!active) return;
-      setValidRecovery(!linkError && isRecoverySession(accessToken));
+      // The marker is written by the app-wide listener (recovery-watch) on PASSWORD_RECOVERY.
+      setValidRecovery(!linkError && isRecoverySession(session, readRecoveryMarker()));
       setChecking(false);
     };
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") decide(session?.access_token);
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") decide(session);
     });
     // getSession waits for the client to finish processing the link, so a
     // recovery confirmed before this page mounted is still recognised here.
-    void supabase.auth.getSession().then(({ data: sessionData }) => decide(sessionData.session?.access_token));
+    void supabase.auth.getSession().then(({ data: sessionData }) => decide(sessionData.session));
     return () => {
       active = false;
       data.subscription.unsubscribe();
@@ -73,6 +76,7 @@ function ResetPassword() {
       toast.error(authErrorMessage(error, "Não foi possível atualizar a senha."));
       return;
     }
+    clearRecoveryMarker();
     toast.success("Senha alterada. Bora voltar pro corre! 🏍️");
     navigate({ to: "/app", replace: true });
   };
