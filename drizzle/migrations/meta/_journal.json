@@ -274,6 +274,13 @@
       "when": 1791923510049,
       "tag": "0038_financial_integrity_phase2",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1791924299877,
+      "tag": "0039_allow_exact_legacy_expense_link",
+      "breakpoints": true
     }
   ]
 }
