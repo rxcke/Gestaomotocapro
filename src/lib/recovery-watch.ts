@@ -22,6 +22,13 @@ const nowSeconds = () => Math.floor(Date.now() / 1000);
 const saveMarker = (userId: string, at: number) =>
   window.sessionStorage.setItem(RECOVERY_MARKER_KEY, JSON.stringify({ userId, at } satisfies RecoveryMarker));
 
+/** Called by /auth/confirm after verifyOtp(recovery) succeeded. Never sufficient alone:
+ * /reset-password still requires a fresh OTP session of the same user. */
+export function markRecoveryVerified(userId: string) {
+  if (typeof window === "undefined") return;
+  saveMarker(userId, nowSeconds());
+}
+
 /** True when the URL is the auth server's recovery redirect (implicit flow). Never proof on its own. */
 export function urlHasRecoverySignal(hash: string): boolean {
   const p = new URLSearchParams(hash.replace(/^#/, ""));

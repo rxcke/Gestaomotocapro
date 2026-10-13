@@ -7,6 +7,7 @@ import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
+import { buildRecoveryConfirmUrl } from '@/lib/recovery-link'
 
 // Configuration
 const SITE_NAME = "Gestão Motoca Pro"
@@ -59,7 +60,12 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
               render: (data) =>
                 React.createElement(RecoveryEmail, {
                   siteName: SITE_NAME,
-                  confirmationUrl: data.url,
+                  // Points to /auth/confirm; keeps the original link if the format is unexpected.
+                  confirmationUrl:
+                    buildRecoveryConfirmUrl(
+                      data.url,
+                      (data as { token_hash?: string | null }).token_hash,
+                    ) ?? data.url,
                 }),
             },
             email_change: {

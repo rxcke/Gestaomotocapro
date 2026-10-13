@@ -22,6 +22,7 @@ import { Route as AuthenticatedPagamentoRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppDinheiroRouteImport } from './routes/_authenticated/app.dinheiro'
 import { Route as AuthenticatedAppDocumentosRouteImport } from './routes/_authenticated/app.documentos'
@@ -99,6 +100,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
   path: '/callback',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthConfirmRoute = AuthConfirmRouteImport.update({
+  id: '/confirm',
+  path: '/confirm',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/pagamento': typeof AuthenticatedPagamentoRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/auth/': typeof AuthIndexRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/app/documentos': typeof AuthenticatedAppDocumentosRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/pagamento': typeof AuthenticatedPagamentoRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/auth': typeof AuthIndexRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/app/documentos': typeof AuthenticatedAppDocumentosRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/_authenticated/pagamento': typeof AuthenticatedPagamentoRoute
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/_authenticated/app/documentos': typeof AuthenticatedAppDocumentosRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/planos'
     | '/auth/callback'
+    | '/auth/confirm'
     | '/auth/'
     | '/app/dinheiro'
     | '/app/documentos'
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/planos'
     | '/auth/callback'
+    | '/auth/confirm'
     | '/auth'
     | '/app/dinheiro'
     | '/app/documentos'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pagamento'
     | '/_authenticated/planos'
     | '/auth/callback'
+    | '/auth/confirm'
     | '/auth/'
     | '/_authenticated/app/dinheiro'
     | '/_authenticated/app/documentos'
@@ -449,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/callback'
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/auth/confirm': {
+      id: '/auth/confirm'
+      path: '/confirm'
+      fullPath: '/auth/confirm'
+      preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_authenticated/app/': {
@@ -614,11 +633,13 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface AuthRouteRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthConfirmRoute: typeof AuthConfirmRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
+  AuthConfirmRoute: AuthConfirmRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 
