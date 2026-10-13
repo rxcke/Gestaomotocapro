@@ -34,6 +34,8 @@ import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authen
 import { Route as ApiPublicCaktoWebhookRouteImport } from './routes/api/public/cakto-webhook'
 import { Route as AuthenticatedAppMotoIndexRouteImport } from './routes/_authenticated/app.moto.index'
 import { Route as AuthenticatedAppMotoAbastecimentosRouteImport } from './routes/_authenticated/app.moto.abastecimentos'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -165,6 +167,16 @@ const AuthenticatedAppMotoAbastecimentosRoute =
     path: '/abastecimentos',
     getParentRoute: () => AuthenticatedAppMotoRoute,
   } as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -190,6 +202,8 @@ export interface FileRoutesByFullPath {
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/app/moto/': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRoutesByTo {
@@ -213,6 +227,8 @@ export interface FileRoutesByTo {
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/app/moto': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRoutesById {
@@ -241,6 +257,8 @@ export interface FileRoutesById {
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/_authenticated/app/moto/': typeof AuthenticatedAppMotoIndexRoute
 }
 export interface FileRouteTypes {
@@ -269,6 +287,8 @@ export interface FileRouteTypes {
     | '/api/public/cakto-webhook'
     | '/app/'
     | '/app/moto/abastecimentos'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/app/moto/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -292,6 +312,8 @@ export interface FileRouteTypes {
     | '/api/public/cakto-webhook'
     | '/app'
     | '/app/moto/abastecimentos'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/app/moto'
   id:
     | '__root__'
@@ -319,6 +341,8 @@ export interface FileRouteTypes {
     | '/api/public/cakto-webhook'
     | '/_authenticated/app/'
     | '/_authenticated/app/moto/abastecimentos'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/_authenticated/app/moto/'
   fileRoutesById: FileRoutesById
 }
@@ -330,6 +354,8 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicCaktoWebhookRoute: typeof ApiPublicCaktoWebhookRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -509,6 +535,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMotoAbastecimentosRouteImport
       parentRoute: typeof AuthenticatedAppMotoRoute
     }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -594,6 +634,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicCaktoWebhookRoute: ApiPublicCaktoWebhookRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
