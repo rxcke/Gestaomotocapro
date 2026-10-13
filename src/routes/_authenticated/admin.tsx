@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { AmbientBackground, ErrorBlock, GlassCard, LoadingBlock, PageTitle, Stat } from "@/components/glass";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { getAdminData, setAmbassadorAccess, type AdminData } from "@/lib/admin.functions";
+import { getAdminData, reprocessCaktoEvent, setAmbassadorAccess, type AdminData } from "@/lib/admin.functions";
 import { brl, dateBR, km } from "@/lib/format";
 import { displayProfilePhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,22 @@ function AdminPage() {
 function AdminContent({ data, section, setSection }: { data: AdminData; section: Section; setSection: (section: Section) => void }) {
   const [pendingUser, setPendingUser] = useState<AdminData["users"][number] | null>(null);
   const queryClient = useQueryClient();
+  const reprocessFn = useServerFn(reprocessCaktoEvent);
+  const reprocess = useMutation({
+    mutationFn: (eventId: string) => reprocessFn({ data: { eventId } }),
+    onSuccess: async ({ result }) => {
+      const messages: Record<string, string> = {
+        processed: "Compra vinculada à conta do comprador.",
+        buyer_not_found: "Ainda não existe conta confirmada com o e-mail da compra.",
+        missing_link_data: "Evento antigo sem dados para vincular. Reenvie pela Cakto.",
+        ambiguous_buyer: "Mais de uma conta corresponde. Verifique manualmente.",
+        already_processed: "Este evento já foi processado.",
+      };
+      toast(messages[result] ?? `Resultado: ${result}`);
+      await queryClient.invalidateQueries({ queryKey: ["admin", "overview"] });
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao reprocessar."),
+  });
   const updateAccess = useServerFn(setAmbassadorAccess);
   const update = useMutation({
     mutationFn: (input: { userId: string; grant: boolean }) => updateAccess({ data: input }),
@@ -139,7 +155,7 @@ function AdminContent({ data, section, setSection }: { data: AdminData; section:
         {section === "expenses" && data.expenses.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.category}</p><p className="truncate text-xs text-muted-foreground">{item.group_name} · {item.description ?? "Sem descrição"} · {dateBR(item.date)}</p></div><strong className="num-display text-sm text-negative">{brl(item.amount)}</strong></div>)}
         {section === "fuel" && data.fuelRecords.map((item) => { const details = [item.liters != null ? `${item.liters.toLocaleString("pt-BR")} L` : null, item.km != null ? km(item.km) : null, dateBR(item.date)].filter(Boolean); return <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.station ?? "Posto não informado"}</p><p className="text-xs text-muted-foreground">{details.join(" · ")}</p></div><strong className="num-display text-sm">{brl(item.total)}</strong></div>})}
         {section === "subscriptions" && data.subscriptions.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><Owner data={data} userId={item.user_id} /><div><p className="font-semibold">{item.plan === "monthly" ? "Start · Mensal" : item.plan === "quarterly" ? "Pro · Trimestral" : "Elite · Anual"} · {subscriptionStatus(item.provider_status === "pending" && item.status !== "pending" ? item.status : item.provider_status)}</p><p className="truncate text-xs text-muted-foreground">{item.cakto_transaction_id ?? "Sem transação"} · {dateBR(item.started_at ?? item.created_at)}</p></div><div className="text-sm sm:text-right"><strong>{item.expires_at ? dateBR(item.expires_at) : "—"}</strong>{item.recurring_amount !== null ? <p className="text-xs text-muted-foreground">{brl(Number(item.recurring_amount))}</p> : null}</div>{item.trial_started_at ? <p className="text-xs text-muted-foreground sm:col-span-3">Trial: {dateBR(item.trial_started_at)} até {dateBR(item.trial_ends_at)}</p> : null}</div>)}
-        {section === "webhooks" && data.webhookEvents.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><div><p className="font-semibold">{item.event_type}</p><p className="truncate text-xs text-muted-foreground">{item.transaction_id ?? "Sem transação"}</p></div><div><p className="text-sm">{item.processed ? "Processado" : "Não processado"}</p><p className="truncate text-xs text-muted-foreground">{item.error_message ?? "Sem erro registrado"}</p></div><strong className="text-sm">{dateBR(item.created_at)}</strong></div>)}
+        {section === "webhooks" && data.webhookEvents.map((item) => <div key={item.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"><div><p className="font-semibold">{item.event_type}</p><p className="truncate text-xs text-muted-foreground">{item.transaction_id ?? "Sem transação"}</p></div><div><p className="text-sm">{item.processed ? "Processado" : "Não processado"}</p><p className="truncate text-xs text-muted-foreground">{item.error_message ?? "Sem erro registrado"}</p>{!item.processed && item.error_message === "buyer_not_found" && <Button size="sm" variant="outline" className="mt-2" disabled={reprocess.isPending} onClick={() => reprocess.mutate(item.id)}>Reprocessar</Button>}</div><strong className="text-sm">{dateBR(item.created_at)}</strong></div>)}
         {((section === "users" && !data.users.length) || (section === "motorcycles" && !data.motorcycles.length) || (section === "incomes" && !data.incomes.length) || (section === "expenses" && !data.expenses.length) || (section === "fuel" && !data.fuelRecords.length) || (section === "subscriptions" && !data.subscriptions.length) || (section === "webhooks" && !data.webhookEvents.length)) ? <p className="p-8 text-center text-sm text-muted-foreground">Nenhum registro encontrado.</p> : null}
       </div>
     </GlassCard>

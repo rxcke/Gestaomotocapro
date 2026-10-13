@@ -7,9 +7,9 @@ import {
   type CaktoPlan,
 } from "@/lib/cakto-offers";
 import { readCaktoSubscriptionFacts } from "@/lib/cakto-trial";
+import { caktoEventTime, hasValidCaktoSignature } from "@/lib/cakto-events";
 
 const MAX_BODY_BYTES = 256_000;
-const MAX_TIMESTAMP_DRIFT_SECONDS = 300;
 
 const supportedEvents = new Set([
   "purchase_approved",
@@ -38,6 +38,8 @@ const orderSchema = z.object({
   createdAt: z.string().datetime({ offset: true }).nullable().optional(),
   paidAt: z.string().datetime({ offset: true }).nullable().optional(),
   canceledAt: z.string().datetime({ offset: true }).nullable().optional(),
+  refundedAt: z.string().datetime({ offset: true }).nullable().optional(),
+  chargedbackAt: z.string().datetime({ offset: true }).nullable().optional(),
 });
 
 const payloadSchema = z.object({
@@ -47,46 +49,6 @@ const payloadSchema = z.object({
 });
 
 type Order = z.infer<typeof orderSchema>;
-
-function hexToBytes(value: string): ArrayBuffer | null {
-  if (!/^[0-9a-f]+$/i.test(value) || value.length % 2 !== 0) return null;
-  const bytes = new Uint8Array(value.length / 2);
-  for (let index = 0; index < bytes.length; index += 1) {
-    const pair = value.slice(index * 2, index * 2 + 2);
-    bytes[index] = Number.parseInt(pair, 16);
-  }
-  return bytes.buffer;
-}
-
-async function hasValidSignature(
-  rawBody: string,
-  timestamp: string | null,
-  signature: string | null,
-  secret: string,
-): Promise<boolean> {
-  if (!timestamp || !signature?.startsWith("v1=")) return false;
-  const timestampSeconds = Number(timestamp);
-  if (!Number.isInteger(timestampSeconds)) return false;
-  if (Math.abs(Date.now() / 1000 - timestampSeconds) > MAX_TIMESTAMP_DRIFT_SECONDS) return false;
-
-  const signatureBytes = hexToBytes(signature.slice(3));
-  if (!signatureBytes) return false;
-
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["verify"],
-  );
-  return crypto.subtle.verify(
-    "HMAC",
-    key,
-    signatureBytes,
-    encoder.encode(`${timestamp}.${rawBody}`),
-  );
-}
 
 function hasValidBodySecret(received: unknown, expected: string): boolean {
   if (typeof received !== "string") return false;
@@ -177,7 +139,7 @@ function logWebhook(
   else console.info(entry);
 }
 
-async function processOrder(event: string, order: Order, plan: CaktoPlan) {
+async function processOrder(event: string, order: Order, plan: CaktoPlan, deliveryTimestamp: string | null) {
   const subscription = subscriptionFields(order);
   const facts = readCaktoSubscriptionFacts(order.subscription);
   // Trial access ends at the Cakto-reported first charge; never extend it by a paid period.
@@ -187,7 +149,7 @@ async function processOrder(event: string, order: Order, plan: CaktoPlan) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   // PostgREST accepts null for these nullable SQL parameters, while generated RPC types omit null.
   const nullableRpcString = (value: string | null) => value as unknown as string;
-  const { data, error } = await supabaseAdmin.rpc("process_cakto_subscription_event_v2", {
+  const { data, error } = await supabaseAdmin.rpc("process_cakto_subscription_event_v3", {
     _event_id: `${event}:${order.id}`,
     _event_type: event,
     _transaction_id: order.id,
@@ -203,6 +165,7 @@ async function processOrder(event: string, order: Order, plan: CaktoPlan) {
     _subscription_status: nullableRpcString(facts.status),
     _trial_ends_at: nullableRpcString(facts.trialEndsAt),
     _amount: facts.amount as unknown as number,
+    _event_at: nullableRpcString(caktoEventTime(event, order, deliveryTimestamp)),
   });
   if (error) throw new Error(error.message);
   return data;
@@ -260,17 +223,21 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
           return Response.json({ error: "invalid_payload" }, { status: 400 });
         }
 
-        const signatureIsValid = await hasValidSignature(
+        const deliveryTimestamp = request.headers.get("x-cakto-timestamp");
+        const signatureIsValid = await hasValidCaktoSignature(
           rawBody,
-          request.headers.get("x-cakto-timestamp"),
+          deliveryTimestamp,
           request.headers.get("x-cakto-signature"),
           webhookSecret,
         );
-        const bodySecretIsValid = hasValidBodySecret(parsedPayload.data.secret, webhookSecret);
+        // HMAC header is mandatory (documented by Cakto). Body secret only as an explicit emergency rollback.
+        const bodySecretAllowed = process.env["CAKTO_ALLOW_BODY_SECRET"] === "true";
+        const bodySecretIsValid = bodySecretAllowed && hasValidBodySecret(parsedPayload.data.secret, webhookSecret);
         if (!signatureIsValid && !bodySecretIsValid) {
           logWebhook("warn", { outcome: "invalid_signature" });
           return Response.json({ error: "invalid_signature" }, { status: 401 });
         }
+        logWebhook("info", { outcome: "authenticated", method: signatureIsValid ? "hmac" : "body_secret_fallback" });
 
         const { event } = parsedPayload.data;
         if (!supportedEvents.has(event)) {
@@ -300,7 +267,7 @@ export const Route = createFileRoute("/api/public/cakto-webhook")({
               results.push({ id: order.id, result: "unknown_offer" });
               continue;
             }
-            const result = await processOrder(event, order, plan);
+            const result = await processOrder(event, order, plan, deliveryTimestamp);
             if (event === "purchase_approved" && result && typeof result === "object" && "result" in result && result['result'] === "processed" && !("trial" in result && result['trial'] === true) && "user_id" in result && typeof result['user_id'] === "string") {
               // Advertising is best-effort; it never controls subscription status or webhook acknowledgement.
               try {

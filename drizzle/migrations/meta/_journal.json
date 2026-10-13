@@ -253,6 +253,20 @@
       "when": 1791461474633,
       "tag": "0035_demo_24h_unlimited",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791922774633,
+      "tag": "0036_cakto_event_ordering_and_pending_link",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1791922840623,
+      "tag": "0037_cakto_event_ordering_and_pending_link_apply",
+      "breakpoints": true
     }
   ]
 }

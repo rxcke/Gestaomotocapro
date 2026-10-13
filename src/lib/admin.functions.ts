@@ -255,3 +255,19 @@ export const exportUsersCsv = createServerFn({ method: "POST" })
     }));
     return { count: rows.length, csv };
   });
+
+const ReprocessInput = z.object({ eventId: z.string().uuid() });
+
+/** P-04: admin-only retry of a pending Cakto purchase; the owner comes only from the stored buyer hash. */
+export const reprocessCaktoEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ReprocessInput.parse(input))
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (roleError || !isAdmin) throw new Error("Acesso administrativo não autorizado.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: result, error } = await supabaseAdmin.rpc("admin_reprocess_cakto_event", { _event_row_id: data.eventId });
+    if (error) throw new Error("Não foi possível reprocessar o evento.");
+    const value = result && typeof result === "object" && "result" in result ? String(result["result"]) : "unknown";
+    return { result: value };
+  });
