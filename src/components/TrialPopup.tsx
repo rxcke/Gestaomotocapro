@@ -28,10 +28,15 @@ export function TrialPopup() {
     void import("@/integrations/supabase/client").then(({ supabase }) =>
       supabase.auth.getSession().then(({ data }) => { if (!cancelled) setSignedIn(Boolean(data.session)); }),
     );
-    const t = window.setTimeout(() => {
+    // Espera 5s e, se o aviso de privacidade estiver aberto, aguarda a escolha antes de abrir.
+    let t = 0;
+    const tryOpen = () => {
+      if (cancelled) return;
+      if (document.querySelector('[aria-label="Preferências de privacidade"]')) { t = window.setTimeout(tryOpen, 1000); return; }
       setOpen(true);
       try { sessionStorage.setItem(SEEN_KEY, "1"); } catch { /* sem storage */ }
-    }, DELAY_MS);
+    };
+    t = window.setTimeout(tryOpen, DELAY_MS);
     return () => { cancelled = true; window.clearTimeout(t); };
   }, []);
 
@@ -47,7 +52,7 @@ export function TrialPopup() {
       <DialogContent className="dark max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-4xl gap-0 overflow-hidden rounded-3xl border-primary/25 bg-background p-0 text-foreground shadow-2xl motion-reduce:animate-none [&>button:last-child]:hidden">
         <div className="grid max-h-[calc(100dvh-1.5rem)] overflow-y-auto md:grid-cols-[1.05fr_0.95fr] md:overflow-hidden">
           {/* Imagem */}
-          <div className="relative h-44 overflow-hidden sm:h-56 md:order-2 md:h-auto">
+          <div className="relative h-36 overflow-hidden sm:h-56 md:order-2 md:h-auto">
             <img src={courier} alt="Motoboy profissional com mochila de entrega ao lado da moto" width={800} height={1104} className="absolute inset-0 size-full object-cover object-[center_25%]" />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent md:bg-gradient-to-r md:from-background md:via-background/20" aria-hidden="true" />
             <PhonePreview />
@@ -74,10 +79,11 @@ export function TrialPopup() {
               ))}
             </ul>
 
+            <div className="sticky bottom-0 z-10 -mx-6 mt-6 bg-background px-6 pt-2 pb-1 sm:-mx-9 sm:px-9 md:static md:mx-0 md:bg-transparent md:p-0">
             <button
               type="button"
               onClick={goToTrial}
-              className="relative mt-6 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-primary to-primary/80 px-6 text-sm font-extrabold tracking-wide text-primary-foreground shadow-[0_12px_32px_-10px_var(--primary)] transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              className="relative inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-primary to-primary/80 px-6 text-sm font-extrabold tracking-wide text-primary-foreground shadow-[0_12px_32px_-10px_var(--primary)] transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               QUERO TESTAR GRÁTIS POR 24H<ArrowRight className="size-4 shrink-0" />
             </button>
@@ -85,6 +91,7 @@ export function TrialPopup() {
               <span className="inline-flex items-center gap-1.5"><CreditCard className="size-3.5" />Sem cartão de crédito</span>
               <span className="inline-flex items-center gap-1.5"><Check className="size-3.5" />Seu corre sob controle</span>
             </p>
+            </div>
           </div>
         </div>
 
