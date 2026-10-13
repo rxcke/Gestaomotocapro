@@ -629,6 +629,7 @@ export type Database = {
           kiwify_product_id: string | null
           kiwify_subscription_id: string | null
           kiwify_transaction_id: string | null
+          last_event_at: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           provider: string
           provider_status: string
@@ -653,6 +654,7 @@ export type Database = {
           kiwify_product_id?: string | null
           kiwify_subscription_id?: string | null
           kiwify_transaction_id?: string | null
+          last_event_at?: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           provider?: string
           provider_status?: string
@@ -677,6 +679,7 @@ export type Database = {
           kiwify_product_id?: string | null
           kiwify_subscription_id?: string | null
           kiwify_transaction_id?: string | null
+          last_event_at?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           provider?: string
           provider_status?: string
@@ -713,34 +716,46 @@ export type Database = {
       }
       webhook_events: {
         Row: {
+          apply_args: Json | null
+          buyer_email_hash: string | null
           created_at: string
           error_message: string | null
+          event_at: string | null
           event_id: string
           event_type: string
           id: string
           payload: Json
+          plan: Database["public"]["Enums"]["subscription_plan"] | null
           processed: boolean
           processed_at: string | null
           transaction_id: string | null
         }
         Insert: {
+          apply_args?: Json | null
+          buyer_email_hash?: string | null
           created_at?: string
           error_message?: string | null
+          event_at?: string | null
           event_id: string
           event_type: string
           id?: string
           payload: Json
+          plan?: Database["public"]["Enums"]["subscription_plan"] | null
           processed?: boolean
           processed_at?: string | null
           transaction_id?: string | null
         }
         Update: {
+          apply_args?: Json | null
+          buyer_email_hash?: string | null
           created_at?: string
           error_message?: string | null
+          event_at?: string | null
           event_id?: string
           event_type?: string
           id?: string
           payload?: Json
+          plan?: Database["public"]["Enums"]["subscription_plan"] | null
           processed?: boolean
           processed_at?: string | null
           transaction_id?: string | null
@@ -837,6 +852,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_reprocess_cakto_event: {
+        Args: { _event_row_id: string }
+        Returns: Json
+      }
+      apply_cakto_event: {
+        Args: { _claimed_event: string; _email: string; _user_id: string }
+        Returns: Json
+      }
+      cakto_email_hash: { Args: { _email: string }; Returns: string }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_app_access: { Args: { _user_id: string }; Returns: boolean }
       has_demo_access: { Args: { _user_id: string }; Returns: boolean }
@@ -848,6 +872,10 @@ export type Database = {
         Returns: boolean
       }
       has_valid_trial: { Args: { _user_id: string }; Returns: boolean }
+      link_pending_cakto_purchases: {
+        Args: { _user_id: string }
+        Returns: Json
+      }
       process_cakto_subscription_event: {
         Args: {
           _buyer_email: string
@@ -882,6 +910,27 @@ export type Database = {
           _subscription_status?: string
           _transaction_id: string
           _trial_ends_at?: string
+        }
+        Returns: Json
+      }
+      process_cakto_subscription_event_v3: {
+        Args: {
+          _amount: number
+          _buyer_email: string
+          _canceled_at: string
+          _event_at: string
+          _event_id: string
+          _event_type: string
+          _expires_at: string
+          _offer_id: string
+          _payload: Json
+          _plan: Database["public"]["Enums"]["subscription_plan"]
+          _product_id: string
+          _started_at: string
+          _subscription_id: string
+          _subscription_status: string
+          _transaction_id: string
+          _trial_ends_at: string
         }
         Returns: Json
       }
