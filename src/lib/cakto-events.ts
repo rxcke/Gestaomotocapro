@@ -5,10 +5,10 @@
 export const MAX_TIMESTAMP_DRIFT_SECONDS = 300;
 
 type EventDates = {
-  paidAt?: string | null;
-  refundedAt?: string | null;
-  chargedbackAt?: string | null;
-  canceledAt?: string | null;
+  paidAt?: string | null | undefined;
+  refundedAt?: string | null | undefined;
+  chargedbackAt?: string | null | undefined;
+  canceledAt?: string | null | undefined;
 };
 
 function iso(value: string | null | undefined): string | null {
@@ -34,9 +34,9 @@ export function caktoEventTime(event: string, order: EventDates, deliveryTimesta
   return Number.isInteger(seconds) && seconds > 0 ? new Date(seconds * 1000).toISOString() : null;
 }
 
-function hexToBytes(value: string): Uint8Array | null {
+function hexToBytes(value: string): Uint8Array<ArrayBuffer> | null {
   if (!/^[0-9a-f]+$/i.test(value) || value.length % 2 !== 0) return null;
-  const bytes = new Uint8Array(value.length / 2);
+  const bytes = new Uint8Array(new ArrayBuffer(value.length / 2));
   for (let i = 0; i < bytes.length; i += 1) bytes[i] = Number.parseInt(value.slice(i * 2, i * 2 + 2), 16);
   return bytes;
 }
