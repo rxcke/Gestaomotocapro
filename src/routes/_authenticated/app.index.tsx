@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useApp, useScopedData } from "@/lib/app-context";
 import { financeSummary, monthPeriod, percent, sumAmount, variation } from "@/lib/calc";
 import { useIncomes, useWorkSessionPauses, useWorkSessions } from "@/lib/data";
-import { brl, greeting, num, shortDuration, todayISO } from "@/lib/format";
+import { brl, greeting, num, shortDuration } from "@/lib/format";
 import { workedDuration } from "@/lib/work-duration";
 import { cn } from "@/lib/utils";
 
@@ -55,8 +55,6 @@ function Home() {
   const current = financeSummary(data.incomes, data.expenses, month);
   const previous = financeSummary(data.incomes, data.expenses, monthPeriod(-1));
   const change = variation(current.net, previous.net);
-  const today = financeSummary(data.incomes, data.expenses, { start: todayISO(), end: todayISO() });
-  const hasToday = today.totalIncome > 0 || today.totalExpense > 0;
 
   const activeGoal = data.goals.find((g) => g.start_date <= month.end && g.end_date >= month.start);
   const goalTarget = Number(activeGoal?.target_amount ?? 0);
@@ -105,12 +103,6 @@ function Home() {
             <p className="font-display text-lg font-bold tabular-nums text-negative">{brl(current.totalExpense)}</p>
             <p className="text-xs text-muted-foreground">gastos</p>
           </div>
-          {hasToday ? (
-            <div className="min-w-0">
-              <p className="font-display text-lg font-bold tabular-nums">{brl(today.net)}</p>
-              <p className="text-xs text-muted-foreground">sobrou hoje</p>
-            </div>
-          ) : null}
         </div>
       </section>
 
