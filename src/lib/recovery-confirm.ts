@@ -6,7 +6,7 @@ export type ConfirmResult =
 
 type VerifyFn = (args: { token_hash: string; type: "recovery" }) => Promise<{
   data: { session: { user?: { id?: string } } | null; user?: { id?: string } | null };
-  error: { code?: string; status?: number; message?: string } | null;
+  error: { code?: string | undefined; status?: number | undefined; message?: string | undefined } | null;
 }>;
 
 const inflight = new Map<string, Promise<ConfirmResult>>();
