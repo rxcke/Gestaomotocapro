@@ -91,7 +91,7 @@ function Home() {
           {positive ? "foi o que sobrou do seu corre" : "o corre ainda está no vermelho"}
           {change != null ? (
             <span className={cn("ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold", change >= 0 ? "bg-positive/15 text-positive" : "bg-negative/15 text-negative")}>
-              {change >= 0 ? "↑" : "↓"} {num(Math.abs(change), 0)}% vs mês passado
+              {change >= 0 ? "↑" : "↓"} {num(Math.abs(change), 0)}% vs mês passado inteiro
             </span>
           ) : null}
         </p>
