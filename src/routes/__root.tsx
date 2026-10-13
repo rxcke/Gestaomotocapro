@@ -14,7 +14,10 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "../lib/theme";
 import { Toaster } from "../components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
-import "@/lib/recovery-watch";
+import { startRecoveryWatch } from "@/lib/recovery-watch";
+
+// Explicit call at app start so the password-recovery event is never missed.
+startRecoveryWatch();
 import { MarketingConsent } from "@/components/MarketingConsent";
 
 function NotFoundComponent() {
