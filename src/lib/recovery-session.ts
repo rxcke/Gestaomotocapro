@@ -1,8 +1,14 @@
-// Identifies a password-recovery session from the access token issued by the
-// auth server after it validated a recovery link (amr method "recovery").
-// An ordinary signed-in session (password, Google, magic link) never qualifies.
+// Password recovery is recognised by two facts together:
+// 1. this tab received the auth client's official PASSWORD_RECOVERY event
+//    (emitted only after the server accepted a recovery link) — stored as a
+//    per-tab marker tied to the user it was issued for;
+// 2. the session was issued by an e-mail one-time token (amr method "otp",
+//    what the auth server really records for recovery links) less than 1 hour ago.
+// Password/Google sessions, or a magic link without the recovery event, never qualify.
 export const RECOVERY_WINDOW_SECONDS = 60 * 60;
+export const RECOVERY_MARKER_KEY = "auth:recovery";
 
+export type RecoveryMarker = { userId: string; at: number };
 type AmrEntry = { method?: string; timestamp?: number };
 
 function decodeClaims(accessToken: string): Record<string, unknown> | null {
@@ -16,17 +22,32 @@ function decodeClaims(accessToken: string): Record<string, unknown> | null {
   }
 }
 
-export function isRecoverySession(accessToken: string | null | undefined, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
+const fresh = (ts: number, now: number) => now - ts >= -60 && now - ts <= RECOVERY_WINDOW_SECONDS;
+
+export function hasFreshOtpSession(accessToken: string | null | undefined, now: number): boolean {
   if (!accessToken) return false;
-  const claims = decodeClaims(accessToken);
-  const rawAmr = claims?.["amr"];
+  const rawAmr = decodeClaims(accessToken)?.["amr"];
   const amr = Array.isArray(rawAmr) ? (rawAmr as AmrEntry[]) : [];
-  return amr.some((entry) =>
-    entry?.method === "recovery" &&
-    typeof entry.timestamp === "number" &&
-    nowSeconds - entry.timestamp >= -60 &&
-    nowSeconds - entry.timestamp <= RECOVERY_WINDOW_SECONDS,
-  );
+  return amr.some((e) => e?.method === "otp" && typeof e.timestamp === "number" && fresh(e.timestamp, now));
+}
+
+export function parseMarker(raw: string | null): RecoveryMarker | null {
+  try {
+    const v = raw ? JSON.parse(raw) : null;
+    return v && typeof v.userId === "string" && typeof v.at === "number" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+export function isRecoverySession(
+  session: { access_token?: string; user?: { id?: string } } | null | undefined,
+  marker: RecoveryMarker | null,
+  nowSeconds = Math.floor(Date.now() / 1000),
+): boolean {
+  if (!session?.access_token || !session.user?.id || !marker) return false;
+  if (marker.userId !== session.user.id || !fresh(marker.at, nowSeconds)) return false;
+  return hasFreshOtpSession(session.access_token, nowSeconds);
 }
 
 /** Error reported by the auth server in the link's return URL (hash or query). */
