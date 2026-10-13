@@ -90,7 +90,7 @@ function reportWriteError(error: Error) {
     openUpgrade();
     return;
   }
-  toast.error(error.message || "Não foi possível salvar.");
+  toast.error(financialWriteErrorMessage(error.message ?? "") ?? (error.message || "Não foi possível salvar."));
 }
 
 export function useUpsert<T extends Record<string, unknown>>(
