@@ -13,7 +13,7 @@ INSERT INTO work_sessions VALUES ('00000000-0000-0000-0000-0000000000a1','000000
 INSERT INTO incomes(user_id,work_session_id,amount) VALUES ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-0000000000a1',100);
 INSERT INTO incomes(user_id,work_session_id,amount) VALUES ('00000000-0000-0000-0000-00000000000a',null,55);
 INSERT INTO expenses(user_id,work_session_id,amount) VALUES ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-0000000000a1',20);
-\i drizzle/migrations/0038_financial_integrity_phase2.sql -- (rodar a partir da raiz)
+\i drizzle/migrations/0038_financial_integrity_phase2.sql
 CREATE FUNCTION chk(_c boolean,_m text) RETURNS void LANGUAGE plpgsql AS $$ BEGIN IF NOT COALESCE(_c,false) THEN RAISE EXCEPTION 'FAIL: %',_m; END IF; RAISE NOTICE 'PASS: %',_m; END $$;
 CREATE FUNCTION fails(_sql text,_needle text) RETURNS boolean LANGUAGE plpgsql AS $$ BEGIN EXECUTE _sql; RETURN false; EXCEPTION WHEN others THEN RETURN position(_needle in SQLERRM)>0; END $$;
 CREATE FUNCTION tot() RETURNS numeric[] LANGUAGE sql AS $$ SELECT ARRAY[total_income,total_expense,net_profit] FROM work_sessions WHERE id='00000000-0000-0000-0000-0000000000a1' $$;
