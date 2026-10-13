@@ -26,6 +26,7 @@ export function authErrorMessage(error: unknown, fallback = "Não foi possível 
     return waitMessage(message);
   }
   if (code === "otp_expired") return "Este link expirou. Solicite um novo.";
+  if (code === "same_password") return "A nova senha deve ser diferente da senha anterior.";
   return AUTH_ERROR_MESSAGES.find(([pattern]) => pattern.test(message))?.[1] ?? fallback;
 }
 
