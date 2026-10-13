@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { trackClick } from "@/lib/tracking";
+import { TrialPopup } from "@/components/TrialPopup";
 
 const NAV_ITEMS = [
   { label: "Como funciona", href: "#como-funciona" },
@@ -165,6 +166,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-dvh overflow-x-clip bg-canvas text-foreground selection:bg-accent selection:text-accent-foreground">
+      <TrialPopup />
       {/* Cabeçalho */}
       <header className="dark sticky top-0 z-50 border-b border-border bg-background/85 text-foreground backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:h-[72px] lg:px-8">
