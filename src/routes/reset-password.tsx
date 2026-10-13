@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { isRecoverySession, recoveryLinkError } from "@/lib/recovery-session";
 
 export const Route = createFileRoute("/reset-password")({
   staticData: { sitemap: false },
@@ -33,24 +34,21 @@ function ResetPassword() {
 
   useEffect(() => {
     let active = true;
-    const recoveryInUrl = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery";
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!active || event !== "PASSWORD_RECOVERY") return;
-      setValidRecovery(Boolean(session));
-      setChecking(false);
-    });
-    void supabase.auth.getSession().then(({ data: sessionData }) => {
-      if (!active || !recoveryInUrl) return;
-      setValidRecovery(Boolean(sessionData.session));
-      setChecking(false);
-    });
-    const timer = window.setTimeout(() => {
+    // Captured before the auth client clears the URL; a link error always wins.
+    const linkError = recoveryLinkError(window.location.hash, window.location.search);
+    const decide = (accessToken: string | null | undefined) => {
       if (!active) return;
+      setValidRecovery(!linkError && isRecoverySession(accessToken));
       setChecking(false);
-    }, 1500);
+    };
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") decide(session?.access_token);
+    });
+    // getSession waits for the client to finish processing the link, so a
+    // recovery confirmed before this page mounted is still recognised here.
+    void supabase.auth.getSession().then(({ data: sessionData }) => decide(sessionData.session?.access_token));
     return () => {
       active = false;
-      window.clearTimeout(timer);
       data.subscription.unsubscribe();
     };
   }, []);
