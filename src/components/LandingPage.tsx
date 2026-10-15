@@ -470,7 +470,7 @@ export function LandingPage() {
                 const featured = p.name === "Anual";
                 return (
                   <Reveal key={p.name} delay={i * 100} className={cn(featured && "md:-my-4")}>
-                    <article className={cn("relative flex h-full flex-col rounded-[2rem] p-7", featured ? "dark bg-background text-foreground shadow-2xl" : "border border-border bg-card")}>
+                    <article className={cn("relative flex h-full flex-col rounded-[2rem] p-7", featured ? "border border-border bg-card text-card-foreground shadow-2xl" : "border border-border bg-card")}>
                       {p.badge ? <span className={cn("absolute -top-3 left-7 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider", featured ? "bg-accent text-accent-foreground" : "bg-foreground text-background")}>{p.badge}</span> : null}
                       <h3 className="text-sm font-bold uppercase tracking-[0.2em]">{p.name}</h3>
                       <p className="mt-5 flex items-end gap-1"><span className="num-display text-4xl">{p.price}</span><span className="pb-1 text-sm text-muted-foreground">{p.period}</span></p>
