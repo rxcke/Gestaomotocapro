@@ -35,9 +35,8 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           offers: [
-            { "@type": "Offer", name: "Start", price: "29.90", priceCurrency: "BRL", description: "Plano mensal" },
-            { "@type": "Offer", name: "Pro", price: "69.90", priceCurrency: "BRL", description: "Plano trimestral" },
-            { "@type": "Offer", name: "Elite", price: "199.90", priceCurrency: "BRL", description: "Plano anual" },
+            { "@type": "Offer", name: "Mensal", price: "29.90", priceCurrency: "BRL", description: "Plano mensal" },
+            { "@type": "Offer", name: "Anual", price: "199.90", priceCurrency: "BRL", description: "Plano anual, cobrado uma vez por ano" },
           ],
         }),
       },
