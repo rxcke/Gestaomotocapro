@@ -16,9 +16,8 @@ const NAV_ITEMS = [
 ] as const;
 
 const PLANS = [
-  { name: "Start", price: "R$ 29,90", period: "/mês", plan: "mensal", charge: "Cobrado todo mês", monthly: null, badge: null },
-  { name: "Pro", price: "R$ 69,90", period: "/trimestre", plan: "trimestral", charge: "Cobrado a cada 3 meses", monthly: "≈ R$ 23,30/mês", badge: "Mais popular" },
-  { name: "Elite", price: "R$ 199,90", period: "/ano", plan: "anual", charge: "Cobrado uma vez por ano", monthly: "≈ R$ 16,66/mês", badge: "Melhor custo-benefício" },
+  { name: "Mensal", price: "R$ 29,90", period: "/mês", plan: "mensal", charge: "Cobrado todo mês · mais flexível", monthly: null, badge: "Mais flexível" },
+  { name: "Anual", price: "R$ 199,90", period: "/ano", plan: "anual", charge: "Cobrança única de R$ 199,90 por ano", monthly: "Equivale a ≈ R$ 16,66/mês", badge: "Melhor custo-benefício" },
 ] as const;
 
 const PLAN_FEATURES = ["Ganhos e gastos", "Jornada com pausas", "Combustível", "Manutenção", "Metas", "Relatórios"];
@@ -29,7 +28,7 @@ const FAQS = [
   { q: "Preciso instalar algum aplicativo?", a: "Não. Ele funciona direto no navegador do celular ou do computador. Se quiser, dá para adicionar à tela inicial do celular." },
   { q: "Posso testar antes de assinar?", a: "Sim. Toda conta nova ganha uma demonstração gratuita, sem cartão de crédito." },
   { q: "Como funciona a demonstração?", a: "Você tem 24 horas corridas, a partir do cadastro, para usar o app completo. Depois disso, seus dados ficam guardados e você só volta a registrar e editar ao assinar um plano." },
-  { q: "Quais são os planos?", a: "Start por R$ 29,90 por mês, Pro por R$ 69,90 por trimestre e Elite por R$ 199,90 por ano. Todos liberam as mesmas funções do app." },
+  { q: "Quais são os planos?", a: "Mensal por R$ 29,90 por mês ou Anual por R$ 199,90, cobrado uma vez por ano (equivale a cerca de R$ 16,66 por mês). Os dois liberam as mesmas funções do app." },
   { q: "Posso cancelar?", a: "Sim. Fale com a gente pelo e-mail contato@gestaomotocapro.com.br ou pela plataforma de pagamento usada na compra." },
   { q: "Como funciona o acesso após a assinatura?", a: "Depois que o pagamento é confirmado, o acesso é liberado na mesma conta usada na compra, com todos os seus registros." },
 ] as const;
@@ -466,9 +465,9 @@ export function LandingPage() {
               <h2 className="mt-3 text-3xl font-bold sm:text-5xl">Escolha como quer pagar.</h2>
               <p className="mx-auto mt-4 max-w-lg text-muted-foreground">Todos os planos liberam o app completo. Muda só o período.</p>
             </Reveal>
-            <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-3 md:items-stretch">
+            <div className="mx-auto mt-14 grid max-w-3xl gap-5 md:grid-cols-2 md:items-stretch">
               {PLANS.map((p, i) => {
-                const featured = p.name === "Pro";
+                const featured = p.name === "Anual";
                 return (
                   <Reveal key={p.name} delay={i * 100} className={cn(featured && "md:-my-4")}>
                     <article className={cn("relative flex h-full flex-col rounded-[2rem] p-7", featured ? "dark bg-background text-foreground shadow-2xl" : "border border-border bg-card")}>

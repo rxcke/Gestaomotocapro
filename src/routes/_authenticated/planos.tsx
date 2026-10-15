@@ -70,12 +70,11 @@ function PlansPage() {
           <h1 className="mt-3 font-display text-[2.2rem] leading-[1.05] font-extrabold tracking-tight sm:text-6xl">Escolha como você quer controlar seu corre.</h1>
           <p className="mt-4 text-muted-foreground">{access.data?.demoExpired ? "Seus dados continuam aqui. Escolha um plano para continuar." : "Comece simples. Evolua quando quiser. Tudo que você já registrou continua na sua conta."}</p>
         </section>
-        <div className="mt-12 grid gap-5 md:grid-cols-3 md:items-center">
-          <PlanCard name="Start" price="R$ 29,90" period="/mês" charge="Pagamento mensal" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} delay={0} />
-          <PlanCard name="Pro" price="R$ 69,90" period="/trimestre" charge="Pagamento trimestral" monthly="≈ R$ 23,30/mês" badge="🔥 Mais popular" plan="quarterly" featured loading={opening === "quarterly"} onSubscribe={subscribe} delay={100} />
-          <PlanCard name="Elite" price="R$ 199,90" period="/ano" charge="Pagamento anual" monthly="≈ R$ 16,66/mês" badge="🏆 Melhor custo-benefício" plan="annual" loading={opening === "annual"} onSubscribe={subscribe} delay={200} />
+        <div className="mx-auto mt-12 grid max-w-3xl gap-5 md:grid-cols-2 md:items-center">
+          <PlanCard name="Mensal" price="R$ 29,90" period="/mês" charge="Pagamento mensal · mais flexível" badge="Mais flexível" plan="monthly" loading={opening === "monthly"} onSubscribe={subscribe} delay={0} />
+          <PlanCard name="Anual" price="R$ 199,90" period="/ano" charge="Cobrança única de R$ 199,90 por ano" monthly="Equivale a ≈ R$ 16,66/mês" badge="🏆 Melhor custo-benefício" plan="annual" featured loading={opening === "annual"} onSubscribe={subscribe} delay={100} />
         </div>
-        <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-6 text-muted-foreground">Todos os planos liberam o app completo. Pagamento seguro pela Cakto.</p>
+        <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-6 text-muted-foreground">Os dois planos liberam o app completo. Pagamento seguro pela Cakto.</p>
       </>}
     </main>
   </div>;
@@ -89,6 +88,6 @@ function PlanCard({ name, price, period, charge, monthly, badge, plan, featured 
     <p className="mt-1 min-h-5 text-sm font-semibold text-accent">{monthly ?? ""}</p>
     <p className={cn("mt-1 text-xs font-semibold uppercase tracking-wider", featured ? "text-background/60" : "text-muted-foreground")}>{charge}</p>
     <ul className="my-7 flex-1 space-y-2.5">{FEATURES.map((feature) => <li key={feature} className="flex items-center gap-2 text-sm"><Check className="size-4 shrink-0 text-accent" />{feature}</li>)}</ul>
-    <Button className={cn("h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider", featured ? "" : "")} variant={featured ? "default" : "outline"} disabled={loading} onClick={() => { trackClick(`Escolher ${name}`); onSubscribe(plan); }}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : `Assinar ${name}`}</Button>
+    <Button className={cn("h-14 w-full rounded-full text-sm font-bold uppercase tracking-wider", featured ? "" : "")} variant={featured ? "default" : "outline"} disabled={loading} onClick={() => { trackClick(`Escolher ${name}`); onSubscribe(plan); }}>{loading ? <LoaderCircle className="size-4 animate-spin" /> : `Escolher ${name}`}</Button>
   </article>;
 }
