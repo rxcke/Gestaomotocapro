@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, BarChart3, Fuel, MessageCircle, Wallet } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import courierImage from "@/assets/trial-courier.jpg";
+import creatorImage from "@/assets/ambassador-creator.jpg";
 
 const WHATSAPP_URL =
   "https://wa.me/5531983662706?text=Ol%C3%A1%21%20Tenho%20interesse%20em%20me%20tornar%20embaixador%20do%20Gest%C3%A3o%20Motoca%20Pro.%20Gostaria%20de%20conhecer%20o%20programa%20e%20como%20come%C3%A7ar.";
@@ -144,10 +144,10 @@ function AmbassadorPage() {
             <div className="relative mx-auto w-full max-w-md lg:max-w-none">
               <div className="lp-glow absolute -inset-6" aria-hidden="true" />
               <img
-                src={courierImage}
-                alt="Motoboy com capacete ao lado da moto, pronto para o trabalho"
+                src={creatorImage}
+                alt="Criador de conteúdo gravando um vídeo com o celular ao lado da moto, em uma oficina de motos"
                 width={900}
-                height={1100}
+                height={1125}
                 className="relative aspect-[4/5] w-full rounded-2xl border border-border object-cover"
               />
             </div>
