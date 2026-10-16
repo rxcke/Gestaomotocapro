@@ -89,7 +89,7 @@ function Reveal({ children, className = "", delay = 0 }: { children: React.React
     setState("hidden");
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) {
+        if (e?.isIntersecting) {
           setState("shown");
           io.disconnect();
         }
