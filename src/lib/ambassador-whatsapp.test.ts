@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "node:test";
+import assert from "node:assert/strict";
 import { ambassadorWhatsAppUrl } from "./ambassador-whatsapp";
 
 const ORIGINAL =
@@ -6,16 +7,16 @@ const ORIGINAL =
 
 describe("ambassadorWhatsAppUrl", () => {
   test("sem perfil usa a mensagem padrão original", () => {
-    expect(decodeURIComponent(ambassadorWhatsAppUrl(null))).toBe(decodeURIComponent(ORIGINAL));
+    assert.equal(decodeURIComponent(ambassadorWhatsAppUrl(null)), decodeURIComponent(ORIGINAL));
   });
   test("perfis mantêm o mesmo número", () => {
     for (const p of ["criador", "entregador", "comunidade"] as const) {
-      expect(ambassadorWhatsAppUrl(p).startsWith("https://wa.me/5531983662706?text=")).toBe(true);
+      assert.equal(ambassadorWhatsAppUrl(p).startsWith("https://wa.me/5531983662706?text="), true);
     }
   });
   test("cada perfil tem mensagem própria", () => {
-    expect(decodeURIComponent(ambassadorWhatsAppUrl("criador"))).toContain("criador de conteúdo");
-    expect(decodeURIComponent(ambassadorWhatsAppUrl("entregador"))).toContain("profissional de entregas");
-    expect(decodeURIComponent(ambassadorWhatsAppUrl("comunidade"))).toContain("audiência");
+    assert.ok(decodeURIComponent(ambassadorWhatsAppUrl("criador")).includes("criador de conteúdo"));
+    assert.ok(decodeURIComponent(ambassadorWhatsAppUrl("entregador")).includes("profissional de entregas"));
+    assert.ok(decodeURIComponent(ambassadorWhatsAppUrl("comunidade")).includes("audiência"));
   });
 });
