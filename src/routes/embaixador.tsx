@@ -333,16 +333,18 @@ function AmbassadorPage() {
               <Reveal>
                 <SectionTitle eyebrow="COMO FUNCIONA">Começar é simples.</SectionTitle>
               </Reveal>
-              <ol className="relative mt-10 grid gap-6 lg:grid-cols-4 lg:gap-4">
-                <span className="absolute top-6 bottom-6 left-6 w-px bg-gradient-to-b from-primary via-primary/40 to-transparent lg:top-6 lg:right-6 lg:bottom-auto lg:left-6 lg:h-px lg:w-auto lg:bg-gradient-to-r" aria-hidden="true" />
+              <ol className="relative mt-10 grid gap-8 lg:grid-cols-4 lg:gap-4">
+                <span className="absolute top-6 bottom-6 left-[1.375rem] w-px bg-gradient-to-b from-primary via-primary/40 to-transparent sm:left-6 lg:top-6 lg:right-6 lg:bottom-auto lg:left-6 lg:h-px lg:w-auto lg:bg-gradient-to-r" aria-hidden="true" />
                 {STEPS.map((s, i) => (
-                  <li key={s.n} className="relative pl-16 lg:pt-16 lg:pl-0">
-                    <Reveal delay={i * 120}>
-                      <span className="absolute top-0 left-0 grid size-12 place-items-center rounded-xl border border-primary/50 bg-background font-mono text-sm font-bold text-primary shadow-[0_0_20px_-6px_var(--primary)]">
+                  <li key={s.n} className="relative">
+                    <Reveal delay={i * 120} className="flex items-start gap-4 lg:flex-col lg:gap-4">
+                      <span className="relative z-10 grid size-11 shrink-0 place-items-center rounded-xl border border-primary/50 bg-background font-mono text-sm font-bold text-primary shadow-[0_0_20px_-6px_var(--primary)] sm:size-12">
                         {s.n}
                       </span>
-                      <h3 className="text-base font-semibold">{s.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
+                      <div className="min-w-0 flex-1 pt-1 lg:pt-0">
+                        <h3 className="text-base font-semibold break-words">{s.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed break-words text-muted-foreground">{s.text}</p>
+                      </div>
                     </Reveal>
                   </li>
                 ))}
