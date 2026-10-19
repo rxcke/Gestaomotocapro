@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   MoreHorizontal,
   Target,
+  Trophy,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -54,11 +55,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const jornada = { to: "/app/jornada", label: "Jornada", icon: Timer, exact: false };
   const relatorios = { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false };
+  const ranking = { to: "/app/ranking", label: "Ranking", icon: Trophy, exact: false } as const;
   const navGroups = [
     { label: "", items: [NAV[0]] },
     { label: "Seu corre", items: [...(isPro ? [jornada] : []), NAV[1]] },
     { label: "Sua moto", items: [NAV[2], NAV[3]] },
-    { label: "Seu resultado", items: [relatorios] },
+    { label: "Seu resultado", items: [relatorios, ranking] },
     { label: "Conta", items: [NAV[4]] },
   ];
 
@@ -68,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const mobileNav = [NAV[0], isPro ? jornada : NAV[1], isPro ? NAV[1] : NAV[2], relatorios];
   const moreGroups = [
     { label: "Sua moto", items: isPro ? [NAV[2], NAV[3]] : [NAV[3]] },
-    { label: "Seu resultado", items: [{ to: "/app/metas", label: "Metas", icon: Target, exact: false }] },
+    { label: "Seu resultado", items: [{ to: "/app/metas", label: "Metas", icon: Target, exact: false }, ranking] },
     { label: "Conta", items: [NAV[4]] },
   ];
   const moreActive = moreGroups.some((g) => g.items.some((item) => isActive(item.to, false)));
