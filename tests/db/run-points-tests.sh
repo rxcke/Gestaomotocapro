@@ -7,14 +7,18 @@ chmod 777 "$tmp"
 run_pg() { if [ "$(id -u)" = 0 ]; then runuser -u nobody -- "$@"; else "$@"; fi; }
 cleanup() { run_pg pg_ctl -D "$tmp/data" -m immediate stop >/dev/null 2>&1 || true; rm -rf "$tmp"; }
 trap cleanup EXIT
-pg_lib="$(dirname "$(dirname "$(readlink -f "$(command -v initdb)")")")/lib"
-pg_share="$(dirname "$pg_lib")/share/postgresql"
-cp -R "$pg_share" "$tmp/share"
-# Nix sandbox binaries report an unavailable compiled $libdir; fix only copied bootstrap inputs.
-for file in "$tmp/share/postgres.bki" "$tmp/share/system_functions.sql" "$tmp/share/snowball_create.sql"; do
-  test ! -f "$file" || sed -i "s|\$libdir|$pg_lib|g" "$file"
-done
-run_pg initdb -L "$tmp/share" -D "$tmp/data" -A trust -U points_test -c "dynamic_library_path=$pg_lib" >/dev/null
+pg_home="$(dirname "$(dirname "$(readlink -f "$(command -v initdb)")")")"
+pg_lib="$pg_home/lib"
+if [ ! -f "$pg_lib/plpgsql.so" ]; then
+  # Relocate disposable executables to restore Nix's split library layout.
+  pg_lib="$(ls -d /nix/store/*-postgresql-*-lib/lib | head -1)"
+  mkdir -p "$tmp/pgsql/share"
+  cp -R "$pg_home/bin" "$tmp/pgsql/bin"
+  ln -s "$pg_lib" "$tmp/pgsql/lib"
+  ln -s "$pg_home/share/postgresql" "$tmp/pgsql/share/postgresql"
+  export PATH="$tmp/pgsql/bin:$PATH"
+fi
+run_pg initdb -D "$tmp/data" -A trust -U points_test >/dev/null
 run_pg pg_ctl -D "$tmp/data" -l "$tmp/server.log" -o "-k $tmp -p 55439 -c listen_addresses=''" start >/dev/null
 export PGHOST="$tmp" PGPORT=55439 PGUSER=points_test PGDATABASE=postgres PGSSLMODE=disable
 unset PGPASSWORD
