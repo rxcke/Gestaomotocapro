@@ -281,6 +281,13 @@
       "when": 1791924299877,
       "tag": "0039_allow_exact_legacy_expense_link",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792445122913,
+      "tag": "0040_usage_points_ledger",
+      "breakpoints": true
     }
   ]
 }
