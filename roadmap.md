@@ -1,5 +1,10 @@
 # Roadmap
 
+## Interface do ranking
+- [x] Integrar resumo pessoal, classificação paginada e histórico às consultas reais existentes
+- [x] Adicionar Ranking ao menu desktop e Mais no celular, preservando acesso e pontuação
+- [x] Validar conta descartável autorizada: 1 ponto, 1 dia, 1º lugar compartilhado, histórico +1; página vazia mantém posição pessoal; menu mobile, erro 503 e repetição recuperada; desktop/360px sem overflow. 139 testes passaram e build OK. Nenhuma migração ou publicação.
+
 ## Pontuação e preparação do ranking
 - [x] Auditar autenticação, acesso, RLS e integração mínima
 - [x] Criar histórico protegido, crédito diário de 1 ponto e bônus semanal de 5 pontos em Brasília
