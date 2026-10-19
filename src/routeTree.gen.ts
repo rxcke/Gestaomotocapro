@@ -32,6 +32,7 @@ import { Route as AuthenticatedAppManutencaoRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticated/app.metas'
 import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
 import { Route as AuthenticatedAppPerfilRouteImport } from './routes/_authenticated/app.perfil'
+import { Route as AuthenticatedAppRankingRouteImport } from './routes/_authenticated/app.ranking'
 import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authenticated/app.relatorios'
 import { Route as ApiPublicCaktoWebhookRouteImport } from './routes/api/public/cakto-webhook'
 import { Route as AuthenticatedAppMotoIndexRouteImport } from './routes/_authenticated/app.moto.index'
@@ -156,6 +157,11 @@ const AuthenticatedAppPerfilRoute = AuthenticatedAppPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppRankingRoute = AuthenticatedAppRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppRelatoriosRoute =
   AuthenticatedAppRelatoriosRouteImport.update({
     id: '/relatorios',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
+  '/app/ranking': typeof AuthenticatedAppRankingRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/app/manutencao': typeof AuthenticatedAppManutencaoRoute
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
+  '/app/ranking': typeof AuthenticatedAppRankingRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/_authenticated/app/metas': typeof AuthenticatedAppMetasRoute
   '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/_authenticated/app/perfil': typeof AuthenticatedAppPerfilRoute
+  '/_authenticated/app/ranking': typeof AuthenticatedAppRankingRoute
   '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/app/metas'
     | '/app/moto'
     | '/app/perfil'
+    | '/app/ranking'
     | '/app/relatorios'
     | '/api/public/cakto-webhook'
     | '/app/'
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/app/manutencao'
     | '/app/metas'
     | '/app/perfil'
+    | '/app/ranking'
     | '/app/relatorios'
     | '/api/public/cakto-webhook'
     | '/app'
@@ -361,6 +372,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/metas'
     | '/_authenticated/app/moto'
     | '/_authenticated/app/perfil'
+    | '/_authenticated/app/ranking'
     | '/_authenticated/app/relatorios'
     | '/api/public/cakto-webhook'
     | '/_authenticated/app/'
@@ -546,6 +558,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppPerfilRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/ranking': {
+      id: '/_authenticated/app/ranking'
+      path: '/ranking'
+      fullPath: '/app/ranking'
+      preLoaderRoute: typeof AuthenticatedAppRankingRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/relatorios': {
       id: '/_authenticated/app/relatorios'
       path: '/relatorios'
@@ -613,6 +632,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppMetasRoute: typeof AuthenticatedAppMetasRoute
   AuthenticatedAppMotoRoute: typeof AuthenticatedAppMotoRouteWithChildren
   AuthenticatedAppPerfilRoute: typeof AuthenticatedAppPerfilRoute
+  AuthenticatedAppRankingRoute: typeof AuthenticatedAppRankingRoute
   AuthenticatedAppRelatoriosRoute: typeof AuthenticatedAppRelatoriosRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
@@ -625,6 +645,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppMetasRoute: AuthenticatedAppMetasRoute,
   AuthenticatedAppMotoRoute: AuthenticatedAppMotoRouteWithChildren,
   AuthenticatedAppPerfilRoute: AuthenticatedAppPerfilRoute,
+  AuthenticatedAppRankingRoute: AuthenticatedAppRankingRoute,
   AuthenticatedAppRelatoriosRoute: AuthenticatedAppRelatoriosRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
