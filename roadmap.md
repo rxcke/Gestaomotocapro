@@ -5,7 +5,8 @@
 - [x] Criar histórico protegido, crédito diário de 1 ponto e bônus semanal de 5 pontos em Brasília
 - [x] Registrar acessos autenticados e preparar consultas privadas/seguras para o ranking
 - [x] Executar os nove cenários em PostgreSQL descartável, concorrência e leituras autenticadas sem modificar dados reais
-- [ ] Validar crédito e leitura ponta a ponta no preview com uma conta descartável autorizada (bloqueado: preservar pontuação da conta real)
+- [ ] Validar crédito diário, leitura, repetição, isolamento e falhas no preview exclusivamente com conta descartável (bloqueado: usuário precisa identificar a conta autorizada; sessão disponível é da conta real)
+- [ ] Validar bônus por cinco dias em cenário controlado sem créditos retroativos na base ativa (usar banco descartável ou cinco dias reais da conta autorizada)
 
 ## Demonstração gratuita
 - [x] Auditar acesso, RLS, gravações, pagamentos e indicação existente
