@@ -9,14 +9,22 @@ cleanup() { run_pg pg_ctl -D "$tmp/data" -m immediate stop >/dev/null 2>&1 || tr
 trap cleanup EXIT
 pg_home="$(dirname "$(dirname "$(readlink -f "$(command -v initdb)")")")"
 pg_lib="$pg_home/lib"
-if [ ! -f "$pg_lib/plpgsql.so" ]; then
-  # Relocate disposable executables to restore Nix's split library layout.
-  pg_lib="$(ls -d /nix/store/*-postgresql-*-lib/lib | head -1)"
-  mkdir -p "$tmp/pgsql/share"
-  cp -R "$pg_home/bin" "$tmp/pgsql/bin"
-  ln -s "$pg_lib" "$tmp/pgsql/lib"
-  ln -s "$pg_home/share/postgresql" "$tmp/pgsql/share/postgresql"
-  export PATH="$tmp/pgsql/bin:$PATH"
+if [ -f "$pg_lib/plpgsql.so" ] && [ -d /nix/store ]; then
+  # Patch only a temporary executable: sandbox Nix paths split modules from the compiled libdir.
+  mkdir -p "$tmp/bin"
+  cp -R "$pg_home/bin/." "$tmp/bin/"
+  chmod u+w "$tmp/bin/postgres"
+  python3 - "$tmp/bin/postgres" "$pg_lib" <<'PY'
+import pathlib, re, sys
+path = pathlib.Path(sys.argv[1])
+data = path.read_bytes()
+replacement = sys.argv[2].encode()
+for old in re.findall(rb'/nix/store/[^\x00]+-postgresql-[^/\x00]+-lib/lib(?=\x00)', data):
+    if len(replacement) <= len(old):
+        data = data.replace(old + b'\x00', replacement + b'\x00' * (len(old) - len(replacement) + 1))
+path.write_bytes(data)
+PY
+  export PATH="$tmp/bin:$PATH"
 fi
 run_pg initdb -D "$tmp/data" -A trust -U points_test >/dev/null
 run_pg pg_ctl -D "$tmp/data" -l "$tmp/server.log" -o "-k $tmp -p 55439 -c listen_addresses=''" start >/dev/null
