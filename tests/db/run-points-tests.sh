@@ -12,6 +12,7 @@ pg_lib="$pg_home/lib"
 if [ -f "$pg_lib/plpgsql.so" ] && [ -d /nix/store ]; then
   # Patch only a temporary executable: sandbox Nix paths split modules from the compiled libdir.
   mkdir -p "$tmp/bin"
+  ln -s "$pg_home/share" "$tmp/share"
   cp -R "$pg_home/bin/." "$tmp/bin/"
   chmod u+w "$tmp/bin/postgres"
   python3 - "$tmp/bin/postgres" "$pg_lib" <<'PY'
