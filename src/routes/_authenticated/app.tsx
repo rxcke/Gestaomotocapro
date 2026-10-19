@@ -10,12 +10,15 @@ import { PremiumGate } from "@/components/PremiumGate";
 import { getSubscriptionAccess } from "@/lib/subscription.functions";
 import { fetchSubscriptionAccessWhenAuthenticated } from "@/lib/subscription-access";
 import { needsPhoneCompletion } from "@/lib/phone";
+import { usePointsAccess } from "@/lib/use-points-access";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: AppLayout,
 });
 
 function AppLayout() {
+  const { user } = Route.useRouteContext();
+  usePointsAccess(user.id);
   const profile = useProfile();
   const navigate = useNavigate();
   const fetchAccess = useServerFn(getSubscriptionAccess);

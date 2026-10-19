@@ -544,6 +544,70 @@ export type Database = {
         }
         Relationships: []
       }
+      points_events: {
+        Row: {
+          event_type: string
+          granted_at: string
+          id: string
+          points: number
+          reference_date: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          event_type: string
+          granted_at?: string
+          id?: string
+          points: number
+          reference_date: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          event_type?: string
+          granted_at?: string
+          id?: string
+          points?: number
+          reference_date?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "points_participants"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      points_participants: {
+        Row: {
+          created_at: string
+          public_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          public_name?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          public_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           auth_provider: string
@@ -861,6 +925,38 @@ export type Database = {
         Returns: Json
       }
       cakto_email_hash: { Args: { _email: string }; Returns: string }
+      credit_app_access_points_internal: {
+        Args: { _at: string; _user_id: string }
+        Returns: {
+          bonus_awarded: boolean
+          daily_awarded: boolean
+          reference_date: string
+          week_start: string
+        }[]
+      }
+      get_my_points_summary: {
+        Args: never
+        Returns: {
+          position: number
+          public_name: string
+          total_points: number
+          weekly_days: number
+          weekly_points: number
+          weekly_progress: number
+        }[]
+      }
+      get_points_ranking: {
+        Args: { _limit?: number; _offset?: number }
+        Returns: {
+          is_current_user: boolean
+          position: number
+          public_name: string
+          total_points: number
+          weekly_days: number
+          weekly_points: number
+          weekly_progress: number
+        }[]
+      }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_app_access: { Args: { _user_id: string }; Returns: boolean }
       has_demo_access: { Args: { _user_id: string }; Returns: boolean }
@@ -948,6 +1044,15 @@ export type Database = {
           _transaction_id: string
         }
         Returns: Json
+      }
+      record_app_access_points: {
+        Args: never
+        Returns: {
+          bonus_awarded: boolean
+          daily_awarded: boolean
+          reference_date: string
+          week_start: string
+        }[]
       }
       set_work_session_pause: {
         Args: { _pause: boolean; _session_id: string }
