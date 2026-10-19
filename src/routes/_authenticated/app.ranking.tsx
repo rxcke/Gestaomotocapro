@@ -9,17 +9,17 @@ import { getMyPoints, getPointsRanking } from "@/lib/points.functions";
 import { pointsEventDate, rankingPage, RANKING_PAGE_SIZE, weeklyBonusPercent } from "@/lib/points-view";
 import { cn } from "@/lib/utils";
 
-const personalQuery = (userId: string, fetcher: typeof getMyPoints = getMyPoints) => queryOptions({
+const personalQuery = (userId: string, fetcher: () => ReturnType<typeof getMyPoints> = getMyPoints) => queryOptions({
   queryKey: ["points", "summary", userId], queryFn: () => fetcher(), staleTime: 30_000,
 });
-const rankingQuery = (userId: string, page: number, fetcher: typeof getPointsRanking = getPointsRanking) => queryOptions({
+const rankingQuery = (userId: string, page: number, fetcher: (input: { data: { limit: number; offset: number } }) => ReturnType<typeof getPointsRanking> = getPointsRanking) => queryOptions({
   queryKey: ["points", "ranking", userId, page],
   queryFn: () => fetcher({ data: { limit: RANKING_PAGE_SIZE, offset: (page - 1) * RANKING_PAGE_SIZE } }),
   staleTime: 30_000,
 });
 
 export const Route = createFileRoute("/_authenticated/app/ranking")({
-  validateSearch: (search) => ({ page: rankingPage(search.page) }),
+  validateSearch: (search) => ({ page: rankingPage(search["page"]) }),
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ context, deps }) => {
     await Promise.all([
@@ -109,7 +109,7 @@ function RankingPage() {
       <h2 id="history-title" className="font-display text-lg font-bold">Meu histórico</h2>
       {personal.history.length ? <ul className="mt-4 divide-y divide-border border-y border-border">
         {personal.history.map((event) => <li key={event.id} className="flex items-center justify-between gap-4 py-4">
-          <div><p className="text-sm font-semibold">{event.event_type === "daily_login" ? "Login diário" : "Bônus semanal"}</p><p className="mt-1 text-xs text-muted-foreground">{pointsEventDate(event.reference_date)}</p></div>
+          <div><p className="text-sm font-semibold">{event.event_type === "daily_login" ? "Login diário" : "Bônus semanal"}</p><p className="mt-1 text-xs text-muted-foreground">{event.event_type === "daily_login" ? pointsEventDate(event.reference_date) : new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "short", year: "numeric" }).format(new Date(event.granted_at))}</p></div>
           <span className="num-display shrink-0 text-sm text-accent">+{event.points} {event.points === 1 ? "ponto" : "pontos"}</span>
         </li>)}
       </ul> : <p className="mt-4 py-6 text-sm text-muted-foreground">Nenhum crédito registrado no seu histórico.</p>}
