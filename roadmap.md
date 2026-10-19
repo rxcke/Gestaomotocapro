@@ -1,5 +1,10 @@
 # Roadmap
 
+## Interface do ranking
+- [ ] Integrar resumo pessoal, classificação paginada e histórico às consultas reais existentes
+- [ ] Adicionar Ranking ao menu desktop e Mais no celular, preservando acesso e pontuação
+- [ ] Validar dados autenticados, erro, vazio e telas desktop/mobile sem concessões à conta real
+
 ## Pontuação e preparação do ranking
 - [x] Auditar autenticação, acesso, RLS e integração mínima
 - [x] Criar histórico protegido, crédito diário de 1 ponto e bônus semanal de 5 pontos em Brasília
