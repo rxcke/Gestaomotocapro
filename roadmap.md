@@ -1,5 +1,11 @@
 # Roadmap
 
+## Pontuação e preparação do ranking
+- [ ] Auditar autenticação, acesso, RLS e integração mínima
+- [ ] Criar histórico protegido, crédito diário de 1 ponto e bônus semanal de 5 pontos em Brasília
+- [ ] Registrar acessos autenticados e preparar consultas privadas/seguras para o ranking
+- [ ] Executar testes de regras, segurança, calendário e fluxo autenticado sem modificar dados reais
+
 ## Demonstração gratuita
 - [x] Auditar acesso, RLS, gravações, pagamentos e indicação existente
 - [x] Implementar estado separado e limites permanentes no banco
