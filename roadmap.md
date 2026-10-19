@@ -1,10 +1,11 @@
 # Roadmap
 
 ## Pontuação e preparação do ranking
-- [ ] Auditar autenticação, acesso, RLS e integração mínima
-- [ ] Criar histórico protegido, crédito diário de 1 ponto e bônus semanal de 5 pontos em Brasília
-- [ ] Registrar acessos autenticados e preparar consultas privadas/seguras para o ranking
-- [ ] Executar testes de regras, segurança, calendário e fluxo autenticado sem modificar dados reais
+- [x] Auditar autenticação, acesso, RLS e integração mínima
+- [x] Criar histórico protegido, crédito diário de 1 ponto e bônus semanal de 5 pontos em Brasília
+- [x] Registrar acessos autenticados e preparar consultas privadas/seguras para o ranking
+- [x] Executar os nove cenários em PostgreSQL descartável, concorrência e leituras autenticadas sem modificar dados reais
+- [ ] Validar crédito e leitura ponta a ponta no preview com uma conta descartável autorizada (bloqueado: preservar pontuação da conta real)
 
 ## Demonstração gratuita
 - [x] Auditar acesso, RLS, gravações, pagamentos e indicação existente
