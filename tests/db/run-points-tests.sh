@@ -26,7 +26,7 @@ path.write_bytes(data)
 PY
   export PATH="$tmp/bin:$PATH"
 fi
-run_pg initdb -D "$tmp/data" -A trust -U points_test >/dev/null
+run_pg initdb -L "$pg_home/share/postgresql" -D "$tmp/data" -A trust -U points_test >/dev/null
 run_pg pg_ctl -D "$tmp/data" -l "$tmp/server.log" -o "-k $tmp -p 55439 -c listen_addresses=''" start >/dev/null
 export PGHOST="$tmp" PGPORT=55439 PGUSER=points_test PGDATABASE=postgres PGSSLMODE=disable
 unset PGPASSWORD
