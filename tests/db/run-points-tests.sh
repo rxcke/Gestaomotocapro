@@ -7,7 +7,8 @@ chmod 777 "$tmp"
 run_pg() { if [ "$(id -u)" = 0 ]; then runuser -u nobody -- "$@"; else "$@"; fi; }
 cleanup() { run_pg pg_ctl -D "$tmp/data" -m immediate stop >/dev/null 2>&1 || true; rm -rf "$tmp"; }
 trap cleanup EXIT
-run_pg initdb -D "$tmp/data" -A trust -U points_test >/dev/null
+pg_lib="$(dirname "$(dirname "$(readlink -f "$(command -v initdb)")")")/lib"
+run_pg initdb -D "$tmp/data" -A trust -U points_test -c "dynamic_library_path=$pg_lib" >/dev/null
 run_pg pg_ctl -D "$tmp/data" -l "$tmp/server.log" -o "-k $tmp -p 55439 -c listen_addresses=''" start >/dev/null
 export PGHOST="$tmp" PGPORT=55439 PGUSER=points_test PGDATABASE=postgres PGSSLMODE=disable
 unset PGPASSWORD
