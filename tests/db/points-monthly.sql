@@ -13,8 +13,7 @@ BEGIN EXECUTE _sql; RETURN false; EXCEPTION WHEN OTHERS THEN RETURN true; END;
 $$;
 
 -- User 10: nineteen distinct November days must not grant the monthly bonus.
-SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000010', ('2026-11-' || lpad(d::text, 2, '0') || ' 12:00:00+00')::timestamptz)
-FROM generate_series(1, 19) AS d;
+SELECT * FROM generate_series(1, 19) AS d, LATERAL credit_app_access_points_internal('00000000-0000-0000-0000-000000000010', ('2026-11-' || lpad(d::text, 2, '0') || ' 12:00:00+00')::timestamptz);
 SELECT points_assert((SELECT count(*) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000010' AND event_type='monthly_bonus')=0, 'M1 dezenove dias sem bônus mensal');
 SELECT points_assert((SELECT sum(points) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000010')=29, 'M1 dezenove dias totalizam 29 com bônus semanais');
 
@@ -45,8 +44,7 @@ FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000011', '
 
 -- User 12: a week crossing two months keeps each daily day in its own month;
 -- the weekly bonus references the week start, so it counts in the earlier month.
-SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000012', ('2026-10-' || (25 + d)::text || ' 12:00:00+00')::timestamptz)
-FROM generate_series(1, 6) AS d;
+SELECT * FROM generate_series(1, 6) AS d, LATERAL credit_app_access_points_internal('00000000-0000-0000-0000-000000000012', ('2026-10-' || (25 + d)::text || ' 12:00:00+00')::timestamptz);
 SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000012', '2026-11-01 12:00:00+00');
 SELECT points_assert((SELECT coalesce(sum(points),0) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000012' AND date_trunc('month', reference_date)::date='2026-10-01')=11, 'M6 semana entre meses: outubro soma seis dias e o bônus semanal');
 SELECT points_assert((SELECT coalesce(sum(points),0) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000012' AND date_trunc('month', reference_date)::date='2026-11-01')=1, 'M6 semana entre meses: novembro soma apenas o dia primeiro');
@@ -76,6 +74,5 @@ RESET ROLE;
 SELECT points_assert(points_raises($q$INSERT INTO points_events(user_id,event_type,points,reference_date,week_start) VALUES ('00000000-0000-0000-0000-000000000016','monthly_bonus',10,'2026-11-20','2026-11-16')$q$), 'M9 bônus mensal fora do início do mês recusado');
 
 -- User 15: nineteen November days prepared for the simultaneous twentieth-day test in the shell script.
-SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000015', ('2026-11-' || lpad(d::text, 2, '0') || ' 12:00:00+00')::timestamptz)
-FROM generate_series(1, 19) AS d;
+SELECT * FROM generate_series(1, 19) AS d, LATERAL credit_app_access_points_internal('00000000-0000-0000-0000-000000000015', ('2026-11-' || lpad(d::text, 2, '0') || ' 12:00:00+00')::timestamptz);
 SELECT points_assert((SELECT count(*) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000015' AND event_type='monthly_bonus')=0, 'M10 usuário preparado com dezenove dias sem bônus mensal');
