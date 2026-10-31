@@ -206,7 +206,7 @@ function AdminRewards() {
       )}
       {codes && <CodesEditor id={codes} close={() => setCodes(null)} />}
       {request && <ProcessEditor request={request} uid={user.id} close={() => setRequest(null)} />}
-    </main>
+    </div>
   );
 }
 function Empty({ label }: { label: string }) {
