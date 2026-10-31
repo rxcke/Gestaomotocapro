@@ -10,6 +10,22 @@ export function weeklyBonusPercent(progress: number): number {
   return Math.min(5, Math.max(0, progress)) / 5 * 100;
 }
 
+export function monthlyBonusPercent(progress: number): number {
+  return Math.min(20, Math.max(0, progress)) / 20 * 100;
+}
+
+export type RankingPeriod = "week" | "month" | "all";
+
+export function rankingPeriod(value: unknown): RankingPeriod {
+  return value === "week" || value === "month" ? value : "all";
+}
+
+export const rankingPeriodLabels: Record<RankingPeriod, string> = {
+  week: "Semanal",
+  month: "Mensal",
+  all: "Geral",
+};
+
 export function pointsEventDate(referenceDate: string): string {
   // DATE is already the authoritative Brasília day; never convert it to UTC midnight.
   return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" })

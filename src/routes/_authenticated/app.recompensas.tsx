@@ -2,10 +2,13 @@ import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Gift, LockKeyhole, ReceiptText } from "lucide-react";
+import { CalendarRange, Gift, LockKeyhole, ReceiptText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { PageTitle, LoadingBlock } from "@/components/glass";
 import { getRewards, getWalletHistory } from "@/lib/rewards.functions";
+import { getMyPoints } from "@/lib/points.functions";
+import { monthlyBonusPercent } from "@/lib/points-view";
 import { rewardCategories, rewardMeta, rewardPage } from "@/lib/rewards-shared";
 import { RewardPagination, RewardsError, Wallet } from "@/components/rewards/Shared";
 import { RewardDetails } from "@/components/rewards/RewardDetails";
@@ -26,6 +29,12 @@ const movements = (
     queryKey: ["rewards", "movements", uid, page],
     queryFn: () => fetcher({ data: { page } }),
   });
+const monthly = (uid: string, fetcher: () => ReturnType<typeof getMyPoints> = getMyPoints) =>
+  queryOptions({
+    queryKey: ["points", "summary", uid],
+    queryFn: () => fetcher(),
+    staleTime: 30000,
+  });
 export const Route = createFileRoute("/_authenticated/app/recompensas")({
   validateSearch: (s) => ({ page: rewardPage(s["page"]) }),
   loaderDeps: ({ search }) => ({ page: search.page }),
@@ -33,6 +42,7 @@ export const Route = createFileRoute("/_authenticated/app/recompensas")({
     await Promise.all([
       context.queryClient.ensureQueryData(catalogue(context.user.id)),
       context.queryClient.ensureQueryData(movements(context.user.id, deps.page)),
+      context.queryClient.ensureQueryData(monthly(context.user.id)),
     ]);
   },
   head: () =>
@@ -49,8 +59,11 @@ function RewardsPage() {
   const { page } = Route.useSearch();
   const fetch = useServerFn(getRewards);
   const historyFetch = useServerFn(getWalletHistory);
+  const monthlyFetch = useServerFn(getMyPoints);
   const { data } = useSuspenseQuery(catalogue(user.id, fetch));
   const { data: history } = useSuspenseQuery(movements(user.id, page, historyFetch));
+  const { data: points } = useSuspenseQuery(monthly(user.id, monthlyFetch));
+  const summary = points.summary;
   const [category, setCategory] = useState("all");
   const [selected, setSelected] = useState<(typeof data.rewards)[number] | null>(null);
   const rows = data.rewards.filter(
@@ -71,6 +84,24 @@ function RewardsPage() {
         </Button>
       </div>
       <Wallet wallet={data.wallet} />
+      {summary && (
+        <section aria-label="Meta mensal" className="max-w-xl space-y-2 border-b border-border pb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="flex items-center gap-2 font-semibold">
+              <CalendarRange className="size-4 text-accent" />
+              Bônus mensal · +10 pontos
+            </span>
+            <span className="text-muted-foreground">{summary.monthly_progress} de 20 dias</span>
+          </div>
+          <Progress aria-label="Progresso para o bônus mensal" value={monthlyBonusPercent(summary.monthly_progress)} />
+          <p className="text-xs text-muted-foreground">
+            {summary.monthly_progress >= 20
+              ? "Meta mensal alcançada"
+              : `Faltam ${20 - summary.monthly_progress} dias de acesso neste mês`}{" "}
+            · {summary.monthly_points.toLocaleString("pt-BR")} pts conquistados no mês
+          </p>
+        </section>
+      )}
       {!data.wallet.enabled && (
         <div className="flex items-center gap-3 border-b border-border pb-5 text-sm text-muted-foreground">
           <LockKeyhole className="size-5 shrink-0 text-accent" />

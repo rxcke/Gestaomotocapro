@@ -26,13 +26,14 @@ export const getMyPoints = createServerFn({ method: "GET" })
 const RankingInput = z.object({
   limit: z.number().int().min(1).max(100).default(50),
   offset: z.number().int().min(0).default(0),
+  period: z.enum(["week", "month", "all"]).default("all"),
 });
 
 export const getPointsRanking = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => RankingInput.parse(input))
   .handler(async ({ context, data }) => {
-    const result = await context.supabase.rpc("get_points_ranking", { _limit: data.limit, _offset: data.offset });
+    const result = await context.supabase.rpc("get_points_ranking", { _limit: data.limit, _offset: data.offset, _period: data.period });
     if (result.error) throw new Error("Não foi possível consultar o ranking.");
     return result.data ?? [];
   });

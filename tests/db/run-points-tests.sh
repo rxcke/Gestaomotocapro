@@ -4,7 +4,7 @@ set -euo pipefail
 root="$(pwd)"
 tmp="$(mktemp -d /tmp/gmp-points-tests.XXXXXX)"
 chmod 777 "$tmp"
-run_pg() { if [ "$(id -u)" = 0 ]; then runuser -u nobody -- "$@"; else "$@"; fi; }
+run_pg() { if [ "$(id -u)" = 0 ]; then setpriv --reuid=1000 --regid=1000 --clear-groups "$@"; else "$@"; fi; }
 cleanup() { run_pg pg_ctl -D "$tmp/data" -m immediate stop >/dev/null 2>&1 || true; rm -rf "$tmp"; }
 trap cleanup EXIT
 pg_home="$(dirname "$(dirname "$(readlink -f "$(command -v initdb)")")")"
@@ -23,6 +23,7 @@ export PGHOST="$tmp" PGPORT=55439 PGUSER=points_test PGDATABASE=postgres PGSSLMO
 unset PGPASSWORD
 psql -X -v ON_ERROR_STOP=1 -f "$root/tests/db/points-bootstrap.sql" >/dev/null
 psql -X -v ON_ERROR_STOP=1 -f "$root/drizzle/migrations/0040_usage_points_ledger.sql" >/dev/null
+psql -X -v ON_ERROR_STOP=1 -f "$root/drizzle/migrations/0043_monthly_points_bonus_and_period_ranking.sql" >/dev/null
 psql -X -v ON_ERROR_STOP=1 -f "$root/tests/db/points-integrity.sql" >"$tmp/results.log" 2>&1 || { cat "$tmp/results.log"; exit 1; }
 pids=()
 for i in $(seq 1 10); do
@@ -31,5 +32,13 @@ for i in $(seq 1 10); do
 done
 for pid in "${pids[@]}"; do wait "$pid"; done
 psql -X -v ON_ERROR_STOP=1 -c "SELECT points_assert((SELECT sum(points) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000004')=10 AND (SELECT count(*) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000004')=6, 'dez chamadas simultâneas no quinto dia: só um diário e um bônus')" >>"$tmp/results.log" 2>&1
+psql -X -v ON_ERROR_STOP=1 -f "$root/tests/db/points-monthly.sql" >>"$tmp/results.log" 2>&1 || { cat "$tmp/results.log"; exit 1; }
+pids=()
+for i in $(seq 1 10); do
+  psql -X -v ON_ERROR_STOP=1 -c "SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000015','2026-11-20 12:00:00+00')" >"$tmp/concurrent-monthly-$i.log" 2>&1 &
+  pids+=("$!")
+done
+for pid in "${pids[@]}"; do wait "$pid"; done
+psql -X -v ON_ERROR_STOP=1 -c "SELECT points_assert((SELECT count(*) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000015' AND event_type='monthly_bonus')=1 AND (SELECT count(*) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000015' AND event_type='daily_login' AND reference_date='2026-11-20')=1 AND (SELECT sum(points) FROM points_events WHERE user_id='00000000-0000-0000-0000-000000000015')=45, 'dez chamadas simultâneas no vigésimo dia: um diário, um semanal e um mensal')" >>"$tmp/results.log" 2>&1
 grep 'PASS:' "$tmp/results.log"
 printf 'All SQL points tests passed in disposable PostgreSQL.\n'
