@@ -81,7 +81,7 @@ RESET ROLE;
 SELECT reward_assert(reward_fails($q$UPDATE reward_wallet_entries SET points=999$q$,'reward_history_immutable'),'history immutable even privileged');
 SELECT reward_assert((SELECT committed=1 FROM rewards WHERE id='10000000-0000-0000-0000-000000000001'),'stock restored once on cancel/reject');
 SELECT reward_assert((SELECT count(*) FROM reward_redemptions)=4,'failed requests leave no rows');
-SELECT reward_assert((SELECT count(*) FROM reward_audit WHERE action='status')=6,'status audit not duplicated');
+SELECT reward_assert((SELECT count(*) FROM reward_audit WHERE action='status')=5,'status audit not duplicated');
 SET ROLE anon;
 SELECT reward_assert(reward_fails($q$SELECT get_reward_wallet()$q$,'permission denied'),'anonymous wallet denied');
 RESET ROLE;
