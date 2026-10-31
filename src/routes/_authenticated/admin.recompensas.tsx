@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Plus, Gift, LockKeyhole } from "lucide-react";
+import { Plus, Gift, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageTitle, LoadingBlock } from "@/components/glass";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -27,7 +27,7 @@ const adminQuery = (
     queryKey: ["reward-admin", "overview", uid, page],
     queryFn: () => fetcher({ data: { page } }),
   });
-export const Route = createFileRoute("/_authenticated/admin_/recompensas")({
+export const Route = createFileRoute("/_authenticated/admin/recompensas")({
   validateSearch: (s) => ({ page: rewardPage(s["page"]) }),
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: ({ context, deps }) =>
