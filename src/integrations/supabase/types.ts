@@ -751,6 +751,44 @@ export type Database = {
           },
         ]
       }
+      reward_delivery_operations: {
+        Row: {
+          created_at: string
+          id: string
+          instructions_input: string | null
+          redemption_id: string
+          status: string
+          tracking_input: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instructions_input?: string | null
+          redemption_id: string
+          status: string
+          tracking_input?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instructions_input?: string | null
+          redemption_id?: string
+          status?: string
+          tracking_input?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_delivery_operations_redemption_id_fkey"
+            columns: ["redemption_id"]
+            isOneToOne: false
+            referencedRelation: "reward_redemptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reward_partners: {
         Row: {
           active: boolean
