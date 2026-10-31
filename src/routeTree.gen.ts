@@ -33,7 +33,9 @@ import { Route as AuthenticatedAppMetasRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppMotoRouteImport } from './routes/_authenticated/app.moto'
 import { Route as AuthenticatedAppPerfilRouteImport } from './routes/_authenticated/app.perfil'
 import { Route as AuthenticatedAppRankingRouteImport } from './routes/_authenticated/app.ranking'
+import { Route as AuthenticatedAppRecompensasRouteImport } from './routes/_authenticated/app.recompensas'
 import { Route as AuthenticatedAppRelatoriosRouteImport } from './routes/_authenticated/app.relatorios'
+import { Route as AuthenticatedAppResgatesRouteImport } from './routes/_authenticated/app.resgates'
 import { Route as ApiPublicCaktoWebhookRouteImport } from './routes/api/public/cakto-webhook'
 import { Route as AuthenticatedAppMotoIndexRouteImport } from './routes/_authenticated/app.moto.index'
 import { Route as AuthenticatedAppMotoAbastecimentosRouteImport } from './routes/_authenticated/app.moto.abastecimentos'
@@ -162,10 +164,22 @@ const AuthenticatedAppRankingRoute = AuthenticatedAppRankingRouteImport.update({
   path: '/ranking',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppRecompensasRoute =
+  AuthenticatedAppRecompensasRouteImport.update({
+    id: '/recompensas',
+    path: '/recompensas',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppRelatoriosRoute =
   AuthenticatedAppRelatoriosRouteImport.update({
     id: '/relatorios',
     path: '/relatorios',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppResgatesRoute =
+  AuthenticatedAppResgatesRouteImport.update({
+    id: '/resgates',
+    path: '/resgates',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const ApiPublicCaktoWebhookRoute = ApiPublicCaktoWebhookRouteImport.update({
@@ -219,7 +233,9 @@ export interface FileRoutesByFullPath {
   '/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/app/ranking': typeof AuthenticatedAppRankingRoute
+  '/app/recompensas': typeof AuthenticatedAppRecompensasRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
+  '/app/resgates': typeof AuthenticatedAppResgatesRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
@@ -247,7 +263,9 @@ export interface FileRoutesByTo {
   '/app/metas': typeof AuthenticatedAppMetasRoute
   '/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/app/ranking': typeof AuthenticatedAppRankingRoute
+  '/app/recompensas': typeof AuthenticatedAppRecompensasRoute
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
+  '/app/resgates': typeof AuthenticatedAppResgatesRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
@@ -280,7 +298,9 @@ export interface FileRoutesById {
   '/_authenticated/app/moto': typeof AuthenticatedAppMotoRouteWithChildren
   '/_authenticated/app/perfil': typeof AuthenticatedAppPerfilRoute
   '/_authenticated/app/ranking': typeof AuthenticatedAppRankingRoute
+  '/_authenticated/app/recompensas': typeof AuthenticatedAppRecompensasRoute
   '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
+  '/_authenticated/app/resgates': typeof AuthenticatedAppResgatesRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
@@ -313,7 +333,9 @@ export interface FileRouteTypes {
     | '/app/moto'
     | '/app/perfil'
     | '/app/ranking'
+    | '/app/recompensas'
     | '/app/relatorios'
+    | '/app/resgates'
     | '/api/public/cakto-webhook'
     | '/app/'
     | '/app/moto/abastecimentos'
@@ -341,7 +363,9 @@ export interface FileRouteTypes {
     | '/app/metas'
     | '/app/perfil'
     | '/app/ranking'
+    | '/app/recompensas'
     | '/app/relatorios'
+    | '/app/resgates'
     | '/api/public/cakto-webhook'
     | '/app'
     | '/app/moto/abastecimentos'
@@ -373,7 +397,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/moto'
     | '/_authenticated/app/perfil'
     | '/_authenticated/app/ranking'
+    | '/_authenticated/app/recompensas'
     | '/_authenticated/app/relatorios'
+    | '/_authenticated/app/resgates'
     | '/api/public/cakto-webhook'
     | '/_authenticated/app/'
     | '/_authenticated/app/moto/abastecimentos'
@@ -565,11 +591,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRankingRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/recompensas': {
+      id: '/_authenticated/app/recompensas'
+      path: '/recompensas'
+      fullPath: '/app/recompensas'
+      preLoaderRoute: typeof AuthenticatedAppRecompensasRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/relatorios': {
       id: '/_authenticated/app/relatorios'
       path: '/relatorios'
       fullPath: '/app/relatorios'
       preLoaderRoute: typeof AuthenticatedAppRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/resgates': {
+      id: '/_authenticated/app/resgates'
+      path: '/resgates'
+      fullPath: '/app/resgates'
+      preLoaderRoute: typeof AuthenticatedAppResgatesRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/api/public/cakto-webhook': {
@@ -633,7 +673,9 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppMotoRoute: typeof AuthenticatedAppMotoRouteWithChildren
   AuthenticatedAppPerfilRoute: typeof AuthenticatedAppPerfilRoute
   AuthenticatedAppRankingRoute: typeof AuthenticatedAppRankingRoute
+  AuthenticatedAppRecompensasRoute: typeof AuthenticatedAppRecompensasRoute
   AuthenticatedAppRelatoriosRoute: typeof AuthenticatedAppRelatoriosRoute
+  AuthenticatedAppResgatesRoute: typeof AuthenticatedAppResgatesRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
@@ -646,7 +688,9 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppMotoRoute: AuthenticatedAppMotoRouteWithChildren,
   AuthenticatedAppPerfilRoute: AuthenticatedAppPerfilRoute,
   AuthenticatedAppRankingRoute: AuthenticatedAppRankingRoute,
+  AuthenticatedAppRecompensasRoute: AuthenticatedAppRecompensasRoute,
   AuthenticatedAppRelatoriosRoute: AuthenticatedAppRelatoriosRoute,
+  AuthenticatedAppResgatesRoute: AuthenticatedAppResgatesRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 
