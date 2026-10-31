@@ -59,8 +59,11 @@ function RewardsPage() {
   const { page } = Route.useSearch();
   const fetch = useServerFn(getRewards);
   const historyFetch = useServerFn(getWalletHistory);
+  const monthlyFetch = useServerFn(getMyPoints);
   const { data } = useSuspenseQuery(catalogue(user.id, fetch));
   const { data: history } = useSuspenseQuery(movements(user.id, page, historyFetch));
+  const { data: points } = useSuspenseQuery(monthly(user.id, monthlyFetch));
+  const summary = points.summary;
   const [category, setCategory] = useState("all");
   const [selected, setSelected] = useState<(typeof data.rewards)[number] | null>(null);
   const rows = data.rewards.filter(
@@ -81,6 +84,24 @@ function RewardsPage() {
         </Button>
       </div>
       <Wallet wallet={data.wallet} />
+      {summary && (
+        <section aria-label="Meta mensal" className="max-w-xl space-y-2 border-b border-border pb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="flex items-center gap-2 font-semibold">
+              <CalendarRange className="size-4 text-accent" />
+              Bônus mensal · +10 pontos
+            </span>
+            <span className="text-muted-foreground">{summary.monthly_progress} de 20 dias</span>
+          </div>
+          <Progress aria-label="Progresso para o bônus mensal" value={monthlyBonusPercent(summary.monthly_progress)} />
+          <p className="text-xs text-muted-foreground">
+            {summary.monthly_progress >= 20
+              ? "Meta mensal alcançada"
+              : `Faltam ${20 - summary.monthly_progress} dias de acesso neste mês`}{" "}
+            · {summary.monthly_points.toLocaleString("pt-BR")} pts conquistados no mês
+          </p>
+        </section>
+      )}
       {!data.wallet.enabled && (
         <div className="flex items-center gap-3 border-b border-border pb-5 text-sm text-muted-foreground">
           <LockKeyhole className="size-5 shrink-0 text-accent" />
