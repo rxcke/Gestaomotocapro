@@ -25,6 +25,8 @@ import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin.assinaturas'
+import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminRecompensasRouteImport } from './routes/_authenticated/admin_.recompensas'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppDinheiroRouteImport } from './routes/_authenticated/app.dinheiro'
@@ -123,6 +125,18 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminAssinaturasRoute =
+  AuthenticatedAdminAssinaturasRouteImport.update({
+    id: '/assinaturas',
+    path: '/assinaturas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminUsuariosRoute =
+  AuthenticatedAdminUsuariosRouteImport.update({
+    id: '/usuarios',
+    path: '/usuarios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminRecompensasRoute =
   AuthenticatedAdminRecompensasRouteImport.update({
     id: '/admin_/recompensas',
@@ -238,6 +252,8 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/': typeof AuthIndexRoute
+  '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/recompensas': typeof AuthenticatedAdminRecompensasRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/app/documentos': typeof AuthenticatedAppDocumentosRoute
@@ -270,6 +286,8 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth': typeof AuthIndexRoute
+  '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/admin/recompensas': typeof AuthenticatedAdminRecompensasRoute
   '/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/app/documentos': typeof AuthenticatedAppDocumentosRoute
@@ -306,6 +324,8 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/': typeof AuthIndexRoute
+  '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
   '/_authenticated/admin_/recompensas': typeof AuthenticatedAdminRecompensasRoute
   '/_authenticated/app/dinheiro': typeof AuthenticatedAppDinheiroRoute
   '/_authenticated/app/documentos': typeof AuthenticatedAppDocumentosRoute
@@ -343,6 +363,8 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/'
+    | '/admin/assinaturas'
+    | '/admin/usuarios'
     | '/admin/recompensas'
     | '/app/dinheiro'
     | '/app/documentos'
@@ -375,6 +397,8 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth'
+    | '/admin/assinaturas'
+    | '/admin/usuarios'
     | '/admin/recompensas'
     | '/app/dinheiro'
     | '/app/documentos'
@@ -410,6 +434,8 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/confirm'
     | '/auth/'
+    | '/_authenticated/admin/assinaturas'
+    | '/_authenticated/admin/usuarios'
     | '/_authenticated/admin_/recompensas'
     | '/_authenticated/app/dinheiro'
     | '/_authenticated/app/documentos'
@@ -558,6 +584,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/assinaturas': {
+      id: '/_authenticated/admin/assinaturas'
+      path: '/assinaturas'
+      fullPath: '/admin/assinaturas'
+      preLoaderRoute: typeof AuthenticatedAdminAssinaturasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/usuarios': {
+      id: '/_authenticated/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin_/recompensas': {
       id: '/_authenticated/admin_/recompensas'
       path: '/admin/recompensas'
@@ -688,10 +728,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
+  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
