@@ -99,6 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <Link
                       key={item.to}
                       to={item.to}
+                      search={{page:1}}
                       className={cn(
                         "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
                         active
@@ -132,6 +133,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={item.to}
               to={item.to}
+                      search={{page:1}}
               className={cn(
                 "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-medium transition active:scale-95",
                 isActive(item.to, item.exact) ? "text-accent" : "text-muted-foreground",
@@ -166,6 +168,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         <SheetClose asChild key={item.to}>
                           <Link
                             to={item.to}
+                      search={{page:1}}
                             className={cn(
                               "flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition active:scale-[0.98]",
                               isActive(item.to, false) ? "bg-accent/10 font-semibold text-foreground" : "bg-muted/50 text-foreground",
