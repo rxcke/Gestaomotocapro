@@ -23,6 +23,7 @@ export function usePointsAccess(userId: string) {
           if (result.daily_awarded || result.bonus_awarded) {
             void queryClient.invalidateQueries({ queryKey: ["points", "summary", userId] });
             void queryClient.invalidateQueries({ queryKey: ["points", "ranking"] });
+            void queryClient.invalidateQueries({ queryKey: ["rewards", "catalogue", userId] });
           }
         }
       } catch {

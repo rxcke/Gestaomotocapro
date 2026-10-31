@@ -90,7 +90,7 @@ export function AdminEditor({
       ) : (
         <Input
           value={r[key] ?? ""}
-          onChange={(e) => setR({ ...r, [key]: e.target.value || null })}
+          onChange={(e) => setR({ ...r, [key]: key === "image_url" ? e.target.value || null : e.target.value })}
         />
       )}
     </label>
