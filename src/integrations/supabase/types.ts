@@ -650,6 +650,328 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_audit: {
+        Row: {
+          action: string
+          actor_id: string
+          changes: Json
+          created_at: string
+          entity_id: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          changes?: Json
+          created_at?: string
+          entity_id: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          changes?: Json
+          created_at?: string
+          entity_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      reward_codes: {
+        Row: {
+          code: string
+          expires_at: string | null
+          id: string
+          redemption_id: string | null
+          reward_id: string
+        }
+        Insert: {
+          code: string
+          expires_at?: string | null
+          id?: string
+          redemption_id?: string | null
+          reward_id: string
+        }
+        Update: {
+          code?: string
+          expires_at?: string | null
+          id?: string
+          redemption_id?: string | null
+          reward_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_codes_redemption_id_fkey"
+            columns: ["redemption_id"]
+            isOneToOne: true
+            referencedRelation: "reward_redemptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_codes_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_delivery: {
+        Row: {
+          address: Json | null
+          instructions: string | null
+          redemption_id: string
+          tracking: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: Json | null
+          instructions?: string | null
+          redemption_id: string
+          tracking?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: Json | null
+          instructions?: string | null
+          redemption_id?: string
+          tracking?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_delivery_redemption_id_fkey"
+            columns: ["redemption_id"]
+            isOneToOne: true
+            referencedRelation: "reward_redemptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_partners: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          instructions: string
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          instructions?: string
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          instructions?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      reward_redemptions: {
+        Row: {
+          created_at: string
+          id: string
+          idempotency_key: string
+          points_cost: number
+          reward_id: string
+          snapshot: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          points_cost: number
+          reward_id: string
+          snapshot: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          points_cost?: number
+          reward_id?: string
+          snapshot?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_status_history: {
+        Row: {
+          actor_id: string
+          created_at: string
+          id: string
+          note: string
+          redemption_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          id?: string
+          note?: string
+          redemption_id: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          redemption_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_status_history_redemption_id_fkey"
+            columns: ["redemption_id"]
+            isOneToOne: false
+            referencedRelation: "reward_redemptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_wallet_entries: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          points: number
+          redemption_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          points: number
+          redemption_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          points?: number
+          redemption_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_wallet_entries_redemption_id_fkey"
+            columns: ["redemption_id"]
+            isOneToOne: false
+            referencedRelation: "reward_redemptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards: {
+        Row: {
+          active: boolean
+          category: string
+          committed: number
+          conditions: string
+          created_at: string
+          delivery_days: number
+          delivery_method: string
+          description: string
+          expires_at: string | null
+          id: string
+          image_url: string | null
+          name: string
+          partner_id: string | null
+          points_cost: number
+          stock: number | null
+          uses_codes: boolean
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          committed?: number
+          conditions: string
+          created_at?: string
+          delivery_days: number
+          delivery_method: string
+          description?: string
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          partner_id?: string | null
+          points_cost: number
+          stock?: number | null
+          uses_codes?: boolean
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          committed?: number
+          conditions?: string
+          created_at?: string
+          delivery_days?: number
+          delivery_method?: string
+          description?: string
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          partner_id?: string | null
+          points_cost?: number
+          stock?: number | null
+          uses_codes?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "reward_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards_settings: {
+        Row: {
+          id: boolean
+          redemptions_enabled: boolean
+        }
+        Insert: {
+          id?: boolean
+          redemptions_enabled?: boolean
+        }
+        Update: {
+          id?: boolean
+          redemptions_enabled?: boolean
+        }
+        Relationships: []
+      }
       signup_attribution: {
         Row: {
           campaign: Json
@@ -916,6 +1238,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_reward_codes: {
+        Args: { _codes: string[]; _expires_at?: string; _reward_id: string }
+        Returns: number
+      }
       admin_reprocess_cakto_event: {
         Args: { _event_row_id: string }
         Returns: Json
@@ -955,6 +1281,16 @@ export type Database = {
           weekly_days: number
           weekly_points: number
           weekly_progress: number
+        }[]
+      }
+      get_reward_wallet: {
+        Args: never
+        Returns: {
+          available: number
+          earned: number
+          enabled: boolean
+          reserved: number
+          spent: number
         }[]
       }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
@@ -1045,6 +1381,16 @@ export type Database = {
         }
         Returns: Json
       }
+      process_reward: {
+        Args: {
+          _id: string
+          _instructions?: string
+          _note?: string
+          _status: string
+          _tracking?: string
+        }
+        Returns: string
+      }
       record_app_access_points: {
         Args: never
         Returns: {
@@ -1054,6 +1400,17 @@ export type Database = {
           week_start: string
         }[]
       }
+      request_reward: {
+        Args: {
+          _address?: Json
+          _expected_cost: number
+          _key: string
+          _reward_id: string
+        }
+        Returns: string
+      }
+      save_reward: { Args: { _data: Json }; Returns: string }
+      save_reward_partner: { Args: { _data: Json }; Returns: string }
       set_work_session_pause: {
         Args: { _pause: boolean; _session_id: string }
         Returns: undefined

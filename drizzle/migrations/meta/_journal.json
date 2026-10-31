@@ -288,6 +288,13 @@
       "when": 1792445122913,
       "tag": "0040_usage_points_ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1793448182860,
+      "tag": "0041_rewards_club",
+      "breakpoints": true
     }
   ]
 }
