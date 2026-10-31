@@ -1294,6 +1294,7 @@ export type Database = {
         Returns: {
           bonus_awarded: boolean
           daily_awarded: boolean
+          monthly_bonus_awarded: boolean
           reference_date: string
           week_start: string
         }[]
@@ -1301,6 +1302,9 @@ export type Database = {
       get_my_points_summary: {
         Args: never
         Returns: {
+          monthly_days: number
+          monthly_points: number
+          monthly_progress: number
           position: number
           public_name: string
           total_points: number
@@ -1310,9 +1314,10 @@ export type Database = {
         }[]
       }
       get_points_ranking: {
-        Args: { _limit?: number; _offset?: number }
+        Args: { _limit?: number; _offset?: number; _period?: string }
         Returns: {
           is_current_user: boolean
+          period_points: number
           position: number
           public_name: string
           total_points: number
@@ -1434,6 +1439,7 @@ export type Database = {
         Returns: {
           bonus_awarded: boolean
           daily_awarded: boolean
+          monthly_bonus_awarded: boolean
           reference_date: string
           week_start: string
         }[]
