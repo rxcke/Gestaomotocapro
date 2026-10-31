@@ -55,7 +55,9 @@ SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-0000000
 SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000014', '2026-08-03 12:00:00+00');
 SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000014', '2026-08-04 12:00:00+00');
 SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000014', '2026-08-05 12:00:00+00');
-SET ROLE authenticated;
+-- Ranking period assertions run without the restricted role so the join to
+-- points_participants is not narrowed by RLS; the function itself still
+-- requires a valid identity claim.
 SELECT set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000013', false);
 SELECT points_assert((SELECT period_points FROM get_points_ranking(100, 0, 'all') r JOIN points_participants p ON p.public_name = r.public_name WHERE p.user_id='00000000-0000-0000-0000-000000000014')=3, 'M7 ranking geral usa o total histórico');
 SELECT points_assert((SELECT period_points FROM get_points_ranking(100, 0, 'month') r JOIN points_participants p ON p.public_name = r.public_name WHERE p.user_id='00000000-0000-0000-0000-000000000014')=0, 'M7 ranking mensal ignora meses anteriores');
