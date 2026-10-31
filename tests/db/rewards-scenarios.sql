@@ -111,3 +111,17 @@ SELECT reward_assert((SELECT committed=0 FROM rewards WHERE id='10000000-0000-00
 RESET ROLE;
 DROP TRIGGER isolated_delivery_failure ON public.reward_delivery;
 DROP FUNCTION public.fail_reward_delivery_fixture();
+-- Isolated physical ship/deliver replay.
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
+SELECT request_reward('10000000-0000-0000-0000-000000000005',gen_random_uuid(),1,'{"recipient":"Test Recipient","postal_code":"30100000","street":"Test Street","number":"1","district":"Test District","city":"Test City","state":"MG"}') AS shipped_id \gset
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000003',false);
+SELECT process_reward(:'shipped_id','approved');
+SELECT process_reward(:'shipped_id','shipped','','TRACK-TEST','Posted');
+SELECT process_reward(:'shipped_id','delivered','','','Received');
+SELECT reward_assert((SELECT tracking='TRACK-TEST' AND instructions='Received' FROM reward_delivery WHERE redemption_id=:'shipped_id'),'delivery preserves shipment tracking');
+SELECT process_reward(:'shipped_id','shipped','','TRACK-TEST','Posted');
+SELECT reward_assert((SELECT status='delivered' FROM reward_redemptions WHERE id=:'shipped_id'),'original shipping replay works after delivery without reverting state');
+SELECT reward_assert(reward_fails(format($q$SELECT process_reward(%L,'shipped','','OTHER','Posted')$q$,:'shipped_id'),'idempotency_conflict'),'shipping replay altered payload refused');
+RESET ROLE;
+SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000002','2026-10-20 12:00Z');
