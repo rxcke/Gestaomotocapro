@@ -1,5 +1,13 @@
 # Roadmap
 
+## Central de Administração por módulos
+- [x] Transformar /admin em layout com menu lateral (desktop) e navegação superior (celular), gate de administrador no layout e verificação no servidor em cada função
+- [x] Criar módulos Visão geral, Usuários, Assinaturas, Financeiro, Embaixadores e Webhooks; Clube de Recompensas integrado ao layout; Configurações oculto por não ter função real
+- [x] Dividir getAdminData em funções por módulo com busca, filtros e paginação; financeiro só com agregados rotulados como registros dos usuários
+- [x] Preservar "Tornar embaixador", exportação CSV restrita, reprocessamento de webhooks e planos históricos (Pro trimestral)
+- [x] Validar: 156 testes, tipos e build OK; preview com sessão de administrador em todos os módulos (desktop e 360px), filtros de período e de webhooks, e não-administrador redirecionado para /app
+- [ ] Publicar quando o responsável autorizar
+
 ## Pontuação mensal e ranking por período
 - [x] Criar migração aditiva 0043: bônus mensal de +10 aos 20 dias distintos (Brasília), único por mês, transacional e idempotente
 - [x] Adicionar períodos semanal/mensal/geral ao ranking com pontos do período, desempate determinístico e privacidade
