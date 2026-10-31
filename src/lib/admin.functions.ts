@@ -1,9 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import { ADMIN_PAGE_SIZE, accessKind, overviewPeriodStart, webhookNeedsAttention, type AdminAccessKind, type OverviewPeriod } from "./admin-view";
 
-type AdminContext = { supabase: { rpc: (fn: string, args: { _user_id: string; _role: "admin" }) => Promise<{ data: unknown; error: unknown }> }; userId: string };
+type AdminClient = SupabaseClient<Database>;
+
+type AdminContext = { supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => PromiseLike<{ data: unknown; error: unknown }> }; userId: string };
 
 /** Every admin function re-verifies the role server-side; the route gate is only UX. */
 async function requireAdmin(context: AdminContext) {
@@ -41,7 +45,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const now = new Date();
     const start = overviewPeriodStart(data.period as OverviewPeriod, now);
 
-    const count = async (build: () => Promise<{ count: number | null; error: unknown }>) => {
+    const count = async (build: () => PromiseLike<{ count: number | null; error: unknown }>) => {
       const { count: value, error } = await build();
       if (error) throw new Error("Não foi possível carregar a visão geral.");
       return value ?? 0;
