@@ -122,7 +122,8 @@ async function loadUserRows(supabaseAdmin: Awaited<ReturnType<typeof import("@/i
       .filter((row) => row.status === "active" && row.expires_at && new Date(row.expires_at).getTime() > now)
       .map((row) => row.user_id),
   );
-  const latestSub = new Map<string, (typeof subscriptionsResult.data extends (infer T)[] | null ? T : never)>();
+  type SubRow = { user_id: string; plan: string; status: string; provider_status: string; expires_at: string | null; created_at: string };
+  const latestSub = new Map<string, SubRow>();
   for (const sub of subscriptionsResult.data ?? []) if (!latestSub.has(sub.user_id)) latestSub.set(sub.user_id, sub);
   const demoByUser = new Map((demoResult.data ?? []).map((row) => [row.user_id, row]));
   const referralByUser = new Map((attributionResult.data ?? []).map((row) => [row.user_id, row.referral_code]));
