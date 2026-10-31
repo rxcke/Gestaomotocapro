@@ -1,5 +1,12 @@
 # Roadmap
 
+## Clube de Recompensas
+- [ ] Auditar pontos e administração existentes e apresentar plano seguro
+- [ ] Implementar carteira auditável, catálogo, parceiros e resgates atômicos sem alterar ranking histórico
+- [ ] Criar Clube de Recompensas, Meus resgates e administração protegida
+- [ ] Executar testes de concorrência, saldo, estoque, idempotência, devolução, privacidade e permissões em ambiente descartável
+- [ ] Apresentar arquivos, migrações, resultados e pendências antes da liberação de resgates reais; não publicar
+
 ## Interface do ranking
 - [x] Integrar resumo pessoal, classificação paginada e histórico às consultas reais existentes
 - [x] Adicionar Ranking ao menu desktop e Mais no celular, preservando acesso e pontuação
