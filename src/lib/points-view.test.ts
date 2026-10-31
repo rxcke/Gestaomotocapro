@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { rankingPage, weeklyBonusPercent } from "./points-view";
+import { monthlyBonusPercent, rankingPage, rankingPeriod, weeklyBonusPercent } from "./points-view";
 
 test("weekly five-day bonus progress displays three of five as 60 percent", () => {
   assert.equal(weeklyBonusPercent(3), 60);
