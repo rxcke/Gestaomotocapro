@@ -20,7 +20,7 @@ export function usePointsAccess(userId: string) {
         const result = await record();
         if (!disposed && result) {
           queryClient.setQueryData(["points", "last-access", userId], result);
-          if (result.daily_awarded || result.bonus_awarded) {
+          if (result.daily_awarded || result.bonus_awarded || result.monthly_bonus_awarded) {
             void queryClient.invalidateQueries({ queryKey: ["points", "summary", userId] });
             void queryClient.invalidateQueries({ queryKey: ["points", "ranking"] });
             void queryClient.invalidateQueries({ queryKey: ["rewards", "catalogue", userId] });
