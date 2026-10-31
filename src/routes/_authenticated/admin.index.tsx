@@ -89,7 +89,7 @@ function OverviewPage() {
       <section aria-labelledby="shortcuts-title">
         <h2 id="shortcuts-title" className="font-display text-lg font-bold">Tarefas frequentes</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
+          {([
             { to: "/admin/usuarios", icon: Users, label: "Gerenciar usuários", search: { page: 1, busca: "", acesso: "all", assinatura: "all" } },
             { to: "/admin/assinaturas", icon: CreditCard, label: "Ver assinaturas", search: { page: 1, busca: "", status: "all", plano: "all" } },
             { to: "/admin/recompensas", icon: Gift, label: "Clube de Recompensas", search: { page: 1 } },
