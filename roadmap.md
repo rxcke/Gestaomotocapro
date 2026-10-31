@@ -1,5 +1,12 @@
 # Roadmap
 
+## Pontuação mensal e ranking por período
+- [x] Criar migração aditiva 0043: bônus mensal de +10 aos 20 dias distintos (Brasília), único por mês, transacional e idempotente
+- [x] Adicionar períodos semanal/mensal/geral ao ranking com pontos do período, desempate determinístico e privacidade
+- [x] Exibir pontos do mês, progresso de 20 dias e bônus mensal no Ranking e no Clube de Recompensas
+- [x] Executar 65 verificações SQL (19/20/21 dias, concorrência, viradas de mês/ano, semana entre meses, RLS) e 147 testes; build OK
+- [ ] Validar telas de Ranking e Clube no preview com a conta descartável autorizada
+
 ## Clube de Recompensas
 - [x] Auditar pontos e administração existentes e apresentar plano seguro
 - [x] Implementar carteira auditável, catálogo, parceiros e resgates atômicos sem alterar ranking histórico
