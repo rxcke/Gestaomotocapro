@@ -65,6 +65,9 @@ SELECT points_assert((SELECT period_points FROM get_points_ranking(100, 0, 'mont
 SELECT points_assert((SELECT period_points FROM get_points_ranking(100, 0, 'week') r JOIN points_participants p ON p.public_name = r.public_name WHERE p.user_id='00000000-0000-0000-0000-000000000013')=1, 'M7 ranking semanal conta o acesso de hoje');
 SELECT points_assert((SELECT r13."position" < r14."position" FROM get_points_ranking(100, 0, 'month') r13 JOIN points_participants p13 ON p13.public_name = r13.public_name, get_points_ranking(100, 0, 'month') r14 JOIN points_participants p14 ON p14.public_name = r14.public_name WHERE p13.user_id='00000000-0000-0000-0000-000000000013' AND p14.user_id='00000000-0000-0000-0000-000000000014'), 'M7 classificação mensal ordena por pontos do mês');
 SELECT points_assert(points_raises($$SELECT * FROM get_points_ranking(100, 0, 'yearly')$$), 'M7 período inválido recusado');
+SELECT set_config('request.jwt.claim.sub', '', false);
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000013', false);
 SELECT points_assert((SELECT monthly_days FROM get_my_points_summary())=1, 'M8 resumo conta o dia de hoje no mês');
 SELECT points_assert((SELECT monthly_points FROM get_my_points_summary())>=1, 'M8 resumo soma pontos do mês');
 SELECT points_assert((SELECT monthly_progress FROM get_my_points_summary())=1, 'M8 progresso mensal limitado a vinte dias');
