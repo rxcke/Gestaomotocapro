@@ -107,7 +107,7 @@ export type AdminUserRow = {
   access: AdminAccessKind;
 };
 
-async function loadUserRows(supabaseAdmin: Awaited<ReturnType<typeof import("@/integrations/supabase/client.server")>>["supabaseAdmin"]): Promise<AdminUserRow[]> {
+async function loadUserRows(supabaseAdmin: AdminClient): Promise<AdminUserRow[]> {
   const [profilesResult, rolesResult, subscriptionsResult, demoResult, attributionResult] = await Promise.all([
     supabaseAdmin.from("profiles").select("id,name,email,phone,created_at").order("created_at", { ascending: false }).limit(1000),
     supabaseAdmin.from("user_roles").select("user_id,role").in("role", ["admin", "ambassador"]).limit(1000),
@@ -228,7 +228,7 @@ export type AdminFinancial = {
 };
 
 async function sumAmounts(
-  supabaseAdmin: Awaited<ReturnType<typeof import("@/integrations/supabase/client.server")>>["supabaseAdmin"],
+  supabaseAdmin: AdminClient,
   table: "incomes" | "expenses" | "fuel_records",
   column: "amount" | "total",
 ): Promise<{ total: number; count: number }> {
