@@ -40,16 +40,16 @@ SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0
 SELECT reward_assert(reward_fails($q$UPDATE public.reward_wallet_entries SET points=999$q$,'permission denied'),'direct wallet writes denied');
 SELECT reward_assert(reward_fails($q$UPDATE public.reward_redemptions SET status='approved'$q$,'permission denied'),'direct status writes denied');
 SELECT reward_assert(reward_fails($q$SELECT save_reward_partner('{"name":"Forged"}')$q$,'reward_forbidden'),'non-admin partner change denied');
-SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''approved'')',:'request_id')),'reward_forbidden'),'non-admin approval denied');
+SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''approved'')',:'request_id'),'reward_forbidden'),'non-admin approval denied');
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
 SELECT reward_assert((SELECT count(*) FROM reward_redemptions)=0,'other owner cannot read request');
 SELECT reward_assert((SELECT count(*) FROM reward_wallet_entries)=0,'other owner cannot read wallet');
 SELECT reward_assert((SELECT count(*) FROM reward_delivery)=0,'other owner cannot read delivery');
-SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''canceled'')',:'request_id')),'reward_forbidden'),'other owner cannot cancel');
+SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''canceled'')',:'request_id'),'reward_forbidden'),'other owner cannot cancel');
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000003',false);
 SELECT process_reward(:'request_id','approved');
 SELECT process_reward(:'request_id','approved');
-SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''canceled'')',:'request_id')),'invalid_transition'),'approved cancellation denied');
+SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''canceled'')',:'request_id'),'invalid_transition'),'approved cancellation denied');
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);
 SELECT reward_assert((SELECT spent=4 AND reserved=0 AND available=6 AND earned=10 FROM get_reward_wallet()),'approval spends once without second deduction');
 SELECT reward_assert((SELECT total_points=10 FROM get_my_points_summary()),'earned ranking unchanged after spend');
@@ -58,10 +58,10 @@ SELECT process_reward(:'cancel_id','canceled'); SELECT process_reward(:'cancel_i
 SELECT reward_assert((SELECT available=6 AND reserved=0 AND spent=4 FROM get_reward_wallet()),'cancel releases once');
 SELECT request_reward('10000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000003',4) AS reject_id \gset
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000003',false);
-SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''rejected'')',:'reject_id')),'reason_required'),'rejection needs reason');
+SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''rejected'')',:'reject_id'),'reason_required'),'rejection needs reason');
 SELECT process_reward(:'reject_id','rejected','Unavailable'); SELECT process_reward(:'reject_id','rejected','Unavailable');
-SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''approved'')',:'reject_id')),'invalid_transition'),'terminal request cannot reopen');
-SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''delivered'')',:'request_id')),'delivery_required'),'delivery requires evidence');
+SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''approved'')',:'reject_id'),'invalid_transition'),'terminal request cannot reopen');
+SELECT reward_assert(reward_fails(format('SELECT process_reward(%L,''delivered'')',:'request_id'),'delivery_required'),'delivery requires evidence');
 SELECT process_reward(:'request_id','delivered','','','Delivered manually'); SELECT process_reward(:'request_id','delivered','','','Delivered manually');
 SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);
 SELECT reward_assert((SELECT earned=10 AND available=6 AND reserved=0 AND spent=4 FROM get_reward_wallet()),'rejection restores reserve, earned unchanged');
