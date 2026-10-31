@@ -32,6 +32,9 @@ SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0
 SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0000-000000000007',gen_random_uuid(),1)$q$,'reward_unavailable'),'expired refused');
 SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0000-000000000005',gen_random_uuid(),1)$q$,'address_required'),'physical needs minimum address');
 SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0000-000000000001',gen_random_uuid(),4,'{}')$q$,'address_not_required'),'digital rejects extra address');
+SELECT request_reward('10000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000010',4) AS first_cancel_id \gset
+SELECT process_reward(:'first_cancel_id','canceled'); SELECT process_reward(:'first_cancel_id','canceled');
+SELECT reward_assert((SELECT earned=10 AND available=10 AND reserved=0 AND spent=0 FROM get_reward_wallet()),'10 earned reserve 4 cancel restores available 10');
 SELECT request_reward('10000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001',4) AS request_id \gset
 SELECT reward_assert((SELECT available=6 AND reserved=4 AND spent=0 AND earned=10 FROM get_reward_wallet()),'10 earned reserve 4 yields available 6');
 SELECT reward_assert(request_reward('10000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001',4)=:'request_id'::uuid,'identical replay returns original');
@@ -80,8 +83,8 @@ SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0
 RESET ROLE;
 SELECT reward_assert(reward_fails($q$UPDATE reward_wallet_entries SET points=999$q$,'reward_history_immutable'),'history immutable even privileged');
 SELECT reward_assert((SELECT committed=1 FROM rewards WHERE id='10000000-0000-0000-0000-000000000001'),'stock restored once on cancel/reject');
-SELECT reward_assert((SELECT count(*) FROM reward_redemptions)=4,'failed requests leave no rows');
-SELECT reward_assert((SELECT count(*) FROM reward_audit WHERE action='status')=5,'status audit not duplicated');
+SELECT reward_assert((SELECT count(*) FROM reward_redemptions)=5,'failed requests leave no rows');
+SELECT reward_assert((SELECT count(*) FROM reward_audit WHERE action='status')=6,'status audit not duplicated');
 SET ROLE anon;
 SELECT reward_assert(reward_fails($q$SELECT get_reward_wallet()$q$,'permission denied'),'anonymous wallet denied');
 RESET ROLE;
@@ -111,3 +114,17 @@ SELECT reward_assert((SELECT committed=0 FROM rewards WHERE id='10000000-0000-00
 RESET ROLE;
 DROP TRIGGER isolated_delivery_failure ON public.reward_delivery;
 DROP FUNCTION public.fail_reward_delivery_fixture();
+-- Isolated physical ship/deliver replay.
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
+SELECT request_reward('10000000-0000-0000-0000-000000000005',gen_random_uuid(),1,'{"recipient":"Test Recipient","postal_code":"30100000","street":"Test Street","number":"1","district":"Test District","city":"Test City","state":"MG"}') AS shipped_id \gset
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000003',false);
+SELECT process_reward(:'shipped_id','approved');
+SELECT process_reward(:'shipped_id','shipped','','TRACK-TEST','Posted');
+SELECT process_reward(:'shipped_id','delivered','','','Received');
+SELECT reward_assert((SELECT tracking='TRACK-TEST' AND instructions='Received' FROM reward_delivery WHERE redemption_id=:'shipped_id'),'delivery preserves shipment tracking');
+SELECT process_reward(:'shipped_id','shipped','','TRACK-TEST','Posted');
+SELECT reward_assert((SELECT status='delivered' FROM reward_redemptions WHERE id=:'shipped_id'),'original shipping replay works after delivery without reverting state');
+SELECT reward_assert(reward_fails(format($q$SELECT process_reward(%L,'shipped','','OTHER','Posted')$q$,:'shipped_id'),'idempotency_conflict'),'shipping replay altered payload refused');
+RESET ROLE;
+SELECT * FROM credit_app_access_points_internal('00000000-0000-0000-0000-000000000002','2026-10-20 12:00Z');

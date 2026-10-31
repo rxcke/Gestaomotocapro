@@ -25,6 +25,7 @@ psql -X -v ON_ERROR_STOP=1 -f "$root/tests/db/points-bootstrap.sql" >/dev/null
 psql -X -v ON_ERROR_STOP=1 -f "$root/drizzle/migrations/0040_usage_points_ledger.sql" >/dev/null
 psql -X -v ON_ERROR_STOP=1 -f "$root/tests/db/rewards-integrity.sql" >/dev/null
 psql -X -v ON_ERROR_STOP=1 -f "$root/drizzle/migrations/0041_rewards_club.sql" >/dev/null
+psql -X -v ON_ERROR_STOP=1 -f "$root/drizzle/migrations/0042_reward_delivery_operation_replays.sql" >/dev/null
 psql -X -v ON_ERROR_STOP=1 -f "$root/tests/db/rewards-scenarios.sql" >"$tmp/results.log" 2>&1 || { cat "$tmp/results.log"; exit 1; }
 pids=()
 for i in $(seq 1 10); do
