@@ -56,16 +56,8 @@ function AdminRewards() {
   const [codes, setCodes] = useState<string | null>(null);
   const [request, setRequest] = useState<(typeof data.requests)[number] | null>(null);
   return (
-    <main className="mx-auto min-h-dvh max-w-6xl space-y-6 px-4 py-6 text-foreground sm:px-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <PageTitle title="Administração do Clube" />
-        <Button asChild variant="outline">
-          <Link to="/admin">
-            <ArrowLeft className="size-4" />
-            Administração
-          </Link>
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <PageTitle title="Clube de Recompensas" subtitle="Administração protegida de recompensas, parceiros e solicitações." />
       <div className="flex items-center gap-3 border-y border-border py-4 text-sm">
         <LockKeyhole className="size-5 text-accent" />
         {data.enabled ? "Resgates liberados" : "Resgates reais bloqueados"}
