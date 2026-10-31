@@ -238,7 +238,7 @@ async function sumAmounts(
     const { data, error } = await supabaseAdmin.from(table).select(column).range(offset, offset + 999);
     if (error) throw new Error("Não foi possível carregar os dados financeiros.");
     for (const row of data ?? []) {
-      total += Number((row as Record<string, unknown>)[column]) || 0;
+      total += Number((row as unknown as Record<string, unknown>)[column]) || 0;
       count++;
     }
     if (!data || data.length < 1000) break;

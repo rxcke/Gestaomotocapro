@@ -94,7 +94,7 @@ function OverviewPage() {
             { to: "/admin/assinaturas", icon: CreditCard, label: "Ver assinaturas", search: { page: 1, busca: "", status: "all", plano: "all" } },
             { to: "/admin/recompensas", icon: Gift, label: "Clube de Recompensas", search: { page: 1 } },
             { to: "/admin/webhooks", icon: ShieldCheck, label: "Eventos de webhook", search: { page: 1, busca: "", evento: "all", status: "all" } },
-          ].map((item) => (
+          ] as const).map((item) => (
             <Link key={item.to} to={item.to} search={item.search} className="group flex items-center justify-between gap-3 rounded-md border border-border p-4 transition-colors hover:border-accent">
               <span className="flex items-center gap-3 text-sm font-semibold"><item.icon className="size-4 text-accent" />{item.label}</span>
               <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
