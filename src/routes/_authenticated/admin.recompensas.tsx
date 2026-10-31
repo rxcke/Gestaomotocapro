@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Plus, Gift, LockKeyhole } from "lucide-react";
+import { Plus, Gift, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageTitle, LoadingBlock } from "@/components/glass";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -27,7 +27,7 @@ const adminQuery = (
     queryKey: ["reward-admin", "overview", uid, page],
     queryFn: () => fetcher({ data: { page } }),
   });
-export const Route = createFileRoute("/_authenticated/admin_/recompensas")({
+export const Route = createFileRoute("/_authenticated/admin/recompensas")({
   validateSearch: (s) => ({ page: rewardPage(s["page"]) }),
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: ({ context, deps }) =>
@@ -56,16 +56,8 @@ function AdminRewards() {
   const [codes, setCodes] = useState<string | null>(null);
   const [request, setRequest] = useState<(typeof data.requests)[number] | null>(null);
   return (
-    <main className="mx-auto min-h-dvh max-w-6xl space-y-6 px-4 py-6 text-foreground sm:px-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <PageTitle title="Administração do Clube" />
-        <Button asChild variant="outline">
-          <Link to="/admin">
-            <ArrowLeft className="size-4" />
-            Administração
-          </Link>
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <PageTitle title="Clube de Recompensas" subtitle="Administração protegida de recompensas, parceiros e solicitações." />
       <div className="flex items-center gap-3 border-y border-border py-4 text-sm">
         <LockKeyhole className="size-5 text-accent" />
         {data.enabled ? "Resgates liberados" : "Resgates reais bloqueados"}
@@ -214,7 +206,7 @@ function AdminRewards() {
       )}
       {codes && <CodesEditor id={codes} close={() => setCodes(null)} />}
       {request && <ProcessEditor request={request} uid={user.id} close={() => setRequest(null)} />}
-    </main>
+    </div>
   );
 }
 function Empty({ label }: { label: string }) {
