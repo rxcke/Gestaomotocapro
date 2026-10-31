@@ -5,7 +5,7 @@
 - [x] Adicionar períodos semanal/mensal/geral ao ranking com pontos do período, desempate determinístico e privacidade
 - [x] Exibir pontos do mês, progresso de 20 dias e bônus mensal no Ranking e no Clube de Recompensas
 - [x] Executar 65 verificações SQL (19/20/21 dias, concorrência, viradas de mês/ano, semana entre meses, RLS) e 147 testes; build OK
-- [ ] Validar telas de Ranking e Clube no preview com a conta descartável autorizada
+- [x] Validar telas de Ranking e Clube no preview com a conta descartável autorizada: filtros de período, progresso mensal (3 de 20 dias), carteira e mobile 360px sem erros
 
 ## Clube de Recompensas
 - [x] Auditar pontos e administração existentes e apresentar plano seguro
