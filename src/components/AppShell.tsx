@@ -211,7 +211,7 @@ function SidebarFooter() {
 
   return (
     <div className="mt-auto space-y-2">
-      {isAdmin ? <Button asChild variant="outline" className="w-full justify-start"><Link to="/admin"><ShieldCheck className="mr-2 size-4" />Administração</Link></Button> : null}
+      {isAdmin ? <Button asChild variant="outline" className="w-full justify-start"><Link to="/admin" search={{ periodo: "all" }}><ShieldCheck className="mr-2 size-4" />Administração</Link></Button> : null}
       <div className="glass-soft flex items-center gap-3 p-3">
       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold">
         {initials || "P"}

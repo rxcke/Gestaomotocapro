@@ -1,46 +1,43 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft, CreditCard, Gift, LayoutDashboard, Megaphone, ShieldCheck, Users, Wallet } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { ArrowLeft, CreditCard, Gift, LayoutDashboard, Megaphone, ShieldCheck, Users, Wallet, type LucideIcon } from "lucide-react";
 import { AmbientBackground } from "@/components/glass";
 import { cn } from "@/lib/utils";
 
-const adminNav = [
-  { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true, search: undefined },
-  { to: "/admin/usuarios", label: "Usuários", icon: Users, exact: false, search: undefined },
-  { to: "/admin/assinaturas", label: "Assinaturas", icon: CreditCard, exact: false, search: undefined },
-  { to: "/admin/financeiro", label: "Financeiro", icon: Wallet, exact: false, search: undefined },
-  { to: "/admin/recompensas", label: "Clube de Recompensas", icon: Gift, exact: false, search: { page: 1 } },
-  { to: "/admin/embaixadores", label: "Embaixadores", icon: Megaphone, exact: false, search: undefined },
-  { to: "/admin/webhooks", label: "Webhooks", icon: ShieldCheck, exact: false, search: undefined },
-] as const;
+function navClass(active: boolean, orientation: "side" | "top") {
+  return cn(
+    "flex items-center gap-2 rounded-md text-sm font-medium transition-colors",
+    orientation === "side" ? "px-3 py-2.5" : "shrink-0 whitespace-nowrap px-3 py-2",
+    active ? "text-accent" : "text-muted-foreground hover:text-foreground",
+  );
+}
 
 function NavItems({ orientation }: { orientation: "side" | "top" }) {
+  const pathname = useRouterState({ select: (router) => router.location.pathname });
+  const item = (to: string, label: string, Icon: LucideIcon, exact = false) => {
+    const active = exact ? pathname === to : pathname.startsWith(to);
+    return { to, label, Icon, active };
+  };
+  const items = [
+    item("/admin", "Visão geral", LayoutDashboard, true),
+    item("/admin/usuarios", "Usuários", Users),
+    item("/admin/assinaturas", "Assinaturas", CreditCard),
+    item("/admin/financeiro", "Financeiro", Wallet),
+    item("/admin/recompensas", "Clube de Recompensas", Gift),
+    item("/admin/embaixadores", "Embaixadores", Megaphone),
+    item("/admin/webhooks", "Webhooks", ShieldCheck),
+  ];
   return (
     <>
-      {adminNav.map((item) => (
+      {items.map(({ to, label, Icon, active }) => (
         <Link
-          key={item.to}
-          to={item.to}
-          search={item.search}
-          activeOptions={{ exact: item.exact }}
-          activeProps={{ "aria-current": "page" }}
-          className={cn(
-            "flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
-            orientation === "side" ? "px-3 py-2.5" : "shrink-0 px-3 py-2",
-          )}
-          // data-status comes from the router; styled below via aria-current
+          key={to}
+          to={to}
+          aria-current={active ? "page" : undefined}
+          className={navClass(active, orientation)}
         >
-          {({ isActive }) => (
-            <span
-              className={cn(
-                "flex items-center gap-2",
-                isActive && "text-accent",
-              )}
-            >
-              <item.icon className="size-4 shrink-0" />
-              <span className={cn(orientation === "top" && "whitespace-nowrap")}>{item.label}</span>
-            </span>
-          )}
+          <Icon className="size-4 shrink-0" />
+          <span>{label}</span>
         </Link>
       ))}
     </>
