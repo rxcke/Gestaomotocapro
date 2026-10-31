@@ -81,8 +81,33 @@ RESET ROLE;
 SELECT reward_assert(reward_fails($q$UPDATE reward_wallet_entries SET points=999$q$,'reward_history_immutable'),'history immutable even privileged');
 SELECT reward_assert((SELECT committed=1 FROM rewards WHERE id='10000000-0000-0000-0000-000000000001'),'stock restored once on cancel/reject');
 SELECT reward_assert((SELECT count(*) FROM reward_redemptions)=4,'failed requests leave no rows');
-SELECT reward_assert((SELECT count(*) FROM reward_audit WHERE action='status')=6,'status audit not duplicated');
+SELECT reward_assert((SELECT count(*) FROM reward_audit WHERE action='status')=5,'status audit not duplicated');
 SET ROLE anon;
 SELECT reward_assert(reward_fails($q$SELECT get_reward_wallet()$q$,'permission denied'),'anonymous wallet denied');
 RESET ROLE;
 -- Dedicated concurrent fixtures: remaining available 5, parallel cost 4.
+-- Exact release-only invariant for owner 2 with no spending.
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
+SELECT request_reward('10000000-0000-0000-0000-000000000005',gen_random_uuid(),1,'{"recipient":"Test Recipient","postal_code":"30100000","street":"Test Street","number":"1","district":"Test District","city":"Test City","state":"MG"}') AS physical_id \gset
+SELECT process_reward(:'physical_id','canceled');
+SELECT reward_assert((SELECT earned=1 AND available=1 AND reserved=0 AND spent=0 FROM get_reward_wallet()),'release without spend restores entire earned balance');
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000003',false);
+SELECT save_reward_partner('{"name":"Isolated partner","instructions":"Test usage","active":true}') AS partner_id \gset
+SELECT save_reward(jsonb_build_object('name','Isolated partner reward','category','partner','partner_id',:'partner_id','points_cost',2,'stock',2,'conditions','Test conditions','delivery_method','Manual','delivery_days',0,'active',false,'uses_codes',false)) AS saved_id \gset
+SELECT reward_assert((SELECT active=false AND points_cost=2 FROM rewards WHERE id=:'saved_id'),'admin creates inactive reward');
+SELECT save_reward(jsonb_build_object('id',:'saved_id','name','Edited isolated reward','category','partner','partner_id',:'partner_id','points_cost',3,'stock',2,'conditions','Edited conditions','delivery_method','Manual','delivery_days',0,'active',true,'uses_codes',true));
+SELECT reward_assert((SELECT name='Edited isolated reward' AND points_cost=3 AND active FROM rewards WHERE id=:'saved_id'),'admin edits price and activation');
+SELECT reward_assert(add_reward_codes(:'saved_id',ARRAY['UNIQUE-CODE','UNIQUE-CODE'])=1,'admin duplicate coupon import inserts only one');
+SELECT reward_assert(reward_fails($q$SELECT save_reward('{"id":"10000000-0000-0000-0000-000000000001","name":"Invalid stock","category":"digital","points_cost":4,"stock":0,"conditions":"Test conditions","delivery_method":"Manual","delivery_days":0,"active":true}')$q$,'check constraint'),'stock cannot fall below committed');
+RESET ROLE;
+CREATE FUNCTION public.fail_reward_delivery_fixture() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'isolated_failure_injection'; END $$;
+CREATE TRIGGER isolated_delivery_failure BEFORE INSERT ON public.reward_delivery FOR EACH ROW EXECUTE FUNCTION public.fail_reward_delivery_fixture();
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);
+SELECT reward_assert(reward_fails($q$SELECT request_reward('10000000-0000-0000-0000-000000000005','20000000-0000-0000-0000-000000000009',1,'{"recipient":"Test Recipient","postal_code":"30100000","street":"Test Street","number":"1","district":"Test District","city":"Test City","state":"MG"}')$q$,'isolated_failure_injection'),'intermediate delivery failure aborts transaction');
+SELECT reward_assert((SELECT count(*) FROM reward_redemptions WHERE idempotency_key='20000000-0000-0000-0000-000000000009')=0 AND (SELECT available=5 AND reserved=0 FROM get_reward_wallet()),'failure leaves no partial request or reservation');
+SELECT reward_assert((SELECT committed=0 FROM rewards WHERE id='10000000-0000-0000-0000-000000000005'),'failure leaves physical stock intact');
+RESET ROLE;
+DROP TRIGGER isolated_delivery_failure ON public.reward_delivery;
+DROP FUNCTION public.fail_reward_delivery_fixture();

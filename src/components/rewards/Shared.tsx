@@ -1,6 +1,91 @@
-import { Link, useRouter } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, RefreshCw, Gift } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-export function RewardsError() { const router=useRouter(); return <div role="alert" className="space-y-4 py-12 text-center"><Gift className="mx-auto size-8 text-accent"/><h1 className="font-display text-xl font-bold">Não foi possível carregar o clube</h1><Button variant="outline" onClick={()=>void router.invalidate()}><RefreshCw className="size-4"/>Tentar novamente</Button></div>; }
-export function RewardPagination({page,count,to}:{page:number;count:number;to:'/app/resgates'|'/app/recompensas'|'/admin/recompensas'}) { if(page===1&&count<=20)return null;return <nav aria-label="Paginação" className="flex items-center justify-between gap-3 py-4"><Button variant="outline" size="icon" aria-label="Página anterior" disabled={page===1} asChild={page>1}>{page>1?<Link to={to} search={{page:page-1}}><ArrowLeft className="size-4"/></Link>:<ArrowLeft className="size-4"/>}</Button><span className="text-sm text-muted-foreground">Página {page}</span><Button variant="outline" size="icon" aria-label="Próxima página" disabled={page*20>=count} asChild={page*20<count}>{page*20<count?<Link to={to} search={{page:page+1}}><ArrowRight className="size-4"/></Link>:<ArrowRight className="size-4"/>}</Button></nav>; }
-export function Wallet({wallet}:{wallet:{earned:number;spent:number;reserved:number;available:number}}) { return <section aria-label="Minha carteira" className="grid grid-cols-2 gap-5 border-y border-border py-6 sm:grid-cols-4">{([['Disponíveis',wallet.available],['Conquistados',wallet.earned],['Reservados',wallet.reserved],['Gastos',wallet.spent]] as const).map(([label,n],i)=><div key={label}><p className="text-xs text-muted-foreground">{label}</p><p className={`num-display mt-2 text-3xl ${i===0?'text-accent':'text-foreground'}`}>{n.toLocaleString('pt-BR')}<span className="ml-1 text-xs text-muted-foreground">pts</span></p></div>)}</section>; }
+import { Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, RefreshCw, Gift } from "lucide-react";
+import { Button } from "@/components/ui/button";
+export function RewardsError() {
+  const router = useRouter();
+  return (
+    <div role="alert" className="space-y-4 py-12 text-center">
+      <Gift className="mx-auto size-8 text-accent" />
+      <h1 className="font-display text-xl font-bold">Não foi possível carregar o clube</h1>
+      <Button variant="outline" onClick={() => void router.invalidate()}>
+        <RefreshCw className="size-4" />
+        Tentar novamente
+      </Button>
+    </div>
+  );
+}
+export function RewardPagination({
+  page,
+  count,
+  to,
+}: {
+  page: number;
+  count: number;
+  to: "/app/resgates" | "/app/recompensas" | "/admin/recompensas";
+}) {
+  if (page === 1 && count <= 20) return null;
+  return (
+    <nav aria-label="Paginação" className="flex items-center justify-between gap-3 py-4">
+      <Button
+        variant="outline"
+        size="icon"
+        aria-label="Página anterior"
+        disabled={page === 1}
+        asChild={page > 1}
+      >
+        {page > 1 ? (
+          <Link to={to} search={{ page: page - 1 }}>
+            <ArrowLeft className="size-4" />
+          </Link>
+        ) : (
+          <ArrowLeft className="size-4" />
+        )}
+      </Button>
+      <span className="text-sm text-muted-foreground">Página {page}</span>
+      <Button
+        variant="outline"
+        size="icon"
+        aria-label="Próxima página"
+        disabled={page * 20 >= count}
+        asChild={page * 20 < count}
+      >
+        {page * 20 < count ? (
+          <Link to={to} search={{ page: page + 1 }}>
+            <ArrowRight className="size-4" />
+          </Link>
+        ) : (
+          <ArrowRight className="size-4" />
+        )}
+      </Button>
+    </nav>
+  );
+}
+export function Wallet({
+  wallet,
+}: {
+  wallet: { earned: number; spent: number; reserved: number; available: number };
+}) {
+  return (
+    <section
+      aria-label="Minha carteira"
+      className="grid grid-cols-2 gap-5 border-y border-border py-6 sm:grid-cols-4"
+    >
+      {(
+        [
+          ["Disponíveis", wallet.available],
+          ["Conquistados", wallet.earned],
+          ["Reservados", wallet.reserved],
+          ["Gastos", wallet.spent],
+        ] as const
+      ).map(([label, n], i) => (
+        <div key={label}>
+          <p className="text-xs text-muted-foreground">{label}</p>
+          <p className={`num-display mt-2 text-3xl ${i === 0 ? "text-accent" : "text-foreground"}`}>
+            {n.toLocaleString("pt-BR")}
+            <span className="ml-1 text-xs text-muted-foreground">pts</span>
+          </p>
+        </div>
+      ))}
+    </section>
+  );
+}
