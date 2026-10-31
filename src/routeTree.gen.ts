@@ -24,6 +24,7 @@ import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminRecompensasRouteImport } from './routes/_authenticated/admin_.recompensas'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppDinheiroRouteImport } from './routes/_authenticated/app.dinheiro'
@@ -116,6 +117,11 @@ const AuthConfirmRoute = AuthConfirmRouteImport.update({
   id: '/confirm',
   path: '/confirm',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminRecompensasRoute =
   AuthenticatedAdminRecompensasRouteImport.update({
@@ -224,7 +230,7 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pagamento': typeof AuthenticatedPagamentoRoute
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app/resgates': typeof AuthenticatedAppResgatesRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -257,7 +264,6 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pagamento': typeof AuthenticatedPagamentoRoute
   '/planos': typeof AuthenticatedPlanosRoute
@@ -276,6 +282,7 @@ export interface FileRoutesByTo {
   '/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/app/resgates': typeof AuthenticatedAppResgatesRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -291,7 +298,7 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pagamento': typeof AuthenticatedPagamentoRoute
@@ -312,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/app/relatorios': typeof AuthenticatedAppRelatoriosRoute
   '/_authenticated/app/resgates': typeof AuthenticatedAppResgatesRoute
   '/api/public/cakto-webhook': typeof ApiPublicCaktoWebhookRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/moto/abastecimentos': typeof AuthenticatedAppMotoAbastecimentosRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -348,6 +356,7 @@ export interface FileRouteTypes {
     | '/app/relatorios'
     | '/app/resgates'
     | '/api/public/cakto-webhook'
+    | '/admin/'
     | '/app/'
     | '/app/moto/abastecimentos'
     | '/lovable/email/auth/preview'
@@ -360,7 +369,6 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/reset-password'
-    | '/admin'
     | '/onboarding'
     | '/pagamento'
     | '/planos'
@@ -379,6 +387,7 @@ export interface FileRouteTypes {
     | '/app/relatorios'
     | '/app/resgates'
     | '/api/public/cakto-webhook'
+    | '/admin'
     | '/app'
     | '/app/moto/abastecimentos'
     | '/lovable/email/auth/preview'
@@ -414,6 +423,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/relatorios'
     | '/_authenticated/app/resgates'
     | '/api/public/cakto-webhook'
+    | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/app/moto/abastecimentos'
     | '/lovable/email/auth/preview'
@@ -540,6 +550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/confirm'
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin_/recompensas': {
       id: '/_authenticated/admin_/recompensas'
@@ -670,6 +687,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedAppMotoRouteChildren {
   AuthenticatedAppMotoAbastecimentosRoute: typeof AuthenticatedAppMotoAbastecimentosRoute
   AuthenticatedAppMotoIndexRoute: typeof AuthenticatedAppMotoIndexRoute
@@ -718,7 +746,7 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPagamentoRoute: typeof AuthenticatedPagamentoRoute
@@ -727,7 +755,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPagamentoRoute: AuthenticatedPagamentoRoute,
