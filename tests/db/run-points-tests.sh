@@ -4,7 +4,7 @@ set -euo pipefail
 root="$(pwd)"
 tmp="$(mktemp -d /tmp/gmp-points-tests.XXXXXX)"
 chmod 777 "$tmp"
-run_pg() { if [ "$(id -u)" = 0 ]; then runuser -u nobody -- "$@"; else "$@"; fi; }
+run_pg() { if [ "$(id -u)" = 0 ]; then setpriv --reuid=1000 --regid=1000 --clear-groups "$@"; else "$@"; fi; }
 cleanup() { run_pg pg_ctl -D "$tmp/data" -m immediate stop >/dev/null 2>&1 || true; rm -rf "$tmp"; }
 trap cleanup EXIT
 pg_home="$(dirname "$(dirname "$(readlink -f "$(command -v initdb)")")")"
