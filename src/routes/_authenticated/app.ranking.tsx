@@ -1,30 +1,30 @@
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, CalendarDays, Medal, RefreshCw, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CalendarRange, Medal, RefreshCw, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { LoadingBlock, PageTitle } from "@/components/glass";
 import { getMyPoints, getPointsRanking } from "@/lib/points.functions";
-import { pointsEventDate, rankingPage, RANKING_PAGE_SIZE, weeklyBonusPercent } from "@/lib/points-view";
+import { monthlyBonusPercent, pointsEventDate, rankingPage, rankingPeriod, rankingPeriodLabels, RANKING_PAGE_SIZE, weeklyBonusPercent, type RankingPeriod } from "@/lib/points-view";
 import { cn } from "@/lib/utils";
 
 const personalQuery = (userId: string, fetcher: () => ReturnType<typeof getMyPoints> = getMyPoints) => queryOptions({
   queryKey: ["points", "summary", userId], queryFn: () => fetcher(), staleTime: 30_000,
 });
-const rankingQuery = (userId: string, page: number, fetcher: (input: { data: { limit: number; offset: number } }) => ReturnType<typeof getPointsRanking> = getPointsRanking) => queryOptions({
-  queryKey: ["points", "ranking", userId, page],
-  queryFn: () => fetcher({ data: { limit: RANKING_PAGE_SIZE, offset: (page - 1) * RANKING_PAGE_SIZE } }),
+const rankingQuery = (userId: string, page: number, period: RankingPeriod, fetcher: (input: { data: { limit: number; offset: number; period: RankingPeriod } }) => ReturnType<typeof getPointsRanking> = getPointsRanking) => queryOptions({
+  queryKey: ["points", "ranking", userId, period, page],
+  queryFn: () => fetcher({ data: { limit: RANKING_PAGE_SIZE, offset: (page - 1) * RANKING_PAGE_SIZE, period } }),
   staleTime: 30_000,
 });
 
 export const Route = createFileRoute("/_authenticated/app/ranking")({
-  validateSearch: (search) => ({ page: rankingPage(search["page"]) }),
-  loaderDeps: ({ search }) => ({ page: search.page }),
+  validateSearch: (search) => ({ page: rankingPage(search["page"]), periodo: rankingPeriod(search["periodo"]) }),
+  loaderDeps: ({ search }) => ({ page: search.page, periodo: search.periodo }),
   loader: async ({ context, deps }) => {
     await Promise.all([
       context.queryClient.ensureQueryData(personalQuery(context.user.id)),
-      context.queryClient.ensureQueryData(rankingQuery(context.user.id, deps.page)),
+      context.queryClient.ensureQueryData(rankingQuery(context.user.id, deps.page, deps.periodo)),
     ]);
   },
   head: () => ({ meta: [
