@@ -2,10 +2,13 @@ import { useState } from "react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Gift, LockKeyhole, ReceiptText } from "lucide-react";
+import { CalendarRange, Gift, LockKeyhole, ReceiptText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { PageTitle, LoadingBlock } from "@/components/glass";
 import { getRewards, getWalletHistory } from "@/lib/rewards.functions";
+import { getMyPoints } from "@/lib/points.functions";
+import { monthlyBonusPercent } from "@/lib/points-view";
 import { rewardCategories, rewardMeta, rewardPage } from "@/lib/rewards-shared";
 import { RewardPagination, RewardsError, Wallet } from "@/components/rewards/Shared";
 import { RewardDetails } from "@/components/rewards/RewardDetails";
@@ -26,6 +29,12 @@ const movements = (
     queryKey: ["rewards", "movements", uid, page],
     queryFn: () => fetcher({ data: { page } }),
   });
+const monthly = (uid: string, fetcher: () => ReturnType<typeof getMyPoints> = getMyPoints) =>
+  queryOptions({
+    queryKey: ["points", "summary", uid],
+    queryFn: () => fetcher(),
+    staleTime: 30000,
+  });
 export const Route = createFileRoute("/_authenticated/app/recompensas")({
   validateSearch: (s) => ({ page: rewardPage(s["page"]) }),
   loaderDeps: ({ search }) => ({ page: search.page }),
@@ -33,6 +42,7 @@ export const Route = createFileRoute("/_authenticated/app/recompensas")({
     await Promise.all([
       context.queryClient.ensureQueryData(catalogue(context.user.id)),
       context.queryClient.ensureQueryData(movements(context.user.id, deps.page)),
+      context.queryClient.ensureQueryData(monthly(context.user.id)),
     ]);
   },
   head: () =>
