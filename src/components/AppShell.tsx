@@ -15,6 +15,7 @@ import {
   MoreHorizontal,
   Target,
   Trophy,
+  Gift,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,11 +57,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const jornada = { to: "/app/jornada", label: "Jornada", icon: Timer, exact: false };
   const relatorios = { to: "/app/relatorios", label: "Relatórios", icon: BarChart3, exact: false };
   const ranking = { to: "/app/ranking", label: "Ranking", icon: Trophy, exact: false } as const;
+  const rewards = { to: "/app/recompensas", label: "Clube de Recompensas", icon: Gift, exact: false } as const;
   const navGroups = [
     { label: "", items: [NAV[0]] },
     { label: "Seu corre", items: [...(isPro ? [jornada] : []), NAV[1]] },
     { label: "Sua moto", items: [NAV[2], NAV[3]] },
-    { label: "Seu resultado", items: [relatorios, ranking] },
+    { label: "Seu resultado", items: [relatorios, ranking, rewards] },
     { label: "Conta", items: [NAV[4]] },
   ];
 
@@ -70,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const mobileNav = [NAV[0], isPro ? jornada : NAV[1], isPro ? NAV[1] : NAV[2], relatorios];
   const moreGroups = [
     { label: "Sua moto", items: isPro ? [NAV[2], NAV[3]] : [NAV[3]] },
-    { label: "Seu resultado", items: [{ to: "/app/metas", label: "Metas", icon: Target, exact: false }, ranking] },
+    { label: "Seu resultado", items: [{ to: "/app/metas", label: "Metas", icon: Target, exact: false }, ranking, rewards] },
     { label: "Conta", items: [NAV[4]] },
   ];
   const moreActive = moreGroups.some((g) => g.items.some((item) => isActive(item.to, false)));
@@ -97,6 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <Link
                       key={item.to}
                       to={item.to}
+                      search={{page:1}}
                       className={cn(
                         "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
                         active
@@ -130,6 +133,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={item.to}
               to={item.to}
+                      search={{page:1}}
               className={cn(
                 "flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-medium transition active:scale-95",
                 isActive(item.to, item.exact) ? "text-accent" : "text-muted-foreground",
@@ -164,6 +168,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         <SheetClose asChild key={item.to}>
                           <Link
                             to={item.to}
+                      search={{page:1}}
                             className={cn(
                               "flex min-h-12 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition active:scale-[0.98]",
                               isActive(item.to, false) ? "bg-accent/10 font-semibold text-foreground" : "bg-muted/50 text-foreground",
